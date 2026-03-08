@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NäköHarjoitus — Optikon hallintapaneeli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f2ec;
+    --surface: #ffffff;
+    --surface2: #f0ece3;
+    --border: #ddd8cc;
+    --accent: #1a3a2a;
+    --accent2: #2d6e4e;
+    --highlight: #4caf7d;
+    --warn: #c0392b;
+    --text: #1a1a1a;
+    --text-dim: #6b6660;
+    --text-faint: #b5b0a8;
+    --radius: 14px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* Subtle dot grid */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: radial-gradient(circle, #c8c2b4 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.45;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* TOP BAR */
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 40px;
+  }
+
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .logo-mark {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  .logo-text { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; }
+  .logo-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 1px;
+  }
+
+  .topbar-right {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    text-align: right;
+  }
+
+  /* STEPS */
+  .steps {
+    display: flex; gap: 4px; margin-bottom: 36px;
+    align-items: center;
+  }
+
+  .step {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .step.active {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .step.done {
+    color: var(--highlight);
+  }
+
+  .step-num {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px;
+  }
+
+  .step-connector { flex: 1; height: 1px; background: var(--border); max-width: 40px; }
+
+  /* SECTIONS */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .card-title-icon {
+    width: 28px; height: 28px;
+    background: var(--surface2);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+
+  /* FORM */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .form-full { grid-column: 1 / -1; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+
+  label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  input, select, textarea {
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    width: 100%;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent2);
+    background: #fff;
+  }
+
+  textarea { resize: vertical; min-height: 70px; line-height: 1.6; }
+
+  select { cursor: pointer; }
+
+  /* EXERCISE LIBRARY */
+  .ex-library {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .ex-lib-card {
+    background: var(--surface2);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+
+  .ex-lib-card:hover { border-color: var(--accent2); background: #fff; }
+  .ex-lib-card.selected { border-color: var(--accent); background: rgba(44,110,78,0.06); }
+
+  .ex-lib-icon { font-size: 22px; margin-bottom: 8px; }
+  .ex-lib-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .ex-lib-cat {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+  }
+
+  .ex-lib-check {
+    float: right;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    transition: all 0.2s;
+  }
+
+  .ex-lib-card.selected .ex-lib-check {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* SELECTED EXERCISES */
+  .selected-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .sel-ex-row {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: auto 1fr auto auto auto;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .sel-ex-icon { font-size: 18px; }
+  .sel-ex-name { font-size: 13px; font-weight: 700; }
+
+  .mini-input {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+    outline: none;
+    width: 80px;
+    text-align: center;
+  }
+
+  .mini-input:focus { border-color: var(--accent2); }
+
+  .remove-btn {
+    background: none; border: none;
+    color: var(--text-faint); cursor: pointer; font-size: 16px;
+    padding: 4px; border-radius: 6px;
+    transition: color 0.2s;
+  }
+
+  .remove-btn:hover { color: var(--warn); }
+
+  /* SCHEDULE */
+  .schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .day-toggle {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    cursor: pointer;
+  }
+
+  .day-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+  }
+
+  .day-btn {
+    width: 40px; height: 40px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+
+  .day-btn.on {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .duration-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  }
+
+  /* REMINDER */
+  .time-picker-row { display: flex; align-items: center; gap: 12px; }
+
+  /* PREVIEW PHONE */
+  .preview-wrap {
+    display: flex; gap: 32px; align-items: flex-start;
+  }
+
+  .preview-phone {
+    flex-shrink: 0;
+    width: 200px;
+    background: var(--accent);
+    border-radius: 28px;
+    padding: 20px 14px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    position: relative;
+  }
+
+  .phone-notch {
+    width: 60px; height: 8px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 100px;
+    margin: 0 auto 16px;
+  }
+
+  .phone-screen {
+    background: #080d1a;
+    border-radius: 16px;
+    padding: 14px;
+    min-height: 320px;
+  }
+
+  .phone-athlete {
+    font-family: 'DM Mono', monospace;
+    font-size: 7px;
+    color: #00d4ff;
+    letter-spacing: 0.15em;
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.2);
+    padding: 3px 8px;
+    border-radius: 100px;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+
+  .phone-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #e8f0ff;
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+
+  .phone-title span {
+    background: linear-gradient(135deg, #00d4ff, #7b4fff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .phone-ex {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .phone-ex-icon { font-size: 12px; }
+  .phone-ex-name { font-size: 9px; color: #e8f0ff; font-weight: 600; }
+  .phone-ex-meta { font-family: 'DM Mono', monospace; font-size: 7px; color: #6b7fa3; }
+
+  .preview-info { flex: 1; }
+
+  .summary-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .summary-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+
+  .summary-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    color: var(--text-faint);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .summary-value { font-size: 16px; font-weight: 700; }
+
+  /* QR AREA */
+  .qr-area {
+    background: var(--surface2);
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  #qrcode {
+    display: inline-block;
+    background: white;
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 14px;
+  }
+
+  .qr-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+
+  .link-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    word-break: break-all;
+    text-align: left;
+    margin: 0 auto;
+    max-width: 400px;
+  }
+
+  /* BUTTONS */
+  .btn {
+    padding: 13px 24px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.03em;
+  }
+
+  .btn:active { transform: scale(0.97); }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .btn-primary:hover { background: var(--accent2); }
+
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1.5px solid var(--border);
+  }
+
+  .btn-secondary:hover { border-color: var(--accent2); }
+
+  .btn-success {
+    background: var(--highlight);
+    color: #fff;
+  }
+
+  .btn-row { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 28px;
+    color: var(--text-faint);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+  }
+
+  .empty-icon { font-size: 28px; margin-bottom: 8px; }
+
+  /* TAG */
+  .tag {
+    display: inline-flex; align-items: center;
+    background: rgba(44,110,78,0.1);
+    color: var(--accent2);
+    border: 1px solid rgba(44,110,78,0.2);
+    border-radius: 100px;
+    padding: 3px 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+  }
+
+  /* ATHLETE LIST */
+  .athlete-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .athlete-row {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  .athlete-row:hover { border-color: var(--accent2); }
+
+  .athlete-row-left { display: flex; align-items: center; gap: 12px; }
+
+  .athlete-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: #fff; font-weight: 700;
+  }
+
+  .athlete-name { font-size: 14px; font-weight: 700; }
+  .athlete-meta { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  .chevron { color: var(--text-faint); font-size: 16px; }
+
+  /* NOTIFICATION */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--accent);
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    z-index: 1000;
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  @media (max-width: 640px) {
+    .form-grid, .form-grid.three { grid-template-columns: 1fr; }
+    .preview-wrap { flex-direction: column; }
+    .summary-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="logo">
+      <div class="logo-mark">👁️</div>
+      <div>
+        <div class="logo-text">NäköHarjoitus</div>
+        <div class="logo-sub">Optikon hallintapaneeli</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div style="font-weight:700; font-size:13px;">Dr. Optikko</div>
+      <div>Hallintanäkymä v1.0</div>
+    </div>
+  </div>
+
+  <!-- STEPS -->
+  <div class="steps">
+    <div class="step active" id="step1" onclick="goStep(1)">
+      <div class="step-num">1</div> Urheilija
+    </div>
+    <div class="step-connector"></div>
+    <div class="step" id="step2" onclick="goStep(2)">
+      <div class="step-num">2</div> Harjoitukset
+    </div>
+    <div class="step-connector"></div>
+    <div class="step" id="step3" onclick="goStep(3)">
+      <div class="step-num">3</div> Aikataulu
+    </div>
+    <div class="step-connector"></div>
+    <div class="step" id="step4" onclick="goStep(4)">
+      <div class="step-num">4</div> Jaa linkki
+    </div>
+  </div>
+
+  <!-- ── STEP 1: URHEILIJA ───────────────────────────────────────── -->
+  <div class="section active" id="section1">
+
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-icon">👤</div>
+        Urheilijan tiedot
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Etunimi</label>
+          <input type="text" id="fname" placeholder="Mikko" oninput="updatePreview()">
+        </div>
+        <div class="field">
+          <label>Sukunimi</label>
+          <input type="text" id="lname" placeholder="Virtanen" oninput="updatePreview()">
+        </div>
+        <div class="field">
+          <label>Laji / joukkue</label>
+          <input type="text" id="sport" placeholder="Jääkiekko / HIFK" oninput="updatePreview()">
+        </div>
+        <div class="field">
+          <label>Syntymävuosi</label>
+          <input type="number" id="byear" placeholder="1998" min="1950" max="2015">
+        </div>
+        <div class="field form-full">
+          <label>Muistiinpano optikolta (ei näy urheilijalle)</label>
+          <textarea id="optNote" placeholder="Esim. konvergenssivajavuus, suositellaan erityistä huomiota lähinäköön..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-icon">📋</div>
+        Aiemmat urheilijat
+      </div>
+      <div class="athlete-list" id="athleteList">
+        <div class="athlete-row" onclick="loadAthlete('Mikko','Virtanen','Jääkiekko / HIFK')">
+          <div class="athlete-row-left">
+            <div class="athlete-avatar">MV</div>
+            <div>
+              <div class="athlete-name">Mikko Virtanen</div>
+              <div class="athlete-meta">Jääkiekko / HIFK · Ohjelma luotu 02.03.2026</div>
+            </div>
+          </div>
+          <div class="chevron">›</div>
+        </div>
+        <div class="athlete-row" onclick="loadAthlete('Sara','Leinonen','Sulkapallo')">
+          <div class="athlete-row-left">
+            <div class="athlete-avatar">SL</div>
+            <div>
+              <div class="athlete-name">Sara Leinonen</div>
+              <div class="athlete-meta">Sulkapallo · Ohjelma luotu 28.02.2026</div>
+            </div>
+          </div>
+          <div class="chevron">›</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <div></div>
+      <button class="btn btn-primary" onclick="goStep(2)">Jatka harjoituksiin →</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 2: HARJOITUKSET ───────────────────────────────────────── -->
+  <div class="section" id="section2">
+
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-icon">📚</div>
+        Harjoituskirjasto — valitse harjoitukset
+      </div>
+      <div class="ex-library" id="exLibrary"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-icon">⚙️</div>
+        Valitut harjoitukset — mukauta
+      </div>
+      <div class="selected-list" id="selectedList">
+        <div class="empty-state">
+          <div class="empty-icon">☝️</div>
+          Valitse harjoituksia yllä olevasta kirjastosta
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-icon">✏️</div>
+        Lisää oma harjoitus kirjastoon
+      </div>
+      <div class="form-grid three">
+        <div class="field">
+          <label>Harjoituksen nimi</label>
+          <input type="text" id="customName" placeholder="Esim. Perifeerinen...">
+        </div>
+        <div class="field">
+          <label>Kategoria</label>
+          <select id="customCat">
+            <option>Silmänliike</option>
+            <option>Koordinaatio</option>
+            <option>Akkomodaatio</option>
+            <option>Binokulaarisuus</option>
+            <option>Muu</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Mittayksikkö</label>
+          <input type="text" id="customUnit" placeholder="Esim. ms, pisteet, cm">
+        </div>
+        <div class="field form-full">
+          <label>Ohjeet urheilijalle</label>
+          <textarea id="customInstr" placeholder="Kirjoita selkeät ohjeet mitä urheilija näkee puhelimessaan..."></textarea>
+        </div>
+      </div>
+      <button class="btn btn-secondary" style="margin-top:14px" onclick="addCustomExercise()">+ Lisää kirjastoon</button>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goStep(1)">← Takaisin</button>
+      <button class="btn btn-primary" onclick="goStep(3)">Jatka aikatauluun →</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 3: AIKATAULU ───────────────────────────────────────── -->
+  <div class="section" id="section3">
+
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-icon">📅</div>
+        Harjoituspäivät
+      </div>
+      <div class="schedule-grid" id="dayGrid"></div>
+      <div class="duration-row">
+        <div class="field">
+          <label>Ohjelman kesto</label>
+          <select id="progDuration">
+            <option value="2">2 viikkoa</option>
+            <option value="4" selected>4 viikkoa</option>
+            <option value="6">6 viikkoa</option>
+            <option value="8">8 viikkoa</option>
+            <option value="12">12 viikkoa</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Aloituspäivä</label>
+          <input type="date" id="startDate">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-icon">🔔</div>
+        Muistutusviesti
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Muistutusaika</label>
+          <input type="time" id="reminderTime" value="08:00">
+        </div>
+        <div class="field">
+          <label>Muistutusteksti</label>
+          <input type="text" id="reminderText" value="Tänään on näköharjoituspäivä! 👁️">
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goStep(2)">← Takaisin</button>
+      <button class="btn btn-primary" onclick="generateAndPreview()">Luo ohjelma ja esikatselu →</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 4: JAA LINKKI ───────────────────────────────────────── -->
+  <div class="section" id="section4">
+
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-icon">👁️</div>
+        Esikatselu &amp; jakaminen
+      </div>
+      <div class="preview-wrap">
+        <div class="preview-phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="phone-athlete" id="previewName">Urheilija</div>
+            <div class="phone-title">Tänään on<br><span>harjoituspäivä</span></div>
+            <div id="phoneExList"></div>
+          </div>
+        </div>
+        <div class="preview-info">
+          <div class="summary-grid" id="summaryGrid">
+            <div class="summary-item"><div class="summary-label">Urheilija</div><div class="summary-value" id="sumName">—</div></div>
+            <div class="summary-item"><div class="summary-label">Harjoituksia</div><div class="summary-value" id="sumEx">—</div></div>
+            <div class="summary-item"><div class="summary-label">Harjoituspäiviä/vk</div><div class="summary-value" id="sumDays">—</div></div>
+            <div class="summary-item"><div class="summary-label">Kesto</div><div class="summary-value" id="sumDur">—</div></div>
+          </div>
+          <p style="font-size:13px; color:var(--text-dim); line-height:1.7; margin-bottom:16px;">
+            Urheilija avaa linkin selaimessa ja lisää sivun aloitusnäytölle. Ohjelma toimii sen jälkeen <strong>täysin offline</strong> — kaikki data tallennetaan puhelimeen.
+          </p>
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            <span class="tag">✓ Ei rekisteröitymistä</span>
+            <span class="tag">✓ Toimii offline</span>
+            <span class="tag">✓ iOS &amp; Android</span>
+            <span class="tag">✓ Data pysyy puhelimessa</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-icon">🔗</div>
+        QR-koodi &amp; linkki
+      </div>
+      <div class="qr-area">
+        <div id="qrcode"></div>
+        <div class="qr-label">Skannaa tai jaa linkki suoraan</div>
+        <div class="link-box" id="shareLink">— generoidaan ohjelmasta —</div>
+      </div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
+        <button class="btn btn-primary" onclick="copyLink()">📋 Kopioi linkki</button>
+        <button class="btn btn-secondary" onclick="printQR()">🖨️ Tulosta QR</button>
+        <button class="btn btn-success" onclick="openProgram()">📱 Avaa urheilijan näkymä</button>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goStep(3)">← Takaisin</button>
+      <button class="btn btn-primary" onclick="newProgram()">+ Uusi ohjelma</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- QR code library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+
+// ── EXERCISE LIBRARY DATA ────────────────────────────────────────────────
+let LIBRARY = [
+  { id:'sakkadi', name:'Sakkadinen silmänliike', icon:'↔️', cat:'Silmänliike', unit:'ms', unitLabel:'reaktioaika (ms)',
+    instructions:'Aseta <strong>numerotaulu</strong> seinälle silmien korkeudelle noin 1 m etäisyydelle. Lue numerot 1–20 järjestyksessä mahdollisimman nopeasti liikuttaen vain silmiä, ei päätä. Pidä 30 s tauko sarjojen välillä. Mittaa aika tai laske virheet.' },
+  { id:'silmakasi', name:'Silmä-käsikoordinaatio', icon:'🎯', cat:'Koordinaatio', unit:'pisteet', unitLabel:'osumia / 20',
+    instructions:'Pomppaa <strong>tennispallo</strong> seinään ja ota kiinni yhdellä kädellä vuorotellen. Etäisyys n. 2 m. Vaikeuta lisäämällä rytmi tai sulkemalla toinen silmä. Laske onnistuneet kiinniotot per sarja.' },
+  { id:'akkomodaatio', name:'Akkomodaatio (lähi-kauko)', icon:'🔭', cat:'Akkomodaatio', unit:'s', unitLabel:'tarkennusaika (s)',
+    instructions:'Pidä <strong>kynää</strong> 10 cm silmistä ja katso vuorotellen kynän kärkeä ja kaukaista kohdetta (>5 m). Laske hitaasti 3 sekuntia per kohde.' },
+  { id:'brock', name:'Brockin lanka', icon:'🪢', cat:'Binokulaarisuus', unit:'cm', unitLabel:'lähin risteyspiste (cm)',
+    instructions:'Kiinnitä <strong>lanka</strong> (2 m) seinään. Aseta 3–4 helmeä eri etäisyyksille. Katso helmiä: näe kaksi lankaa risteytyä helmessä. Kirjaa etäisyys josta risteys häviää.' },
+  { id:'periferia', name:'Perifeerinen näkö', icon:'🌐', cat:'Silmänliike', unit:'°', unitLabel:'kulma-aste',
+    instructions:'Katso suoraan eteenpäin. Vie käsi sivulle ja heiluta sormia — merkitse kulma jossa liike ensin näkyy. Toista molemmille puolille.' },
+  { id:'pursuit', name:'Silmän seuranta (Pursuit)', icon:'🔄', cat:'Silmänliike', unit:'', unitLabel:'arvio 1–5',
+    instructions:'Seuraa liikkuvaa kohdetta (esim. kynää) tasaisella nopeudella. Pidä pää paikallaan. Arvioi seurannan tasaisuus asteikolla 1–5.' },
+];
+
+// ── STATE ────────────────────────────────────────────────────────────────
+let selected = {}; // id -> { ...ex, duration, sets }
+let trainingDays = [1,3,5]; // Mon=0...Sun=6 (0-indexed Mon)
+let programData = null;
+let qrInstance = null;
+
+// ── STEP NAVIGATION ──────────────────────────────────────────────────────
+function goStep(n) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('section' + n).classList.add('active');
+  document.getElementById('step' + n).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ── LOAD EXAMPLE ATHLETE ─────────────────────────────────────────────────
+function loadAthlete(fn, ln, sport) {
+  document.getElementById('fname').value = fn;
+  document.getElementById('lname').value = ln;
+  document.getElementById('sport').value = sport;
+  showToast('Ladattu: ' + fn + ' ' + ln);
+  updatePreview();
+}
+
+// ── EXERCISE LIBRARY ─────────────────────────────────────────────────────
+function buildLibrary() {
+  const el = document.getElementById('exLibrary');
+  el.innerHTML = '';
+  LIBRARY.forEach(ex => {
+    const card = document.createElement('div');
+    card.className = 'ex-lib-card' + (selected[ex.id] ? ' selected' : '');
+    card.id = 'lib-' + ex.id;
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div class="ex-lib-icon">${ex.icon}</div>
+        <div class="ex-lib-check">${selected[ex.id] ? '✓' : ''}</div>
+      </div>
+      <div class="ex-lib-name">${ex.name}</div>
+      <div class="ex-lib-cat">${ex.cat} · ${ex.unit || 'laadullinen'}</div>
+    `;
+    card.onclick = () => toggleExercise(ex);
+    el.appendChild(card);
+  });
+}
+
+function toggleExercise(ex) {
+  if (selected[ex.id]) {
+    delete selected[ex.id];
+  } else {
+    selected[ex.id] = { ...ex, sets: '3', duration: '5 min' };
+  }
+  buildLibrary();
+  buildSelected();
+}
+
+function buildSelected() {
+  const el = document.getElementById('selectedList');
+  const keys = Object.keys(selected);
+  if (keys.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">☝️</div>Valitse harjoituksia yllä olevasta kirjastosta</div>';
+    return;
+  }
+  el.innerHTML = '';
+  keys.forEach(id => {
+    const ex = selected[id];
+    const row = document.createElement('div');
+    row.className = 'sel-ex-row';
+    row.innerHTML = `
+      <div class="sel-ex-icon">${ex.icon}</div>
+      <div>
+        <div class="sel-ex-name">${ex.name}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text-dim)">${ex.cat}</div>
+      </div>
+      <input class="mini-input" type="text" value="${ex.sets}" placeholder="sarjat" title="Sarjat"
+        onchange="selected['${id}'].sets = this.value">
+      <input class="mini-input" type="text" value="${ex.duration}" placeholder="kesto" title="Kesto"
+        onchange="selected['${id}'].duration = this.value" style="width:90px">
+      <button class="remove-btn" onclick="removeEx('${id}')">✕</button>
+    `;
+    el.appendChild(row);
+  });
+}
+
+function removeEx(id) {
+  delete selected[id];
+  buildLibrary();
+  buildSelected();
+}
+
+function addCustomExercise() {
+  const name = document.getElementById('customName').value.trim();
+  const cat = document.getElementById('customCat').value;
+  const unit = document.getElementById('customUnit').value.trim();
+  const instr = document.getElementById('customInstr').value.trim();
+  if (!name) { showToast('Anna harjoitukselle nimi'); return; }
+  const id = 'custom_' + Date.now();
+  const icons = { 'Silmänliike':'👁️', 'Koordinaatio':'🤝', 'Akkomodaatio':'🔭', 'Binokulaarisuus':'🪢', 'Muu':'⭐' };
+  LIBRARY.push({ id, name, icon: icons[cat] || '⭐', cat, unit, unitLabel: unit || 'arvio', instructions: instr });
+  buildLibrary();
+  document.getElementById('customName').value = '';
+  document.getElementById('customUnit').value = '';
+  document.getElementById('customInstr').value = '';
+  showToast('Harjoitus lisätty kirjastoon!');
+}
+
+// ── DAY GRID ─────────────────────────────────────────────────────────────
+const DAY_NAMES = ['MA','TI','KE','TO','PE','LA','SU'];
+
+function buildDayGrid() {
+  const el = document.getElementById('dayGrid');
+  el.innerHTML = '';
+  DAY_NAMES.forEach((d, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'day-toggle';
+    const btn = document.createElement('div');
+    btn.className = 'day-btn' + (trainingDays.includes(i) ? ' on' : '');
+    btn.id = 'daybtn-' + i;
+    btn.textContent = d.charAt(0);
+    btn.onclick = () => toggleDay(i, btn);
+    wrap.innerHTML = `<div class="day-name">${d}</div>`;
+    wrap.appendChild(btn);
+    el.appendChild(wrap);
+  });
+}
+
+function toggleDay(i, btn) {
+  if (trainingDays.includes(i)) {
+    trainingDays = trainingDays.filter(d => d !== i);
+    btn.classList.remove('on');
+  } else {
+    trainingDays.push(i);
+    btn.classList.add('on');
+  }
+}
+
+// ── GENERATE PROGRAM ─────────────────────────────────────────────────────
+function generateAndPreview() {
+  const fname = document.getElementById('fname').value.trim() || 'Urheilija';
+  const lname = document.getElementById('lname').value.trim() || '';
+  const sport = document.getElementById('sport').value.trim() || '';
+  const dur = document.getElementById('progDuration').value;
+  const start = document.getElementById('startDate').value || new Date().toISOString().split('T')[0];
+  const reminderTime = document.getElementById('reminderTime').value;
+  const reminderText = document.getElementById('reminderText').value;
+
+  programData = {
+    athlete: { fname, lname, sport },
+    exercises: Object.values(selected),
+    schedule: { days: trainingDays, durationWeeks: parseInt(dur), startDate: start },
+    reminder: { time: reminderTime, text: reminderText },
+    created: new Date().toISOString()
+  };
+
+  // Update summary
+  document.getElementById('sumName').textContent = fname + ' ' + lname;
+  document.getElementById('sumEx').textContent = Object.keys(selected).length;
+  document.getElementById('sumDays').textContent = trainingDays.length;
+  document.getElementById('sumDur').textContent = dur + ' vk';
+
+  // Phone preview
+  document.getElementById('previewName').textContent = fname + ' ' + lname;
+  const phoneList = document.getElementById('phoneExList');
+  phoneList.innerHTML = '';
+  Object.values(selected).slice(0,3).forEach(ex => {
+    const div = document.createElement('div');
+    div.className = 'phone-ex';
+    div.innerHTML = `<div class="phone-ex-icon">${ex.icon}</div><div><div class="phone-ex-name">${ex.name}</div><div class="phone-ex-meta">${ex.sets} · ${ex.duration}</div></div>`;
+    phoneList.appendChild(div);
+  });
+
+  // Generate share URL with encoded data
+  const encoded = btoa(encodeURIComponent(JSON.stringify(programData)));
+  const baseUrl = window.location.origin + window.location.pathname.replace('admin.html','') + 'nakoharjoitukset.html';
+  const shareUrl = baseUrl + '#program=' + encoded;
+  document.getElementById('shareLink').textContent = shareUrl;
+
+  // QR code
+  document.getElementById('qrcode').innerHTML = '';
+  try {
+    new QRCode(document.getElementById('qrcode'), {
+      text: shareUrl,
+      width: 160, height: 160,
+      colorDark: '#1a3a2a',
+      colorLight: '#ffffff',
+    });
+  } catch(e) {
+    document.getElementById('qrcode').textContent = '[QR-koodi generoidaan]';
+  }
+
+  goStep(4);
+}
+
+function updatePreview() {
+  const fn = document.getElementById('fname')?.value || '';
+  const ln = document.getElementById('lname')?.value || '';
+  const el = document.getElementById('previewName');
+  if (el) el.textContent = (fn + ' ' + ln).trim() || 'Urheilija';
+}
+
+function copyLink() {
+  const link = document.getElementById('shareLink').textContent;
+  navigator.clipboard.writeText(link).then(() => showToast('Linkki kopioitu! 📋')).catch(() => showToast('Kopioi linkki käsin'));
+}
+
+function printQR() {
+  window.print();
+}
+
+function openProgram() {
+  const link = document.getElementById('shareLink').textContent;
+  if (link.includes('#program=')) window.open(link, '_blank');
+  else showToast('Luo ensin ohjelma');
+}
+
+function newProgram() {
+  selected = {};
+  trainingDays = [1,3,5];
+  buildLibrary();
+  buildSelected();
+  buildDayGrid();
+  goStep(1);
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+buildLibrary();
+buildSelected();
+buildDayGrid();
+// Set today as default start date
+document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
+</script>
+</body>
+</html>

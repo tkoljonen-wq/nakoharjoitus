@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NäköHarjoitus — Asennusohje</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #1a3a2a;
+    --green2: #2d6e4e;
+    --highlight: #4caf7d;
+    --bg: #f5f2ec;
+    --surface: #fff;
+    --border: #ddd8cc;
+    --text: #1a1a1a;
+    --dim: #6b6660;
+    --faint: #b5b0a8;
+    --warn-bg: #fff8f0;
+    --warn-border: #f0c090;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; padding: 32px 16px 80px; }
+  .page { max-width: 720px; margin: 0 auto; }
+
+  .header { margin-bottom: 40px; }
+  .header-tag {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    color: var(--green2); letter-spacing: 0.18em; text-transform: uppercase;
+    background: rgba(44,110,78,0.1); border: 1px solid rgba(44,110,78,0.2);
+    padding: 5px 12px; border-radius: 100px; display: inline-block; margin-bottom: 14px;
+  }
+  h1 { font-size: 36px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 10px; }
+  .subtitle { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--dim); line-height: 1.7; }
+
+  /* STEP */
+  .step-block { margin-bottom: 28px; }
+  .step-header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 16px;
+  }
+  .step-num {
+    width: 36px; height: 36px; flex-shrink: 0;
+    background: var(--green); color: #fff;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 800;
+  }
+  .step-title { font-size: 19px; font-weight: 700; }
+  .step-subtitle { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--dim); margin-top: 2px; letter-spacing: 0.06em; }
+
+  .step-body {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 24px;
+    margin-left: 50px;
+  }
+
+  /* INSTRUCTION ROW */
+  .instr { display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start; }
+  .instr:last-child { margin-bottom: 0; }
+  .instr-n {
+    width: 22px; height: 22px; flex-shrink: 0;
+    background: var(--bg); border: 1.5px solid var(--border);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500;
+    margin-top: 2px;
+  }
+  .instr-text { font-size: 14px; line-height: 1.7; color: var(--text); }
+  .instr-text strong { font-weight: 700; }
+  .instr-text em { font-style: normal; color: var(--green2); font-weight: 600; }
+
+  /* SCREENSHOT BOX */
+  .screen-box {
+    background: var(--bg);
+    border: 1.5px dashed var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 12px 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--dim);
+    line-height: 1.8;
+  }
+  .screen-box .highlight { color: var(--green2); font-weight: 500; }
+  .screen-box .arrow { color: var(--faint); }
+
+  /* CODE */
+  .code-block {
+    background: #1a1a2e;
+    color: #a8d8a8;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    margin: 10px 0;
+    letter-spacing: 0.02em;
+  }
+
+  /* WARNING BOX */
+  .tip-box {
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 12px 0;
+    display: flex; gap: 10px;
+    font-size: 13px; line-height: 1.6;
+  }
+  .tip-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+  .success-box {
+    background: rgba(76,175,125,0.08);
+    border: 1px solid rgba(76,175,125,0.3);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 12px 0;
+    display: flex; gap: 10px;
+    font-size: 13px; line-height: 1.6;
+  }
+
+  /* FILE LIST */
+  .file-list { margin: 10px 0; }
+  .file-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-family: 'DM Mono', monospace; font-size: 12px;
+  }
+  .file-row:last-child { border-bottom: none; }
+  .file-icon { font-size: 16px; }
+  .file-name { font-weight: 500; color: var(--green2); }
+  .file-desc { color: var(--dim); margin-left: auto; font-size: 11px; }
+
+  /* DIVIDER */
+  .divider {
+    border: none; border-top: 1px solid var(--border);
+    margin: 32px 0;
+  }
+
+  /* URL RESULT */
+  .url-result {
+    background: var(--green);
+    color: #a8d8a8;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    margin: 12px 0;
+    word-break: break-all;
+  }
+
+  /* PHONE REMINDER */
+  .phone-tip {
+    background: #0a0f1e;
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin: 12px 0;
+    color: #e8f0ff;
+  }
+  .phone-tip-title {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    color: #00d4ff; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 10px;
+  }
+  .phone-tip-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 13px; line-height: 1.6; color: #b0c0e0;
+    margin-bottom: 8px;
+  }
+  .phone-tip-row:last-child { margin-bottom: 0; }
+
+  @media print {
+    body { background: white; }
+    .step-body { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="header-tag">👁️ NäköHarjoitus · Asennusohje</div>
+    <h1>GitHub Pages<br>käyttöönotto</h1>
+    <p class="subtitle">Täysin ilmainen — ei kuukausikuluja, ei palvelimia.<br>
+    Osoite muodostuu: <strong>sinunnimesi.github.io/nakoharjoitus</strong></p>
+  </div>
+
+  <!-- MITÄ TIEDOSTOJA -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-num">📁</div>
+      <div>
+        <div class="step-title">Mitä tiedostoja tarvitset</div>
+        <div class="step-subtitle">Latasin nämä kolme tiedostoa</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="file-list">
+        <div class="file-row">
+          <span class="file-icon">🏠</span>
+          <span class="file-name">index.html</span>
+          <span class="file-desc">Aloitussivu</span>
+        </div>
+        <div class="file-row">
+          <span class="file-icon">🔧</span>
+          <span class="file-name">admin.html</span>
+          <span class="file-desc">Optikon hallintapaneeli</span>
+        </div>
+        <div class="file-row">
+          <span class="file-icon">📱</span>
+          <span class="file-name">nakoharjoitukset.html</span>
+          <span class="file-desc">Urheilijan näkymä</span>
+        </div>
+      </div>
+      <div class="tip-box">
+        <span class="tip-icon">💾</span>
+        <span>Tallenna nämä kolme tiedostoa samaan kansioon tietokoneellasi, esim. <strong>Dokumentit / nakoharjoitus</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- VAIHE 1 -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Luo uusi repository GitHubissa</div>
+        <div class="step-subtitle">Repository = kansio GitHubissa</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="instr">
+        <div class="instr-n">1</div>
+        <div class="instr-text">Mene osoitteeseen <em>github.com</em> ja kirjaudu sisään</div>
+      </div>
+      <div class="instr">
+        <div class="instr-n">2</div>
+        <div class="instr-text">Klikkaa oikeassa yläkulmassa <strong>+</strong> -nappia → valitse <em>New repository</em></div>
+      </div>
+      <div class="instr">
+        <div class="instr-n">3</div>
+        <div class="instr-text">Kirjoita nimeksi <em>nakoharjoitus</em> (pienillä kirjaimilla, ei välilyöntejä)</div>
+      </div>
+      <div class="screen-box">
+        <span class="highlight">Repository name</span><br>
+        nakoharjoitus<br><br>
+        <span class="highlight">Visibility</span><br>
+        ● Public &nbsp;&nbsp; ○ Private<br>
+        <span style="font-size:10px;color:#b5b0a8">⚠ Valitse Public — GitHub Pages vaatii tämän ilmaisversiossa</span>
+      </div>
+      <div class="instr">
+        <div class="instr-n">4</div>
+        <div class="instr-text">Vieritä alas ja klikkaa vihreää <em>Create repository</em> -nappia</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VAIHE 2 -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Lataa tiedostot GitHubiin</div>
+        <div class="step-subtitle">Ei koodausta — pelkkä raahaaminen</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="instr">
+        <div class="instr-n">1</div>
+        <div class="instr-text">Olet nyt tyhjässä repositoryssä. Klikkaa linkkiä <em>uploading an existing file</em><br>
+        <span style="font-size:12px;color:#888">(tai navigoi: Add file → Upload files)</span></div>
+      </div>
+      <div class="instr">
+        <div class="instr-n">2</div>
+        <div class="instr-text"><strong>Raahaa kaikki kolme tiedostoa</strong> yhtä aikaa selainikkunaan — tai klikkaa <em>choose your files</em> ja valitse kaikki kolme</div>
+      </div>
+      <div class="instr">
+        <div class="instr-n">3</div>
+        <div class="instr-text">Odota että tiedostot latautuvat (näkyy palkit). Sen jälkeen klikkaa alhaalta <em>Commit changes</em> -nappia — voit jättää viestikenttään oletustekstin</div>
+      </div>
+      <div class="success-box">
+        <span>✅</span>
+        <span>Nyt GitHubissa pitäisi näkyä kolme tiedostoa listassa: <strong>index.html, admin.html, nakoharjoitukset.html</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- VAIHE 3 -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Kytke GitHub Pages päälle</div>
+        <div class="step-subtitle">Tämä tekee sivusta julkisesti auki olevan webbisivun</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="instr">
+        <div class="instr-n">1</div>
+        <div class="instr-text">Klikkaa repositoryn sivulla yläpalkista <em>Settings</em> (hammasratas-ikoni)</div>
+      </div>
+      <div class="instr">
+        <div class="instr-n">2</div>
+        <div class="instr-text">Vasemmasta valikosta klikkaa <em>Pages</em></div>
+      </div>
+      <div class="instr">
+        <div class="instr-n">3</div>
+        <div class="instr-text">Kohdassa <strong>Branch</strong> — valitse pudotusvalikosta <em>main</em> (tai <em>master</em>) ja sen jälkeen klikkaa <em>Save</em></div>
+      </div>
+      <div class="screen-box">
+        <span class="highlight">Source</span><br>
+        Deploy from a branch<br><br>
+        <span class="highlight">Branch</span><br>
+        <span class="highlight">[ main ▼ ] &nbsp; [ / (root) ▼ ] &nbsp; Save</span>
+      </div>
+      <div class="instr">
+        <div class="instr-n">4</div>
+        <div class="instr-text">Odota noin <strong>1–2 minuuttia</strong> ja päivitä sivu. Sivun yläosaan ilmestyy vihreä teksti ja osoite:</div>
+      </div>
+      <div class="url-result">
+        🌐 Your site is live at:<br>
+        https://<span style="color:#fff">sinunnimesi</span>.github.io/nakoharjoitus/
+      </div>
+      <div class="tip-box">
+        <span class="tip-icon">⏳</span>
+        <span>Joskus kestää 2–5 minuuttia ennen kuin sivu aukeaa. Jos tulee 404-virhe, odota hetki ja kokeile uudelleen.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- VAIHE 4 -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-title">Kokeile että toimii</div>
+        <div class="step-subtitle">Tarkista kaikki kolme osoitetta</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="instr">
+        <div class="instr-n">1</div>
+        <div class="instr-text">Avaa selaimessa: <em>sinunnimesi.github.io/nakoharjoitus/</em><br>→ Pitäisi näkyä aloitussivu jossa kaksi nappia</div>
+      </div>
+      <div class="instr">
+        <div class="instr-n">2</div>
+        <div class="instr-text">Klikkaa <strong>Optikon hallintapaneeli</strong> → käy läpi kaikki 4 vaihetta, luo testiohjela ja klikkaa <em>Avaa urheilijan näkymä</em></div>
+      </div>
+      <div class="instr">
+        <div class="instr-n">3</div>
+        <div class="instr-text">Urheilijan näkymässä pitäisi näkyä luomasi harjoitukset nimen kera — ei enää "Demo-näkymä"</div>
+      </div>
+      <div class="success-box">
+        <span>🎉</span>
+        <span>Valmis! Sinulla on nyt toimiva osoite jota voit jakaa urheilijoille tekstiviestillä tai QR-koodilla vastaanotolla.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PUHELIMEN LISÄÄMINEN ALOITUSNÄYTÖLLE -->
+  <hr class="divider">
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-num">📱</div>
+      <div>
+        <div class="step-title">Ohje urheilijalle: lisää puhelimen aloitusnäytölle</div>
+        <div class="step-subtitle">Anna tämä ohje urheilijalle — toimii kuin oikea sovellus</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="phone-tip">
+        <div class="phone-tip-title">iPhone (Safari)</div>
+        <div class="phone-tip-row"><span>1.</span><span>Avaa linkki Safarissa (ei Chrome!)</span></div>
+        <div class="phone-tip-row"><span>2.</span><span>Paina alhaalta <strong>Jaa-nappi</strong> (neliö jossa nuoli ylös)</span></div>
+        <div class="phone-tip-row"><span>3.</span><span>Vieritä alas → <strong>"Lisää Koti-valikkoon"</strong></span></div>
+        <div class="phone-tip-row"><span>4.</span><span>Klikkaa <strong>Lisää</strong> — sovellus ilmestyy aloitusnäytölle</span></div>
+      </div>
+      <div class="phone-tip">
+        <div class="phone-tip-title">Android (Chrome)</div>
+        <div class="phone-tip-row"><span>1.</span><span>Avaa linkki Chromessa</span></div>
+        <div class="phone-tip-row"><span>2.</span><span>Paina oikealla yläkulmassa <strong>⋮</strong> (kolme pistettä)</span></div>
+        <div class="phone-tip-row"><span>3.</span><span><strong>"Lisää aloitusnäyttöön"</strong> tai <strong>"Asenna sovellus"</strong></span></div>
+        <div class="phone-tip-row"><span>4.</span><span>Klikkaa <strong>Lisää</strong> — valmis</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PÄIVITTÄMINEN -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-num">🔄</div>
+      <div>
+        <div class="step-title">Myöhemmin: miten päivitän sovellusta?</div>
+        <div class="step-subtitle">Jos haluat tehdä muutoksia</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="instr">
+        <div class="instr-n">1</div>
+        <div class="instr-text">Mene GitHubissa repositoryyn <em>nakoharjoitus</em></div>
+      </div>
+      <div class="instr">
+        <div class="instr-n">2</div>
+        <div class="instr-text">Klikkaa muokattavan tiedoston nimeä listassa (esim. <em>nakoharjoitukset.html</em>)</div>
+      </div>
+      <div class="instr">
+        <div class="instr-n">3</div>
+        <div class="instr-text">Klikkaa kynä-ikonia oikealla <strong>✏️</strong> → muokkaa → <em>Commit changes</em></div>
+      </div>
+      <div class="tip-box">
+        <span class="tip-icon">💡</span>
+        <span>Jos haluat lisätä uusia harjoituksia tai muuttaa toiminnallisuutta, pyydä minulta päivitetty tiedosto ja lataa se GitHubiin samalla tavalla kuin alussa.</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

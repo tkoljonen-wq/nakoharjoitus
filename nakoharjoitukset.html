@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0f1e">
+<title>NäköHarjoitus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080d1a;
+    --surface: #0f1729;
+    --surface2: #162035;
+    --border: #1e2d4a;
+    --accent: #00d4ff;
+    --accent2: #7b4fff;
+    --warn: #ff6b35;
+    --success: #00e5a0;
+    --text: #e8f0ff;
+    --text-dim: #6b7fa3;
+    --text-faint: #2d3f60;
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid effect */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app { position: relative; z-index: 1; max-width: 430px; margin: 0 auto; padding: 0 0 100px 0; }
+
+  /* HEADER */
+  .header {
+    padding: 52px 20px 24px;
+    position: relative;
+  }
+
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+  }
+
+  .athlete-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    padding: 6px 12px;
+    border-radius: 100px;
+  }
+
+  .streak-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--warn);
+    background: rgba(255,107,53,0.1);
+    border: 1px solid rgba(255,107,53,0.25);
+    padding: 6px 12px;
+    border-radius: 100px;
+  }
+
+  .streak-fire { font-size: 14px; }
+
+  h1 {
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .date-line {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-top: 8px;
+  }
+
+  /* TODAY CARD */
+  .today-card {
+    margin: 0 20px 24px;
+    background: linear-gradient(135deg, rgba(0,212,255,0.12), rgba(123,79,255,0.08));
+    border: 1px solid rgba(0,212,255,0.25);
+    border-radius: var(--radius);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .today-card::after {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, rgba(0,212,255,0.15), transparent 70%);
+    pointer-events: none;
+  }
+
+  .today-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .today-title { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+
+  .today-progress {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 100px;
+    transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .progress-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text-faint);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0 20px;
+    margin-bottom: 12px;
+  }
+
+  /* EXERCISE CARDS */
+  .exercises { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
+
+  .ex-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color 0.2s;
+    cursor: pointer;
+  }
+
+  .ex-card.done {
+    border-color: rgba(0,229,160,0.3);
+    background: rgba(0,229,160,0.04);
+  }
+
+  .ex-card.expanded { border-color: var(--accent); }
+
+  .ex-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+  }
+
+  .ex-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+  }
+
+  .ex-card.done .ex-icon { background: rgba(0,229,160,0.12); border-color: rgba(0,229,160,0.3); }
+
+  .ex-info { flex: 1; }
+
+  .ex-name { font-size: 15px; font-weight: 600; margin-bottom: 3px; }
+  .ex-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    display: flex; gap: 10px;
+  }
+
+  .ex-status {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .ex-card.done .ex-status {
+    background: var(--success);
+    border-color: var(--success);
+    color: #000;
+  }
+
+  /* EXPANDED PANEL */
+  .ex-body {
+    display: none;
+    padding: 0 16px 16px;
+    border-top: 1px solid var(--border);
+    margin-top: 0;
+    padding-top: 16px;
+  }
+
+  .ex-card.expanded .ex-body { display: block; }
+
+  .ex-instructions {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+
+  .ex-instructions strong { color: var(--text); font-weight: 600; }
+
+  .log-section { margin-top: 12px; }
+
+  .log-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text-faint);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .log-row { display: flex; gap: 8px; margin-bottom: 8px; }
+
+  .log-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .log-input::placeholder { color: var(--text-faint); }
+  .log-input:focus { border-color: var(--accent); }
+
+  .log-input.narrow { max-width: 100px; text-align: center; }
+
+  .unit-badge {
+    display: flex; align-items: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    padding: 0 4px;
+    white-space: nowrap;
+  }
+
+  .log-textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    outline: none;
+    resize: none;
+    min-height: 70px;
+    line-height: 1.6;
+    transition: border-color 0.2s;
+  }
+
+  .log-textarea::placeholder { color: var(--text-faint); }
+  .log-textarea:focus { border-color: var(--accent2); }
+
+  .done-btn {
+    width: 100%;
+    margin-top: 14px;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+
+  .done-btn:active { transform: scale(0.98); opacity: 0.9; }
+
+  .done-btn.completed {
+    background: rgba(0,229,160,0.15);
+    color: var(--success);
+    border: 1px solid rgba(0,229,160,0.3);
+  }
+
+  /* WEEK CALENDAR */
+  .week-section { padding: 24px 20px 0; }
+
+  .week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .week-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .week-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    color: var(--text-faint);
+    letter-spacing: 0.1em;
+  }
+
+  .week-dot {
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    background: var(--surface);
+  }
+
+  .week-dot.today {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,212,255,0.08);
+    font-weight: 600;
+  }
+
+  .week-dot.done-day {
+    background: rgba(0,229,160,0.12);
+    border-color: rgba(0,229,160,0.4);
+    color: var(--success);
+  }
+
+  .week-dot.rest {
+    opacity: 0.4;
+  }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: rgba(8,13,26,0.92);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    padding: 12px 0 28px;
+    z-index: 100;
+  }
+
+  .nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 0;
+    transition: opacity 0.2s;
+  }
+
+  .nav-icon { font-size: 20px; }
+  .nav-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .nav-btn.active .nav-icon { filter: drop-shadow(0 0 8px var(--accent)); }
+  .nav-btn.active .nav-label { color: var(--accent); }
+
+  /* VIEWS */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* DIARY VIEW */
+  .diary-list { padding: 0 20px; display: flex; flex-direction: column; gap: 16px; }
+
+  .diary-entry {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+
+  .diary-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    margin-bottom: 10px;
+  }
+
+  .diary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--text-faint);
+  }
+
+  .diary-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+  .diary-ex-name { font-size: 13px; font-weight: 600; }
+  .diary-result {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--success);
+    text-align: right;
+  }
+  .diary-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 2px;
+    text-align: right;
+    max-width: 140px;
+  }
+
+  /* STATS VIEW */
+  .stats-grid { padding: 0 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+
+  .stat-value {
+    font-size: 36px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Notification banner */
+  .notif-banner {
+    margin: 0 20px 20px;
+    background: rgba(255,107,53,0.08);
+    border: 1px solid rgba(255,107,53,0.25);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-dim);
+    animation: slideIn 0.4s ease;
+  }
+
+  .notif-icon { font-size: 20px; flex-shrink: 0; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .live-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+    margin-right: 6px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HOME VIEW -->
+  <div class="view active" id="view-home">
+    <div class="header">
+      <div class="header-top">
+        <div class="athlete-tag" id="athleteTag">Demo</div>
+        <div class="streak-badge"><span class="streak-fire">🔥</span> <span id="streakCount">0</span> pv putki</div>
+      </div>
+      <h1>Tänään on<br><span>harjoituspäivä</span></h1>
+      <div class="date-line" id="dateLine"><span class="live-dot"></span></div>
+    </div>
+
+    <div class="notif-banner">
+      <span class="notif-icon">👁️</span>
+      <span>Muista: tee harjoitukset ennen iltaa, mieluiten <strong>luonnonvalossa</strong> tai hyvässä valaistuksessa.</span>
+    </div>
+
+    <div class="today-card">
+      <div class="today-label">Tämän päivän edistyminen</div>
+      <div class="today-title">4 harjoitusta · n. 20 min</div>
+      <div class="today-progress">
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+        <div class="progress-text" id="progressText">0 / 4</div>
+      </div>
+    </div>
+
+    <div class="section-title">Harjoitukset — sunnuntai</div>
+    <div class="exercises" id="exerciseList"></div>
+
+    <div class="week-section">
+      <div class="section-title" style="padding:0; margin-bottom:12px">Tämä viikko</div>
+      <div class="week-grid">
+        <div class="week-day"><div class="week-label">MA</div><div class="week-dot done-day">✓</div></div>
+        <div class="week-day"><div class="week-label">TI</div><div class="week-dot rest">—</div></div>
+        <div class="week-day"><div class="week-label">KE</div><div class="week-dot done-day">✓</div></div>
+        <div class="week-day"><div class="week-label">TO</div><div class="week-dot rest">—</div></div>
+        <div class="week-day"><div class="week-label">PE</div><div class="week-dot done-day">✓</div></div>
+        <div class="week-day"><div class="week-label">LA</div><div class="week-dot rest">—</div></div>
+        <div class="week-day"><div class="week-label">SU</div><div class="week-dot today">8</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIARY VIEW -->
+  <div class="view" id="view-diary">
+    <div class="header">
+      <div class="header-top">
+        <div class="athlete-tag">Päiväkirja</div>
+      </div>
+      <h1>Harjoitus<br><span>historia</span></h1>
+    </div>
+    <div class="diary-list" id="diaryList"></div>
+  </div>
+
+  <!-- STATS VIEW -->
+  <div class="view" id="view-stats">
+    <div class="header">
+      <div class="header-top">
+        <div class="athlete-tag">Tilastot</div>
+      </div>
+      <h1>Kehitys<br><span>seuranta</span></h1>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Harjoitusta yhteensä</div></div>
+      <div class="stat-card"><div class="stat-value" id="statStreak">5</div><div class="stat-label">Päivien putki</div></div>
+      <div class="stat-card"><div class="stat-value" id="statWeek">3</div><div class="stat-label">Tällä viikolla</div></div>
+      <div class="stat-card"><div class="stat-value" id="statRate">75%</div><div class="stat-label">Suoritusaste</div></div>
+    </div>
+    <div style="padding: 20px; margin-top: 8px;">
+      <div class="section-title" style="padding:0; margin-bottom:12px">Sakkadi — reaktioaika (ms)</div>
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px; height:120px; display:flex; align-items:flex-end; gap:8px;">
+        <div id="chartBars" style="display:flex; align-items:flex-end; gap:8px; width:100%; height:100%;"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="nav-btn active" onclick="showView('home',this)">
+    <span class="nav-icon">👁️</span>
+    <span class="nav-label">Tänään</span>
+  </button>
+  <button class="nav-btn" onclick="showView('diary',this)">
+    <span class="nav-icon">📓</span>
+    <span class="nav-label">Päiväkirja</span>
+  </button>
+  <button class="nav-btn" onclick="showView('stats',this)">
+    <span class="nav-icon">📈</span>
+    <span class="nav-label">Kehitys</span>
+  </button>
+</div>
+
+<script>
+// ── LOAD PROGRAM FROM URL OR USE DEMO DATA ────────────────────────────────
+function loadProgramFromURL() {
+  try {
+    const hash = window.location.hash;
+    if (hash && hash.includes('program=')) {
+      const encoded = hash.split('program=')[1];
+      return JSON.parse(decodeURIComponent(atob(encoded)));
+    }
+  } catch(e) { console.warn('Could not parse program from URL', e); }
+  return null;
+}
+
+const URL_PROGRAM = loadProgramFromURL();
+
+// Use URL program exercises, or fall back to demo data
+const EXERCISES = URL_PROGRAM ? URL_PROGRAM.exercises : [
+  {
+    id: 'sakkadi',
+    name: 'Sakkadinen silmänliike',
+    icon: '↔️',
+    duration: '5 min',
+    sets: '3 sarjaa',
+    unit: 'ms',
+    unitLabel: 'reaktioaika (ms)',
+    instructions: `Aseta <strong>numerotaulu</strong> seinälle silmien korkeudelle noin 1 m etäisyydelle. Lue numerot 1–20 järjestyksessä mahdollisimman nopeasti liikuttaen vain silmiä, ei päätä. Pidä 30 s tauko sarjojen välillä. Mittaa aika tai laske virheet.`
+  },
+  {
+    id: 'silmakasi',
+    name: 'Silmä-käsikoordinaatio',
+    icon: '🎯',
+    duration: '6 min',
+    sets: '4 sarjaa',
+    unit: 'pisteet',
+    unitLabel: 'osumia / 20',
+    instructions: `Pomppaa <strong>tennispallo</strong> seinään ja ota kiinni yhdellä kädellä vuorotellen. Etäisyys n. 2 m. Vaikeuta lisäämällä rytmi tai sulkemalla toinen silmä. Laske onnistuneet kiinniotot per sarja.`
+  },
+  {
+    id: 'akkomodaatio',
+    name: 'Akkomodaatio (lähi-kauko)',
+    icon: '🔭',
+    duration: '4 min',
+    sets: '3 sarjaa',
+    unit: 's',
+    unitLabel: 'tarkennusaika (s)',
+    instructions: `Pidä <strong>kynää</strong> 10 cm silmistä ja katso vuorotellen kynän kärkeä ja kaukaista kohdetta (>5 m). Laske hitaasti 3 sekuntia per kohde. Kun vaihdat, huomioi kuinka nopeasti kuva tarkentuu.`
+  },
+  {
+    id: 'brock',
+    name: "Brockin lanka",
+    icon: '🪢',
+    duration: '5 min',
+    sets: '2 sarjaa',
+    unit: 'cm',
+    unitLabel: 'lähin risteyspiste (cm)',
+    instructions: `Kiinnitä <strong>lanka</strong> (2 m) seinään silmien korkeudelle. Aseta 3–4 helmeä eri etäisyyksille. Pitäen langan nenää vasten, katso helmiä yksitellen: näe <strong>kaksi lankaa</strong> risteytyä helmessä. Jos ei näy — kirjaa etäisyys josta risteys häviää.`
+  }
+];
+
+// Simulate saved diary data
+const DIARY_DATA = [
+  {
+    date: '2026-03-06',
+    dateLabel: 'PE 06.03.2026',
+    entries: [
+      { name: 'Sakkadinen silmänliike', result: '420 ms', note: 'Parempi kuin viimeksi' },
+      { name: 'Akkomodaatio (lähi-kauko)', result: '1.8 s', note: '' },
+      { name: 'Brockin lanka', result: '22 cm', note: 'Vasen silmä dominoi' },
+    ]
+  },
+  {
+    date: '2026-03-04',
+    dateLabel: 'KE 04.03.2026',
+    entries: [
+      { name: 'Sakkadinen silmänliike', result: '450 ms', note: '' },
+      { name: 'Silmä-käsikoordinaatio', result: '16/20', note: 'Oikea käsi parempi' },
+    ]
+  },
+  {
+    date: '2026-03-02',
+    dateLabel: 'MA 02.03.2026',
+    entries: [
+      { name: 'Sakkadinen silmänliike', result: '480 ms', note: 'Ensimmäinen kerta' },
+      { name: 'Brockin lanka', result: '28 cm', note: '' },
+    ]
+  }
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let completed = {};
+let expanded = null;
+
+// ── BUILD EXERCISE LIST ───────────────────────────────────────────────────
+function buildExercises() {
+  const container = document.getElementById('exerciseList');
+  container.innerHTML = '';
+
+  EXERCISES.forEach((ex, i) => {
+    const card = document.createElement('div');
+    card.className = 'ex-card' + (completed[ex.id] ? ' done' : '');
+    card.id = 'card-' + ex.id;
+
+    card.innerHTML = `
+      <div class="ex-header" onclick="toggleCard('${ex.id}')">
+        <div class="ex-icon">${ex.icon}</div>
+        <div class="ex-info">
+          <div class="ex-name">${ex.name}</div>
+          <div class="ex-meta">
+            <span>⏱ ${ex.duration}</span>
+            <span>${ex.sets}</span>
+          </div>
+        </div>
+        <div class="ex-status">${completed[ex.id] ? '✓' : ''}</div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-instructions">${ex.instructions}</div>
+        <div class="log-section">
+          <div class="log-label">Kirjaa tulos</div>
+          <div class="log-row">
+            <input class="log-input narrow" id="num-${ex.id}" type="number" placeholder="—" inputmode="decimal">
+            <div class="unit-badge">${ex.unitLabel}</div>
+          </div>
+          <div class="log-label" style="margin-top:10px">Muistiinpano (vapaaehtoinen)</div>
+          <textarea class="log-textarea" id="note-${ex.id}" placeholder="Esim. vasen silmä väsyi, parempi kuin eilen..."></textarea>
+        </div>
+        <button class="done-btn ${completed[ex.id] ? 'completed' : ''}" onclick="markDone('${ex.id}')">
+          ${completed[ex.id] ? '✓ Merkitty tehdyksi' : 'Merkitse tehdyksi'}
+        </button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  updateProgress();
+}
+
+function toggleCard(id) {
+  if (expanded === id) {
+    document.getElementById('card-' + id).classList.remove('expanded');
+    expanded = null;
+  } else {
+    if (expanded) document.getElementById('card-' + expanded)?.classList.remove('expanded');
+    document.getElementById('card-' + id).classList.add('expanded');
+    expanded = id;
+  }
+}
+
+function markDone(id) {
+  const num = document.getElementById('num-' + id)?.value || '';
+  const note = document.getElementById('note-' + id)?.value || '';
+  completed[id] = { num, note, time: new Date().toISOString() };
+
+  // Save to localStorage
+  try { localStorage.setItem('completed_today', JSON.stringify(completed)); } catch(e) {}
+
+  buildExercises();
+  // Re-expand card
+  document.getElementById('card-' + id).classList.add('done');
+}
+
+function updateProgress() {
+  const total = EXERCISES.length;
+  const done = Object.keys(completed).length;
+  const pct = Math.round((done / total) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = done + ' / ' + total;
+  document.getElementById('statTotal').textContent = done + 12; // simulate history
+}
+
+// ── DIARY ─────────────────────────────────────────────────────────────────
+function buildDiary() {
+  const container = document.getElementById('diaryList');
+  container.innerHTML = '';
+  DIARY_DATA.forEach(day => {
+    const el = document.createElement('div');
+    el.className = 'diary-entry';
+    el.innerHTML = `
+      <div class="diary-date">${day.dateLabel}</div>
+      ${day.entries.map(e => `
+        <div class="diary-item">
+          <div class="diary-ex-name">${e.name}</div>
+          <div>
+            <div class="diary-result">${e.result}</div>
+            ${e.note ? `<div class="diary-note">${e.note}</div>` : ''}
+          </div>
+        </div>
+      `).join('')}
+    `;
+    container.appendChild(el);
+  });
+}
+
+// ── STATS CHART ───────────────────────────────────────────────────────────
+function buildChart() {
+  const data = [480, 450, null, 420, null, 410, null]; // Mon–Sun, nulls = rest
+  const days = ['MA','TI','KE','TO','PE','LA','SU'];
+  const max = 500;
+  const container = document.getElementById('chartBars');
+  container.innerHTML = '';
+  data.forEach((v, i) => {
+    const col = document.createElement('div');
+    col.style.cssText = 'flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:4px; height:100%;';
+    if (v !== null) {
+      const h = Math.round((v / max) * 100);
+      col.innerHTML = `
+        <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--accent)">${v}</div>
+        <div style="width:100%;height:${h}%;background:linear-gradient(180deg,var(--accent2),var(--accent));border-radius:6px 6px 2px 2px;min-height:4px;"></div>
+        <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--text-faint)">${days[i]}</div>
+      `;
+    } else {
+      col.innerHTML = `
+        <div style="width:100%;height:4px;"></div>
+        <div style="width:100%;height:4%;background:var(--border);border-radius:3px;"></div>
+        <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--text-faint)">${days[i]}</div>
+      `;
+    }
+    container.appendChild(col);
+  });
+}
+
+// ── NAV ───────────────────────────────────────────────────────────────────
+function showView(name, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+
+// Set athlete name and date from URL program
+const athleteName = URL_PROGRAM
+  ? (URL_PROGRAM.athlete.fname + ' ' + URL_PROGRAM.athlete.lname).trim()
+  : 'Demo-näkymä';
+document.getElementById('athleteTag').textContent = athleteName;
+
+const now = new Date();
+const fDays = ['SU','MA','TI','KE','TO','PE','LA'];
+const weekNum = Math.ceil((Math.floor((now - new Date(now.getFullYear(),0,1))/86400000) + 1) / 7);
+document.getElementById('dateLine').innerHTML =
+  '<span class="live-dot"></span>' + fDays[now.getDay()] + ' ' +
+  String(now.getDate()).padStart(2,'0') + '.' +
+  String(now.getMonth()+1).padStart(2,'0') + '.' + now.getFullYear() +
+  ' — Viikko ' + weekNum;
+
+// Load today's completions (keyed by date so resets each day)
+const todayKey = 'completed_' + now.toISOString().split('T')[0] +
+  (URL_PROGRAM ? '_' + (URL_PROGRAM.athlete.fname||'').slice(0,4) : '');
+try {
+  const saved = localStorage.getItem(todayKey);
+  if (saved) completed = JSON.parse(saved);
+} catch(e) {}
+
+// Compute streak from localStorage
+let streak = 0;
+for (let i = 1; i <= 60; i++) {
+  const d = new Date(now); d.setDate(d.getDate() - i);
+  const k = 'completed_' + d.toISOString().split('T')[0] +
+    (URL_PROGRAM ? '_' + (URL_PROGRAM.athlete.fname||'').slice(0,4) : '');
+  try {
+    const val = localStorage.getItem(k);
+    if (val && Object.keys(JSON.parse(val)).length > 0) streak++;
+    else break;
+  } catch(e) { break; }
+}
+document.getElementById('streakCount').textContent = streak;
+
+buildExercises();
+buildDiary();
+buildChart();
+</script>
+</body>
+</html>

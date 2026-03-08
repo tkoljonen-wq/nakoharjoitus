@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NäköHarjoitus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;800&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #080d1a;
+    color: #e8f0ff;
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+  .center { text-align: center; position: relative; z-index: 1; padding: 24px; }
+  .icon { font-size: 56px; margin-bottom: 24px; }
+  h1 { font-size: 38px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 10px; }
+  h1 span {
+    background: linear-gradient(135deg, #00d4ff, #7b4fff);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  p { font-family: 'DM Mono', monospace; font-size: 12px; color: #6b7fa3; letter-spacing: 0.08em; margin-bottom: 40px; }
+  .btn-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    padding: 16px 32px;
+    border: none; border-radius: 14px;
+    font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+    cursor: pointer; text-decoration: none; display: inline-block;
+    transition: opacity 0.15s;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn-primary { background: linear-gradient(135deg, #00d4ff, #7b4fff); color: #fff; }
+  .btn-secondary {
+    background: rgba(255,255,255,0.06);
+    color: #e8f0ff;
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+</style>
+</head>
+<body>
+<div class="center">
+  <div class="icon">👁️</div>
+  <h1>Näkö<span>Harjoitus</span></h1>
+  <p>Urheilijoiden näköharjoitteluohjelma</p>
+  <div class="btn-row">
+    <a class="btn btn-primary" href="admin.html">Optikon hallintapaneeli</a>
+    <a class="btn btn-secondary" href="nakoharjoitukset.html">Urheilijan näkymä (demo)</a>
+  </div>
+</div>
+</body>
+</html>
