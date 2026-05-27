@@ -266,6 +266,40 @@
 
   .ex-instructions strong { color: var(--text); font-weight: 600; }
 
+  .material-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 14px;
+    margin-bottom: 4px;
+  }
+
+  .material-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: rgba(0,212,255,0.06);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 10px;
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    text-decoration: none;
+    transition: background 0.18s, border-color 0.18s;
+  }
+
+  .material-btn:active { background: rgba(0,212,255,0.14); border-color: rgba(0,212,255,0.4); }
+
+  .material-btn-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .material-btn-text { flex: 1; }
+  .material-btn-label { font-size: 12px; color: var(--text); font-family: 'Syne', sans-serif; font-weight: 600; }
+  .material-btn-hint { font-size: 10px; color: var(--text-dim); margin-top: 1px; }
+
   .log-section { margin-top: 12px; }
 
   .log-label {
@@ -767,6 +801,18 @@ function buildExercises() {
       </div>
       <div class="ex-body">
         <div class="ex-instructions">${ex.instructions}</div>
+        ${ex.materiaalit?.length ? `
+        <div class="material-links">
+          ${ex.materiaalit.map(m => `
+          <a class="material-btn" href="./materiaalit/${m.tiedosto}" target="_blank" rel="noopener">
+            <div class="material-btn-icon">📄</div>
+            <div class="material-btn-text">
+              <div class="material-btn-label">${m.nimi}</div>
+              <div class="material-btn-hint">Avautuu uuteen välilehteen · tulosta tai tallenna PDF</div>
+            </div>
+            <div style="font-size:16px;color:var(--text-dim)">↗</div>
+          </a>`).join('')}
+        </div>` : ''}
         <div class="log-section">
           <div class="log-label">Kirjaa tulos</div>
           <div class="log-row">

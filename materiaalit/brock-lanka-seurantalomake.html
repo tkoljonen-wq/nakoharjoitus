@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brockin lanka — Seurantalomake</title>
+<style>
+  @media print {
+    .no-print { display: none !important; }
+    body { margin: 0; }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Arial', sans-serif;
+    background: #fff;
+    color: #111;
+  }
+
+  .no-print {
+    background: #1a3a2a;
+    color: #fff;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .no-print-title { font-size: 14px; font-weight: bold; }
+  .no-print-hint { font-size: 12px; opacity: 0.7; }
+
+  .print-btn {
+    background: #4caf7d;
+    color: #fff;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .print-btn:hover { background: #3d9669; }
+
+  .page {
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 14mm 18mm;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 2px solid #111;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+  }
+
+  .header-title { font-size: 18px; font-weight: bold; }
+  .header-sub { font-size: 11px; color: #555; margin-top: 3px; }
+  .header-logo { font-size: 11px; color: #888; text-align: right; }
+
+  .instructions {
+    font-size: 11px;
+    color: #444;
+    background: #f5f5f5;
+    border-left: 3px solid #1a3a2a;
+    padding: 8px 12px;
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
+
+  .instructions strong { color: #1a3a2a; }
+
+  /* ── ASENNUSKAAVIO ── */
+  .diagram-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .diagram-box {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 12px;
+  }
+
+  .diagram-title {
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #555;
+    margin-bottom: 8px;
+  }
+
+  /* SVG-kuva — lankakaavio */
+  .brock-svg {
+    width: 100%;
+    height: auto;
+  }
+
+  .setup-list {
+    font-size: 11px;
+    color: #333;
+    line-height: 2;
+    padding-left: 0;
+    list-style: none;
+  }
+
+  .setup-list li::before {
+    content: "→ ";
+    color: #1a3a2a;
+    font-weight: bold;
+  }
+
+  /* ── TULOSKIRJAUS ── */
+  .tracking-section { margin-top: 8px; }
+
+  .tracking-title {
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+
+  th {
+    background: #f0f0f0;
+    padding: 7px 10px;
+    text-align: left;
+    border: 1px solid #ccc;
+    font-weight: bold;
+  }
+
+  td {
+    padding: 7px 10px;
+    border: 1px solid #ccc;
+    height: 28px;
+  }
+
+  tr:nth-child(even) td { background: #fafafa; }
+
+  /* ── VIITEARVOT ── */
+  .ref-section {
+    margin-top: 14px;
+    border: 1px solid #d0e8da;
+    border-radius: 8px;
+    padding: 10px 14px;
+    background: #f4fbf7;
+  }
+
+  .ref-title {
+    font-size: 11px;
+    font-weight: bold;
+    color: #1a3a2a;
+    margin-bottom: 6px;
+  }
+
+  .ref-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    font-size: 10px;
+  }
+
+  .ref-item {
+    background: #fff;
+    border: 1px solid #c5e0d0;
+    border-radius: 6px;
+    padding: 6px 8px;
+  }
+
+  .ref-item-label { color: #555; }
+  .ref-item-val { font-weight: bold; color: #1a3a2a; font-size: 12px; margin-top: 2px; }
+
+  .footer {
+    margin-top: 14px;
+    font-size: 9px;
+    color: #aaa;
+    text-align: center;
+    border-top: 1px solid #eee;
+    padding-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="no-print">
+  <div>
+    <div class="no-print-title">📄 Brockin lanka — Seurantalomake</div>
+    <div class="no-print-hint">Tulosta A4-paperille tai tallenna PDF:ksi</div>
+  </div>
+  <button class="print-btn" onclick="window.print()">🖨️ Tulosta / Tallenna PDF</button>
+</div>
+
+<div class="page">
+  <div class="header">
+    <div>
+      <div class="header-title">Brockin lanka — Seurantalomake</div>
+      <div class="header-sub">Binokulaarisuus ja konvergenssireservi · Harjoituspohja</div>
+    </div>
+    <div class="header-logo">NäköHarjoitus<br>nakoharjoitus.github.io</div>
+  </div>
+
+  <div class="instructions">
+    <strong>Ohje:</strong> Kiinnitä lanka (noin <strong>2 m</strong>) seinään tai kiinteään pisteeseen.
+    Aseta <strong>3–4 helmeä</strong> eri etäisyyksille (esim. 10 cm, 30 cm, 60 cm, 100 cm nenästä).
+    Katso kutakin helmeä vuorollaan — näet kaksi lankaa risteytyä helmessä (Filippin risteys).
+    Kirjaa lähin etäisyys, jossa risteys pysyy vakaana. Toista päivittäin.
+  </div>
+
+  <div class="diagram-section">
+    <div class="diagram-box">
+      <div class="diagram-title">Asennuskaavio</div>
+      <!-- Yksinkertainen SVG-kaavio -->
+      <svg class="brock-svg" viewBox="0 0 220 160" xmlns="http://www.w3.org/2000/svg">
+        <!-- Seinä -->
+        <rect x="0" y="0" width="8" height="160" fill="#ddd" rx="2"/>
+        <text x="10" y="10" font-size="8" fill="#888">seinä</text>
+
+        <!-- Lanka -->
+        <line x1="4" y1="80" x2="200" y2="80" stroke="#8B4513" stroke-width="1.5"/>
+
+        <!-- Helmet -->
+        <circle cx="44" cy="80" r="7" fill="#e74c3c" stroke="#c0392b" stroke-width="1"/>
+        <text x="40" y="96" font-size="7" fill="#555" text-anchor="middle">10 cm</text>
+
+        <circle cx="84" cy="80" r="7" fill="#3498db" stroke="#2980b9" stroke-width="1"/>
+        <text x="80" y="96" font-size="7" fill="#555" text-anchor="middle">30 cm</text>
+
+        <circle cx="134" cy="80" r="7" fill="#2ecc71" stroke="#27ae60" stroke-width="1"/>
+        <text x="130" y="96" font-size="7" fill="#555" text-anchor="middle">60 cm</text>
+
+        <circle cx="174" cy="80" r="7" fill="#f39c12" stroke="#d68910" stroke-width="1"/>
+        <text x="170" y="96" font-size="7" fill="#555" text-anchor="middle">100 cm</text>
+
+        <!-- Silmä -->
+        <ellipse cx="200" cy="80" rx="10" ry="7" fill="#fff" stroke="#333" stroke-width="1.5"/>
+        <circle cx="200" cy="80" r="4" fill="#1a3a2a"/>
+        <circle cx="202" cy="78" r="1.5" fill="#fff"/>
+        <text x="200" y="110" font-size="8" fill="#333" text-anchor="middle">nenä</text>
+
+        <!-- Risteymisnuolet -->
+        <line x1="170" y1="60" x2="200" y2="80" stroke="#999" stroke-width="0.8" stroke-dasharray="3,2"/>
+        <line x1="170" y1="100" x2="200" y2="80" stroke="#999" stroke-width="0.8" stroke-dasharray="3,2"/>
+        <text x="155" y="57" font-size="7" fill="#888">lankakuva</text>
+      </svg>
+    </div>
+
+    <div class="diagram-box">
+      <div class="diagram-title">Muistilista</div>
+      <ul class="setup-list">
+        <li>Lanka suoraan nenän edestä seinälle</li>
+        <li>3–4 helmeä eri etäisyyksille</li>
+        <li>Katso helmeä — ei lankaa</li>
+        <li>Molemmat silmät auki</li>
+        <li>Kaksi lankaa risteytyy helmessä ✓</li>
+        <li>Langan katoaminen = suppression</li>
+        <li>Kirjaa lähin vakaa risteys (cm)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tracking-section">
+    <div class="tracking-title">Tuloskirjaus — Lähin risteyspiste (cm nenästä)</div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:100px">Päivämäärä</th>
+          <th style="width:60px">Sarja</th>
+          <th style="width:80px">Tulos (cm)</th>
+          <th style="width:80px">Kohde (helmi)</th>
+          <th>Huomiot (suppression, silmäväsymys...)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="ref-section">
+    <div class="ref-title">📊 Viitearvot</div>
+    <div class="ref-grid">
+      <div class="ref-item">
+        <div class="ref-item-label">Normaali (aikuinen)</div>
+        <div class="ref-item-val">≤ 6–8 cm</div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-item-label">Konvergenssin puutos</div>
+        <div class="ref-item-val">&gt; 10 cm</div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-item-label">Tavoite (harjoittelu)</div>
+        <div class="ref-item-val">≤ 5 cm</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">NäköHarjoitus · Brockin lanka · Seurantalomake · Tulostettava harjoituspohja</div>
+</div>
+
+</body>
+</html>

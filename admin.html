@@ -215,6 +215,20 @@
     letter-spacing: 0.08em;
   }
 
+  .ex-lib-material-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-top: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    color: var(--accent2);
+    background: rgba(44,110,78,0.08);
+    border: 1px solid rgba(44,110,78,0.2);
+    border-radius: 4px;
+    padding: 2px 6px;
+  }
+
   .ex-lib-check {
     float: right;
     width: 18px; height: 18px;
@@ -855,15 +869,18 @@
 <script>
 
 // ── EXERCISE LIBRARY DATA ────────────────────────────────────────────────
+// materiaalit: [{ nimi, tiedosto }] — tiedosto on suhteellinen polku materiaalit/-kansioon
 let LIBRARY = [
   { id:'sakkadi', name:'Sakkadinen silmänliike', icon:'↔️', cat:'Silmänliike', unit:'ms', unitLabel:'reaktioaika (ms)',
-    instructions:'Aseta <strong>numerotaulu</strong> seinälle silmien korkeudelle noin 1 m etäisyydelle. Lue numerot 1–20 järjestyksessä mahdollisimman nopeasti liikuttaen vain silmiä, ei päätä. Pidä 30 s tauko sarjojen välillä. Mittaa aika tai laske virheet.' },
+    instructions:'Aseta <strong>numerotaulu</strong> seinälle silmien korkeudelle noin 1 m etäisyydelle. Lue numerot 1–20 järjestyksessä mahdollisimman nopeasti liikuttaen vain silmiä, ei päätä. Pidä 30 s tauko sarjojen välillä. Mittaa aika tai laske virheet.',
+    materiaalit:[{ nimi:'Numerotaulu (A4, tulostettava)', tiedosto:'sakkadi-numerotaulu.html' }] },
   { id:'silmakasi', name:'Silmä-käsikoordinaatio', icon:'🎯', cat:'Koordinaatio', unit:'pisteet', unitLabel:'osumia / 20',
     instructions:'Pomppaa <strong>tennispallo</strong> seinään ja ota kiinni yhdellä kädellä vuorotellen. Etäisyys n. 2 m. Vaikeuta lisäämällä rytmi tai sulkemalla toinen silmä. Laske onnistuneet kiinniotot per sarja.' },
   { id:'akkomodaatio', name:'Akkomodaatio (lähi-kauko)', icon:'🔭', cat:'Akkomodaatio', unit:'s', unitLabel:'tarkennusaika (s)',
     instructions:'Pidä <strong>kynää</strong> 10 cm silmistä ja katso vuorotellen kynän kärkeä ja kaukaista kohdetta (>5 m). Laske hitaasti 3 sekuntia per kohde.' },
   { id:'brock', name:'Brockin lanka', icon:'🪢', cat:'Binokulaarisuus', unit:'cm', unitLabel:'lähin risteyspiste (cm)',
-    instructions:'Kiinnitä <strong>lanka</strong> (2 m) seinään. Aseta 3–4 helmeä eri etäisyyksille. Katso helmiä: näe kaksi lankaa risteytyä helmessä. Kirjaa etäisyys josta risteys häviää.' },
+    instructions:'Kiinnitä <strong>lanka</strong> (2 m) seinään. Aseta 3–4 helmeä eri etäisyyksille. Katso helmiä: näe kaksi lankaa risteytyä helmessä. Kirjaa etäisyys josta risteys häviää.',
+    materiaalit:[{ nimi:'Seurantalomake (A4, tulostettava)', tiedosto:'brock-lanka-seurantalomake.html' }] },
   { id:'periferia', name:'Perifeerinen näkö', icon:'🌐', cat:'Silmänliike', unit:'°', unitLabel:'kulma-aste',
     instructions:'Katso suoraan eteenpäin. Vie käsi sivulle ja heiluta sormia — merkitse kulma jossa liike ensin näkyy. Toista molemmille puolille.' },
   { id:'pursuit', name:'Silmän seuranta (Pursuit)', icon:'🔄', cat:'Silmänliike', unit:'', unitLabel:'arvio 1–5',
@@ -909,6 +926,7 @@ function buildLibrary() {
       </div>
       <div class="ex-lib-name">${ex.name}</div>
       <div class="ex-lib-cat">${ex.cat} · ${ex.unit || 'laadullinen'}</div>
+      ${ex.materiaalit?.length ? `<div class="ex-lib-material-badge">📄 ${ex.materiaalit.length} tulostettava</div>` : ''}
     `;
     card.onclick = () => toggleExercise(ex);
     el.appendChild(card);

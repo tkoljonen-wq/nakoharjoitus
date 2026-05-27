@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sakkadinen silmänliike — Numerotaulu</title>
+<style>
+  @media print {
+    .no-print { display: none !important; }
+    body { margin: 0; }
+    .page { page-break-after: avoid; }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Arial', sans-serif;
+    background: #fff;
+    color: #111;
+  }
+
+  .no-print {
+    background: #1a3a2a;
+    color: #fff;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .no-print-title {
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .no-print-hint {
+    font-size: 12px;
+    opacity: 0.7;
+  }
+
+  .print-btn {
+    background: #4caf7d;
+    color: #fff;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .print-btn:hover { background: #3d9669; }
+
+  .page {
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 16mm 18mm;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 2px solid #111;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+  }
+
+  .header-title { font-size: 18px; font-weight: bold; }
+  .header-sub { font-size: 11px; color: #555; margin-top: 3px; }
+  .header-logo { font-size: 11px; color: #888; text-align: right; }
+
+  .instructions {
+    font-size: 11px;
+    color: #444;
+    background: #f5f5f5;
+    border-left: 3px solid #1a3a2a;
+    padding: 8px 12px;
+    margin-bottom: 18px;
+    line-height: 1.5;
+  }
+
+  .instructions strong { color: #1a3a2a; }
+
+  /* ── NUMEROTAULU ── */
+  .grid-title {
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 10px;
+  }
+
+  .number-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 6px;
+    max-width: 180mm;
+    margin: 0 auto 20px;
+  }
+
+  .num-cell {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #ccc;
+    border-radius: 6px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #111;
+  }
+
+  /* Vaihteleva koko — realistinen sakkadikoulutus */
+  .num-cell.sm { font-size: 14px; }
+  .num-cell.lg { font-size: 22px; }
+
+  /* ── SEURANTALOMAKE ── */
+  .tracking-section {
+    margin-top: 24px;
+    border-top: 1px solid #ddd;
+    padding-top: 16px;
+  }
+
+  .tracking-title {
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .tracking-grid {
+    display: grid;
+    grid-template-columns: 60px repeat(5, 1fr);
+    gap: 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    overflow: hidden;
+    font-size: 11px;
+  }
+
+  .tg-cell {
+    padding: 7px 10px;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .tg-cell:last-child { border-right: none; }
+  .tg-cell.header { background: #f0f0f0; font-weight: bold; text-align: center; }
+  .tg-cell.row-label { background: #f8f8f8; font-weight: bold; }
+  .tg-cell.last-row { border-bottom: none; }
+
+  .footer {
+    margin-top: 20px;
+    font-size: 9px;
+    color: #aaa;
+    text-align: center;
+    border-top: 1px solid #eee;
+    padding-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="no-print">
+  <div>
+    <div class="no-print-title">📄 Sakkadinen silmänliike — Numerotaulu</div>
+    <div class="no-print-hint">Tulosta A4-paperille tai tallenna PDF:ksi</div>
+  </div>
+  <button class="print-btn" onclick="window.print()">🖨️ Tulosta / Tallenna PDF</button>
+</div>
+
+<div class="page">
+  <div class="header">
+    <div>
+      <div class="header-title">Sakkadinen silmänliike — Numerotaulu</div>
+      <div class="header-sub">Silmänliikeen nopeus ja tarkkuus · Harjoituspohja</div>
+    </div>
+    <div class="header-logo">NäköHarjoitus<br>nakoharjoitus.github.io</div>
+  </div>
+
+  <div class="instructions">
+    <strong>Ohje:</strong> Kiinnitä taulu seinälle silmien korkeudelle noin <strong>1 metrin</strong> etäisyydelle.
+    Lue numerot <strong>1–20 järjestyksessä</strong> mahdollisimman nopeasti liikuttaen vain silmiä, ei päätä.
+    Pidä 30 s tauko sarjojen välillä. Mittaa kokonaisaika tai laske virheet.
+  </div>
+
+  <div class="grid-title">Taulu A — Perusjärjestys</div>
+  <div class="number-grid" id="gridA"></div>
+
+  <div class="grid-title">Taulu B — Satunnainen</div>
+  <div class="number-grid" id="gridB"></div>
+
+  <div class="tracking-section">
+    <div class="tracking-title">Tuloskirjaus</div>
+    <div class="tracking-grid">
+      <div class="tg-cell header">Sarja</div>
+      <div class="tg-cell header">Aika (s)</div>
+      <div class="tg-cell header">Virheet</div>
+      <div class="tg-cell header">Taulu</div>
+      <div class="tg-cell header">Päivämäärä</div>
+      <div class="tg-cell header">Huomiot</div>
+
+      <div class="tg-cell row-label">1</div>
+      <div class="tg-cell"></div><div class="tg-cell"></div>
+      <div class="tg-cell"></div><div class="tg-cell"></div><div class="tg-cell"></div>
+
+      <div class="tg-cell row-label">2</div>
+      <div class="tg-cell"></div><div class="tg-cell"></div>
+      <div class="tg-cell"></div><div class="tg-cell"></div><div class="tg-cell"></div>
+
+      <div class="tg-cell row-label">3</div>
+      <div class="tg-cell"></div><div class="tg-cell"></div>
+      <div class="tg-cell"></div><div class="tg-cell"></div><div class="tg-cell"></div>
+
+      <div class="tg-cell row-label last-row">4</div>
+      <div class="tg-cell last-row"></div><div class="tg-cell last-row"></div>
+      <div class="tg-cell last-row"></div><div class="tg-cell last-row"></div>
+      <div class="tg-cell last-row"></div>
+    </div>
+  </div>
+
+  <div class="footer">NäköHarjoitus · Sakkadinen silmänliike · Numerotaulu · Tulostettava harjoituspohja</div>
+</div>
+
+<script>
+// Taulu A: 1–20 järjestyksessä, 10 per rivi (täytetään jäljelle jäävät solut tyhjiksi tai symbolein)
+const gridAEl = document.getElementById('gridA');
+const numbersA = Array.from({length: 20}, (_, i) => i + 1);
+// Hajota numerot 10x10 ruudukkoon satunnaisille paikoille
+const allCells = Array.from({length: 100}, (_, i) => i);
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+// Taulu A: numerot 1-20 hajotettu 10x10 ruudukkoon
+const posA = shuffle(allCells).slice(0, 20);
+const cellsA = Array(100).fill('');
+posA.forEach((pos, idx) => { cellsA[pos] = idx + 1; });
+const sizesA = posA.map(() => ['','sm','lg'][Math.floor(Math.random() * 3)]);
+
+cellsA.forEach((val, i) => {
+  const cell = document.createElement('div');
+  const numIdx = posA.indexOf(i);
+  cell.className = 'num-cell' + (val ? ' ' + (sizesA[numIdx] || '') : '');
+  cell.textContent = val || '';
+  cell.style.borderColor = val ? '#999' : '#eee';
+  cell.style.color = val ? '#111' : 'transparent';
+  gridAEl.appendChild(cell);
+});
+
+// Taulu B: täysin satunnainen järjestys
+const gridBEl = document.getElementById('gridB');
+const posB = shuffle(allCells).slice(0, 20);
+const cellsB = Array(100).fill('');
+const shuffledNums = shuffle(Array.from({length:20},(_,i)=>i+1));
+posB.forEach((pos, idx) => { cellsB[pos] = shuffledNums[idx]; });
+
+cellsB.forEach((val) => {
+  const cell = document.createElement('div');
+  cell.className = 'num-cell';
+  cell.textContent = val || '';
+  cell.style.borderColor = val ? '#999' : '#eee';
+  cell.style.color = val ? '#111' : 'transparent';
+  gridBEl.appendChild(cell);
+});
+</script>
+</body>
+</html>
