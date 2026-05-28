@@ -807,8 +807,7 @@
 
 <div class="toast" id="toast"></div>
 
-<!-- QR code library -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.4/qrcode.js"></script>
+<script src="qrcode.min.js"></script>
 <script>
 
 // ── EXERCISE LIBRARY DATA ────────────────────────────────────────────────
@@ -1040,25 +1039,25 @@ function generateAndPreview() {
   const shareUrl = baseUrl + '#program=' + encoded;
   document.getElementById('shareLink').textContent = shareUrl;
 
-  // QR code
+  // QR code via self-hosted qrcodejs (qrcode.min.js)
   const qrEl = document.getElementById('qrcode');
   qrEl.innerHTML = '';
-  if (typeof QRCode === 'undefined' || !QRCode.toCanvas) {
-    qrEl.textContent = 'QR-kirjasto ei latautunut (tarkista verkkoyhteys)';
+  if (typeof QRCode === 'undefined') {
+    qrEl.textContent = 'QR-kirjasto puuttuu — varmista että qrcode.min.js on samassa kansiossa kuin admin.html.';
   } else {
-    const canvas = document.createElement('canvas');
-    qrEl.appendChild(canvas);
-    QRCode.toCanvas(canvas, shareUrl, {
-      width: 180,
-      margin: 1,
-      errorCorrectionLevel: 'L',
-      color: { dark: '#9A5EA3', light: '#ffffff' }
-    }, function(err) {
-      if (err) {
-        console.error('QR-generointi epäonnistui:', err);
-        qrEl.textContent = 'QR-koodin luonti epäonnistui — linkki on ehkä liian pitkä (' + shareUrl.length + ' merkkiä). Käytä Kopioi linkki -nappia.';
-      }
-    });
+    try {
+      new QRCode(qrEl, {
+        text: shareUrl,
+        width: 200,
+        height: 200,
+        colorDark: '#9A5EA3',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.L
+      });
+    } catch(e) {
+      console.error('QR-generointi epäonnistui:', e);
+      qrEl.textContent = 'QR-koodin luonti epäonnistui — linkki on todennäköisesti liian pitkä (' + shareUrl.length + ' merkkiä). Käytä Kopioi linkki -nappia.';
+    }
   }
 
   goStep(3);
