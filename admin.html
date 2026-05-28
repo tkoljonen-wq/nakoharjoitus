@@ -150,8 +150,6 @@
 
   /* FORM */
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
-  .form-full { grid-column: 1 / -1; }
 
   .field { display: flex; flex-direction: column; gap: 6px; }
 
@@ -535,7 +533,7 @@
   .toast.show { transform: translateY(0); opacity: 1; }
 
   @media (max-width: 640px) {
-    .form-grid, .form-grid.three { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
     .preview-wrap { flex-direction: column; }
     .summary-grid { grid-template-columns: 1fr; }
   }
@@ -596,38 +594,6 @@
           Valitse harjoituksia yllä olevasta kirjastosta
         </div>
       </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">
-        <div class="card-title-icon">✏️</div>
-        Lisää oma harjoitus kirjastoon
-      </div>
-      <div class="form-grid three">
-        <div class="field">
-          <label>Harjoituksen nimi</label>
-          <input type="text" id="customName" placeholder="Esim. Perifeerinen...">
-        </div>
-        <div class="field">
-          <label>Kategoria</label>
-          <select id="customCat">
-            <option>Silmänliike</option>
-            <option>Koordinaatio</option>
-            <option>Akkomodaatio</option>
-            <option>Binokulaarisuus</option>
-            <option>Muu</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Mittayksikkö</label>
-          <input type="text" id="customUnit" placeholder="Esim. ms, pisteet, cm">
-        </div>
-        <div class="field form-full">
-          <label>Ohjeet urheilijalle</label>
-          <textarea id="customInstr" placeholder="Kirjoita selkeät ohjeet mitä urheilija näkee puhelimessaan..."></textarea>
-        </div>
-      </div>
-      <button class="btn btn-secondary" style="margin-top:14px" onclick="addCustomExercise()">+ Lisää kirjastoon</button>
     </div>
 
     <div class="btn-row">
@@ -853,22 +819,6 @@ function removeEx(id) {
   delete selected[id];
   buildLibrary();
   buildSelected();
-}
-
-function addCustomExercise() {
-  const name = document.getElementById('customName').value.trim();
-  const cat = document.getElementById('customCat').value;
-  const unit = document.getElementById('customUnit').value.trim();
-  const instr = document.getElementById('customInstr').value.trim();
-  if (!name) { showToast('Anna harjoitukselle nimi'); return; }
-  const id = 'custom_' + Date.now();
-  const icons = { 'Silmänliike':'👁️', 'Koordinaatio':'🤝', 'Akkomodaatio':'🔭', 'Binokulaarisuus':'🪢', 'Muu':'⭐' };
-  LIBRARY.push({ id, name, icon: icons[cat] || '⭐', cat, unit, unitLabel: unit || 'arvio', instructions: instr });
-  buildLibrary();
-  document.getElementById('customName').value = '';
-  document.getElementById('customUnit').value = '';
-  document.getElementById('customInstr').value = '';
-  showToast('Harjoitus lisätty kirjastoon!');
 }
 
 // ── DAY GRID ─────────────────────────────────────────────────────────────
