@@ -712,23 +712,6 @@
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-title">
-        <div class="card-title-icon">🔔</div>
-        Muistutusviesti
-      </div>
-      <div class="form-grid">
-        <div class="field">
-          <label>Muistutusaika</label>
-          <input type="time" id="reminderTime" value="08:00">
-        </div>
-        <div class="field">
-          <label>Muistutusteksti</label>
-          <input type="text" id="reminderText" value="Tänään on näköharjoituspäivä! 👁️">
-        </div>
-      </div>
-    </div>
-
     <div class="btn-row">
       <div></div>
       <button class="btn btn-primary" onclick="generateAndPreview()">Luo ohjelma ja esikatselu →</button>
@@ -986,8 +969,6 @@ function toggleDay(i, btn) {
 function generateAndPreview() {
   const dur = document.getElementById('progDuration').value;
   const start = document.getElementById('startDate').value || new Date().toISOString().split('T')[0];
-  const reminderTime = document.getElementById('reminderTime').value;
-  const reminderText = document.getElementById('reminderText').value;
 
   // Trim each exercise to the fields the athlete view needs; omit `days` unless overridden
   const exercises = Object.values(selected).map(ex => {
@@ -1005,7 +986,6 @@ function generateAndPreview() {
   programData = {
     exercises,
     schedule: { days: trainingDays, durationWeeks: parseInt(dur), startDate: start },
-    reminder: { time: reminderTime, text: reminderText },
     created: new Date().toISOString()
   };
 
