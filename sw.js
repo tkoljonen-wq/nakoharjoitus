@@ -10,7 +10,6 @@ const PRECACHE_ASSETS = [
   './index.html',
   './admin.html',
   './nakoharjoitukset.html',
-  './asennusohje.html',
   './qrcode.min.js',
   './lz-string.min.js',
   './silmaasema-logo.jpg',

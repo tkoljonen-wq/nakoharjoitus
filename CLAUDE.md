@@ -26,7 +26,6 @@ Testaa mobiilioptimointi Chrome DevToolsin mobiiliemulaattorilla (F12 → Toggle
 index.html          ← Aloitussivu
 admin.html          ← Optikon hallintatyökalu (4-vaiheinen wizard)
 nakoharjoitukset.html ← Urheilijan mobiilisovellus
-asennusohje.html    ← GitHub Pages -asennusohje käyttäjälle
 ```
 
 **Datan kulku:** Optikko rakentaa ohjelman `admin.html`-wizardissa → JSON serialisoidaan base64:ksi → upotetaan URL-hashiin (`#program=...`) → urheilija avaa linkin `nakoharjoitukset.html#program=...` → data puretaan muistiin → localStorage tallentaa päivittäiset suoritukset.
