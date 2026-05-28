@@ -44,16 +44,17 @@ Urheilija voi kirjata numeerisen tuloksen + vapaamuotoisen muistiinpanon jokaise
 
 ## Tulostettavat materiaalit
 
-Kansio `materiaalit/` sisältää HTML-tiedostoja jotka on optimoitu tulostamista varten:
-- Yläpalkissa "🖨️ Tulosta / Tallenna PDF" -nappi (`window.print()`)
-- `@media print` -sääntö piilottaa yläpalkin
-- A4-muotoilu (`max-width: 210mm`, sopivat marginaalit)
+Kansio `materiaalit/` sisältää harjoituksiin liitettäviä tiedostoja. Tuetut tyypit:
+- **PDF** — kopioidaan suoraan kansioon, Chrome avaa selaimessa
+- **HTML** — tulostusoptimoitu pohja: `@media print` piilottaa yläpalkin, `window.print()`-nappi, A4-muotoilu (`max-width: 210mm`)
+
+**Tiedostonimeäminen:** vain pieniä kirjaimia, viivoja ja numeroita — ei välilyöntejä eikä ääkkösiä. Esim. `brock-lanka-ohje.pdf` ✓
 
 **Uuden materiaalin lisääminen:**
-1. Luo `materiaalit/harjoituksen-nimi.html` (kopioi olemassa olevan pohja)
-2. Lisää `LIBRARY`-kohteeseen `materiaalit: [{ nimi: '...', tiedosto: 'harjoituksen-nimi.html' }]`
+1. Kopioi tiedosto (`*.pdf` tai `*.html`) `materiaalit/`-kansioon
+2. Lisää viite `admin.html`:n `LIBRARY`-kohteeseen: `materiaalit: [{ nimi: 'Näkyvä nimi', tiedosto: 'tiedostonimi.pdf' }]`
 
-Harjoituksilla joilla on materiaali näytetään `📄 1 tulostettava` -merkintä kirjastokortissa (admin.html) sekä latauslinkki harjoituskortin sisällä (nakoharjoitukset.html).
+Harjoituksilla joilla on materiaali näytetään `📄 N tulostettava` -merkintä kirjastokortissa (admin.html) sekä latauslinkki(t) harjoituskortin sisällä (nakoharjoitukset.html). Linkki avautuu uuteen välilehteen.
 
 ## Urheilijan näkymä (nakoharjoitukset.html)
 
@@ -67,8 +68,45 @@ Kolme välilehteä (bottom navigation): **Tänään / Päiväkirja / Kehitys**
 
 Sovelluksessa ei vielä ole manifest.json:ia eikä service workeria. Jos lisätään PWA-tuki, noudata `~/.claude/CLAUDE.md`:n PWA-ohjeita (network-first SW, SVG-ikonit, suhteelliset polut).
 
-## Käyttöliittymä
+## Käyttöliittymä — Silmäaseman brändi (2026-05-28 alkaen)
 
-- Värimaailma: tumma tausta (`#0a0a0f`), syaani (`#00d4ff`) ja violetti (`#8b5cf6`) aksentit
-- Fontit: Syne (otsikot), DM Mono (koodityyliset labelit) — ladataan Google Fontsista
-- Kaikki UI-teksti on suomeksi
+Sovellus toimii **Silmäaseman tuotteena** ja noudattaa brändikäsikirjaa (`G:\Oma Drive\Työ\Urheilunäkö\Brändikäsikirja.pdf`).
+
+**Brändi-tokenit (CSS-muuttujat kaikissa tiedostoissa):**
+- `--bg: #f7f5f9` (vaalea harmaa-violetti sivutausta)
+- `--surface: #ffffff` (korttipinta)
+- `--surface2: #f3ecf5` (violetin 10% sävy, taustakorostuksiin)
+- `--border: #e5e0e8`
+- `--accent: #9A5EA3` (Silmäasema-violetti, PMS 258)
+- `--accent-dark: #7d4685` (hover/active) — admin.html:ssä `--accent2`
+- `--warn: #F06428` (brand-oranssi, harkiten — vain streak-tag/notif-banner)
+- `--success: #2d7a4f` (tehty-merkinnät, sopii vaalealle)
+- `--text: #323232` (pehmennetty musta)
+- `--text-dim: #6b6660`, `--text-faint: #a8a39d`
+
+**Typografia (Google Fonts):**
+- **Roboto Condensed** (400/500/700) — otsikot ja UI-labelit, usein VERSAALIT
+- **Roboto Flex** — leipäteksti
+- **Roboto Mono** — numerot, kellonajat, koodimaiset elementit (.ex-meta, .date-line, .progress-text, .week-dot, .log-input)
+
+**Logo:** `silmaasema-logo.jpg` projektin juuressa (~500×100, violetti SILMÄASEMA-teksti). Lisätään `.brand-bar`-elementtiin headerin yläosaan kaikkiin näkymiin.
+
+**Meta:** `<meta name="theme-color" content="#9A5EA3">`, `apple-mobile-web-app-status-bar-style="default"` (ei enää black-translucent).
+
+## Käynnissä oleva työ: brändi-uudistus
+
+Status 2026-05-28: kaikki kolme vaihetta valmiit. Brändi-uudistus päätökseen.
+
+| Vaihe | Tiedosto | Tila |
+|---|---|---|
+| 1 | `nakoharjoitukset.html` | **Valmis** — kaikki värit/fontit/logo päivitetty, modaali + bottom-nav + diary + stats brändin mukaiset |
+| 2 | `admin.html` | **Valmis 2026-05-28** — body Roboto Flex, otsikot/napit Roboto Condensed (uppercase), numerot Roboto Mono, dot-grid violetti `rgba(154,94,163,0.12)`, `.logo-mark`/`.logo-text` korvattu SILMÄASEMA-logolla + violetti pill "Optikon hallintapaneeli", `.preview-phone` vaalea (tumma kotelo + valkoinen näyttö + violetti vasen reuna + SILMÄASEMA-eyebrow), vanhat vihreät `rgba(44,110,78,...)` → `rgba(154,94,163,...)` |
+| 3 | `index.html` | **Valmis 2026-05-28** — täysi uudelleenkirjoitus: vaalea bg + violetti grid, SILMÄASEMA-logo headerinä, "Urheilunäkö"-eyebrow pill, h1 Roboto Condensed uppercase (`Näkö` musta + violetti `Harjoitus`), violetti `.btn-primary` ja valkoinen `.btn-secondary` border-hoverilla |
+
+**Edelliset valmiit työt (kontekstina):**
+- Optikon urheilijavaihe (Step 1) poistettu — admin.html alkaa nyt suoraan Harjoitukset-vaiheesta (3 vaihetta: Harjoitukset, Aikataulu, Jaa linkki)
+- Per-harjoitus aikataulu-override: kunkin valitun harjoituksen rivissä 📅-nappi joka avaa viikonpäivä-paneelin. Tyhjä = käytä Step 2:n globaalia oletusta
+- Urheilijanäkymässä tämän päivän harjoitukset suodatetaan per-harjoitus `days`-kentästä (tai oletuksesta); lepopäivänä rest-day-kortti
+- Fullscreen "Avaa harjoitus" -modaali: ohjeteksti + PDF-preview (iframe) + Avaa/Lataa-napit + tuloskirjaus
+- Brock-harjoitukseen liitetty `materiaalit/brock-lanka-ohje.pdf` valokuvineen (3 sivua)
+- Custom-harjoitusten luonti poistettu admin.html:stä — optikko valitsee vain valmiista LIBRARY-vaihtoehdoista, uudet harjoitukset lisätään koodimuokkauksella

@@ -3,57 +3,133 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NäköHarjoitus</title>
+<meta name="theme-color" content="#9A5EA3">
+<title>NäköHarjoitus — Silmäasema</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;800&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;500;700&family=Roboto+Flex:opsz,wght@8..144,300;8..144,400;8..144,500;8..144,700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --bg: #f7f5f9;
+    --surface: #ffffff;
+    --surface2: #f3ecf5;
+    --border: #e5e0e8;
+    --accent: #9A5EA3;
+    --accent-dark: #7d4685;
+    --text: #323232;
+    --text-dim: #6b6660;
+    --text-faint: #a8a39d;
+  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
+
   body {
-    background: #080d1a;
-    color: #e8f0ff;
-    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Roboto Flex', sans-serif;
     min-height: 100vh;
     display: flex; align-items: center; justify-content: center;
   }
+
   body::before {
     content: '';
     position: fixed; inset: 0;
     background-image:
-      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+      linear-gradient(rgba(154,94,163,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(154,94,163,0.04) 1px, transparent 1px);
     background-size: 40px 40px;
     pointer-events: none;
   }
-  .center { text-align: center; position: relative; z-index: 1; padding: 24px; }
-  .icon { font-size: 56px; margin-bottom: 24px; }
-  h1 { font-size: 38px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 10px; }
-  h1 span {
-    background: linear-gradient(135deg, #00d4ff, #7b4fff);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+
+  .center {
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    padding: 32px 24px;
+    max-width: 480px;
+    width: 100%;
   }
-  p { font-family: 'DM Mono', monospace; font-size: 12px; color: #6b7fa3; letter-spacing: 0.08em; margin-bottom: 40px; }
-  .btn-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+  .brand-logo {
+    height: 56px;
+    width: auto;
+    display: block;
+    margin: 0 auto 28px;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    background: var(--surface2);
+    border: 1px solid rgba(154,94,163,0.2);
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 22px;
+  }
+
+  h1 {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 38px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.05;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .tagline {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    margin-bottom: 40px;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
   .btn {
-    padding: 16px 32px;
-    border: none; border-radius: 14px;
-    font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+    padding: 14px 28px;
+    border: none; border-radius: 12px;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 14px; font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     cursor: pointer; text-decoration: none; display: inline-block;
-    transition: opacity 0.15s;
+    transition: all 0.15s;
   }
-  .btn:hover { opacity: 0.85; }
-  .btn-primary { background: linear-gradient(135deg, #00d4ff, #7b4fff); color: #fff; }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--accent-dark); }
+
   .btn-secondary {
-    background: rgba(255,255,255,0.06);
-    color: #e8f0ff;
-    border: 1px solid rgba(255,255,255,0.12);
+    background: var(--surface);
+    color: var(--text);
+    border: 1.5px solid var(--border);
   }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
 </style>
 </head>
 <body>
 <div class="center">
-  <div class="icon">👁️</div>
+  <img src="silmaasema-logo.jpg" alt="Silmäasema" class="brand-logo">
+  <div class="eyebrow">Urheilunäkö</div>
   <h1>Näkö<span>Harjoitus</span></h1>
-  <p>Urheilijoiden näköharjoitteluohjelma</p>
+  <p class="tagline">Urheilijoiden näköharjoitteluohjelma</p>
   <div class="btn-row">
     <a class="btn btn-primary" href="admin.html">Optikon hallintapaneeli</a>
     <a class="btn btn-secondary" href="nakoharjoitukset.html">Urheilijan näkymä (demo)</a>
