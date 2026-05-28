@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Maskable: täysi violetti tausta (ei pyöristettyjä reunoja), silmä kutistettu 80% safe-arean sisään -->
+  <rect width="512" height="512" fill="#9A5EA3"/>
+  <ellipse cx="256" cy="256" rx="144" ry="84" fill="#ffffff"/>
+  <circle cx="256" cy="256" r="62" fill="#9A5EA3"/>
+  <circle cx="256" cy="256" r="27" fill="#1a1010"/>
+  <circle cx="274" cy="240" r="11" fill="#ffffff" opacity="0.95"/>
+</svg>

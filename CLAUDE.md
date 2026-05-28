@@ -66,7 +66,16 @@ Kolme välilehteä (bottom navigation): **Tänään / Päiväkirja / Kehitys**
 
 ## PWA-tuki
 
-Sovelluksessa ei vielä ole manifest.json:ia eikä service workeria. Jos lisätään PWA-tuki, noudata `~/.claude/CLAUDE.md`:n PWA-ohjeita (network-first SW, SVG-ikonit, suhteelliset polut).
+Sovellus on PWA (2026-05-28 alkaen):
+- `manifest.json` — start_url `"."`, display `standalone`, theme `#9A5EA3`, background `#f7f5f9`
+- `sw.js` — network-first; pre-cachetä HTML/CSS/JS/PDF/HTML-materiaalit/logo/ikonit; **bumppaa `CACHE_NAME` aina** kun julkaiset uusia tiedostoja
+- `icons/icon-192.svg`, `icon-512.svg`, `icon-maskable.svg` — silmäkuvio violetilla brändi-taustalla
+- Kaikki kolme sivua (`index.html`, `admin.html`, `nakoharjoitukset.html`) rekisteröivät SW:n suhteellisella polulla `sw.js`
+
+Asennus aloitusnäytölle:
+- Android (Chrome): osoitepalkin valikko → "Asenna sovellus" / "Lisää aloitusnäytölle"
+- iOS (Safari 16.4+): Jaa → "Lisää Koti-valikkoon"
+- Sovellus avautuu standalone-tilassa (ei selaimen osoitepalkkia), `start_url` = "." → asennetun ikonin painaminen avaa sen sivun johon SW rekisteröitiin
 
 ## Käyttöliittymä — Silmäaseman brändi (2026-05-28 alkaen)
 
@@ -102,6 +111,10 @@ Status 2026-05-28: kaikki kolme vaihetta valmiit. Brändi-uudistus päätökseen
 | 1 | `nakoharjoitukset.html` | **Valmis** — kaikki värit/fontit/logo päivitetty, modaali + bottom-nav + diary + stats brändin mukaiset |
 | 2 | `admin.html` | **Valmis 2026-05-28** — body Roboto Flex, otsikot/napit Roboto Condensed (uppercase), numerot Roboto Mono, dot-grid violetti `rgba(154,94,163,0.12)`, `.logo-mark`/`.logo-text` korvattu SILMÄASEMA-logolla + violetti pill "Optikon hallintapaneeli", `.preview-phone` vaalea (tumma kotelo + valkoinen näyttö + violetti vasen reuna + SILMÄASEMA-eyebrow), vanhat vihreät `rgba(44,110,78,...)` → `rgba(154,94,163,...)` |
 | 3 | `index.html` | **Valmis 2026-05-28** — täysi uudelleenkirjoitus: vaalea bg + violetti grid, SILMÄASEMA-logo headerinä, "Urheilunäkö"-eyebrow pill, h1 Roboto Condensed uppercase (`Näkö` musta + violetti `Harjoitus`), violetti `.btn-primary` ja valkoinen `.btn-secondary` border-hoverilla |
+
+### Muut 2026-05-28 valmistuneet työt
+- **QR-generointi**: korjattu — self-hosted `qrcode.min.js` (~20 KB, davidshimjs/qrcodejs 1.0.0) + LZString-kompressio (`lz-string.min.js`, ~5 KB). Ohjelmadata pakataan ~3175 → ~1000–1500 merkkiä, QR luettavissa puhelinkameralla. Väri musta (#000000) maksikontrastia varten
+- **PWA**: lisätty `manifest.json`, `sw.js` (network-first, pre-cache), `icons/` (silmä violetilla taustalla — vaihtoehto 1 4:stä ehdotuksesta). SW-rekisteröinti kaikilla kolmella sivulla. "Toimii offline" -lupaus asennusohjeessa nyt aidosti toteen
 
 **Edelliset valmiit työt (kontekstina):**
 - Optikon urheilijavaihe (Step 1) poistettu — admin.html alkaa nyt suoraan Harjoitukset-vaiheesta (3 vaihetta: Harjoitukset, Aikataulu, Jaa linkki)

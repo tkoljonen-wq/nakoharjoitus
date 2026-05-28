@@ -1,0 +1,33 @@
+{
+  "name": "NäköHarjoitus — Silmäasema",
+  "short_name": "NäköHarjoitus",
+  "description": "Silmäaseman urheilunäkö-harjoitusohjelma. Tee oma harjoituspolku puhelimella, seuraa edistymistä ja kehity.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f7f5f9",
+  "theme_color": "#9A5EA3",
+  "lang": "fi",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
