@@ -808,6 +808,7 @@
 <div class="toast" id="toast"></div>
 
 <script src="qrcode.min.js"></script>
+<script src="lz-string.min.js"></script>
 <script>
 
 // ── EXERCISE LIBRARY DATA ────────────────────────────────────────────────
@@ -1033,8 +1034,8 @@ function generateAndPreview() {
     phoneList.appendChild(div);
   });
 
-  // Generate share URL with encoded data
-  const encoded = btoa(encodeURIComponent(JSON.stringify(programData)));
+  // Generate share URL with LZString-compressed data (URL-safe, much shorter than btoa)
+  const encoded = LZString.compressToEncodedURIComponent(JSON.stringify(programData));
   const baseUrl = window.location.origin + window.location.pathname.replace('admin.html','') + 'nakoharjoitukset.html';
   const shareUrl = baseUrl + '#program=' + encoded;
   document.getElementById('shareLink').textContent = shareUrl;

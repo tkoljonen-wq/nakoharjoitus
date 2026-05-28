@@ -855,6 +855,7 @@
   </button>
 </div>
 
+<script src="lz-string.min.js"></script>
 <script>
 // ── LOAD PROGRAM FROM URL OR USE DEMO DATA ────────────────────────────────
 function loadProgramFromURL() {
@@ -862,6 +863,12 @@ function loadProgramFromURL() {
     const hash = window.location.hash;
     if (hash && hash.includes('program=')) {
       const encoded = hash.split('program=')[1];
+      // Try LZString first (new format)
+      if (typeof LZString !== 'undefined') {
+        const decompressed = LZString.decompressFromEncodedURIComponent(encoded);
+        if (decompressed) return JSON.parse(decompressed);
+      }
+      // Fallback: legacy btoa + encodeURIComponent
       return JSON.parse(decodeURIComponent(atob(encoded)));
     }
   } catch(e) { console.warn('Could not parse program from URL', e); }
