@@ -808,7 +808,7 @@
 <div class="toast" id="toast"></div>
 
 <!-- QR code library -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script>
 
 // ── EXERCISE LIBRARY DATA ────────────────────────────────────────────────
@@ -1041,16 +1041,24 @@ function generateAndPreview() {
   document.getElementById('shareLink').textContent = shareUrl;
 
   // QR code
-  document.getElementById('qrcode').innerHTML = '';
-  try {
-    new QRCode(document.getElementById('qrcode'), {
-      text: shareUrl,
-      width: 160, height: 160,
-      colorDark: '#1a3a2a',
-      colorLight: '#ffffff',
+  const qrEl = document.getElementById('qrcode');
+  qrEl.innerHTML = '';
+  if (typeof QRCode === 'undefined' || !QRCode.toCanvas) {
+    qrEl.textContent = 'QR-kirjasto ei latautunut (tarkista verkkoyhteys)';
+  } else {
+    const canvas = document.createElement('canvas');
+    qrEl.appendChild(canvas);
+    QRCode.toCanvas(canvas, shareUrl, {
+      width: 180,
+      margin: 1,
+      errorCorrectionLevel: 'L',
+      color: { dark: '#9A5EA3', light: '#ffffff' }
+    }, function(err) {
+      if (err) {
+        console.error('QR-generointi epäonnistui:', err);
+        qrEl.textContent = 'QR-koodin luonti epäonnistui — linkki on ehkä liian pitkä (' + shareUrl.length + ' merkkiä). Käytä Kopioi linkki -nappia.';
+      }
     });
-  } catch(e) {
-    document.getElementById('qrcode').textContent = '[QR-koodi generoidaan]';
   }
 
   goStep(3);
