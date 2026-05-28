@@ -2,7 +2,7 @@
   "name": "NäköHarjoitus — Silmäasema",
   "short_name": "NäköHarjoitus",
   "description": "Silmäaseman urheilunäkö-harjoitusohjelma. Tee oma harjoituspolku puhelimella, seuraa edistymistä ja kehity.",
-  "start_url": ".",
+  "start_url": "nakoharjoitukset.html",
   "scope": ".",
   "display": "standalone",
   "orientation": "portrait",
