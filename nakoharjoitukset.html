@@ -861,21 +861,33 @@
 
 <script src="lz-string.min.js"></script>
 <script>
-// ── LOAD PROGRAM FROM URL OR USE DEMO DATA ────────────────────────────────
+// ── LOAD PROGRAM FROM URL (and persist to localStorage so PWA reopens work) ──
+const PROGRAM_STORAGE_KEY = 'nakoharjoitusProgram';
+
 function loadProgramFromURL() {
+  // 1) Try URL hash (kun urheilija avaa jaetun linkin / QR-koodin)
   try {
     const hash = window.location.hash;
     if (hash && hash.includes('program=')) {
       const encoded = hash.split('program=')[1];
+      let parsed = null;
       // Try LZString first (new format)
       if (typeof LZString !== 'undefined') {
         const decompressed = LZString.decompressFromEncodedURIComponent(encoded);
-        if (decompressed) return JSON.parse(decompressed);
+        if (decompressed) parsed = JSON.parse(decompressed);
       }
       // Fallback: legacy btoa + encodeURIComponent
-      return JSON.parse(decodeURIComponent(atob(encoded)));
+      if (!parsed) parsed = JSON.parse(decodeURIComponent(atob(encoded)));
+      // Persist so PWA-opens ilman hashia toimivat
+      try { localStorage.setItem(PROGRAM_STORAGE_KEY, JSON.stringify(parsed)); } catch(e) {}
+      return parsed;
     }
   } catch(e) { console.warn('Could not parse program from URL', e); }
+  // 2) Fallback: aiemmin tallennettu ohjelma (PWA-uudelleenavaus aloitusnäytöltä)
+  try {
+    const saved = localStorage.getItem(PROGRAM_STORAGE_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch(e) { console.warn('Could not load program from storage', e); }
   return null;
 }
 
