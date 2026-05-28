@@ -246,13 +246,17 @@
   /* SELECTED EXERCISES */
   .selected-list { display: flex; flex-direction: column; gap: 8px; }
 
-  .sel-ex-row {
+  .sel-ex-wrapper {
     background: var(--surface2);
     border: 1px solid var(--border);
     border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .sel-ex-row {
     padding: 14px 16px;
     display: grid;
-    grid-template-columns: auto 1fr auto auto auto;
+    grid-template-columns: auto 1fr auto auto auto auto;
     gap: 12px;
     align-items: center;
   }
@@ -283,6 +287,87 @@
   }
 
   .remove-btn:hover { color: var(--warn); }
+
+  .day-toggle-btn {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .day-toggle-btn:hover { border-color: var(--accent2); color: var(--accent); }
+
+  .day-toggle-btn.has-override {
+    border-color: var(--accent2);
+    background: rgba(44,110,78,0.06);
+    color: var(--accent);
+  }
+
+  .sel-ex-days {
+    display: none;
+    padding: 14px 16px;
+    border-top: 1px solid var(--border);
+    background: rgba(0,0,0,0.02);
+  }
+
+  .sel-ex-days.open { display: block; }
+
+  .days-mini-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .reset-default-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.15s;
+  }
+
+  .reset-default-btn:hover { border-color: var(--warn); color: var(--warn); }
+
+  .days-mini-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+
+  .day-mini-btn {
+    aspect-ratio: 1;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .day-mini-btn:hover { border-color: var(--accent2); }
+
+  .day-mini-btn.on {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
 
   /* SCHEDULE */
   .schedule-grid {
@@ -608,8 +693,11 @@
     <div class="card">
       <div class="card-title">
         <div class="card-title-icon">📅</div>
-        Harjoituspäivät
+        Oletusaikataulu
       </div>
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:14px;line-height:1.6">
+        Nämä päivät koskevat harjoituksia joille ei ole asetettu omaa aikataulua. Yksittäisen harjoituksen päiviä voi mukauttaa Harjoitukset-vaiheen 📅-napilla.
+      </p>
       <div class="schedule-grid" id="dayGrid"></div>
       <div class="duration-row">
         <div class="field">
@@ -671,7 +759,7 @@
         <div class="preview-info">
           <div class="summary-grid" id="summaryGrid">
             <div class="summary-item"><div class="summary-label">Harjoituksia</div><div class="summary-value" id="sumEx">—</div></div>
-            <div class="summary-item"><div class="summary-label">Harjoituspäiviä/vk</div><div class="summary-value" id="sumDays">—</div></div>
+            <div class="summary-item"><div class="summary-label">Oletuspäiviä/vk</div><div class="summary-value" id="sumDays">—</div></div>
             <div class="summary-item"><div class="summary-label">Kesto</div><div class="summary-value" id="sumDur">—</div></div>
           </div>
           <p style="font-size:13px; color:var(--text-dim); line-height:1.7; margin-bottom:16px;">
@@ -741,8 +829,9 @@ let LIBRARY = [
 ];
 
 // ── STATE ────────────────────────────────────────────────────────────────
-let selected = {}; // id -> { ...ex, duration, sets }
+let selected = {}; // id -> { ...ex, duration, sets, days? }
 let trainingDays = [1,3,5]; // Mon=0...Sun=6 (0-indexed Mon)
+let openDayPanels = new Set(); // exercise ids with open per-exercise day panel
 let programData = null;
 let qrInstance = null;
 
@@ -797,27 +886,74 @@ function buildSelected() {
   el.innerHTML = '';
   keys.forEach(id => {
     const ex = selected[id];
-    const row = document.createElement('div');
-    row.className = 'sel-ex-row';
-    row.innerHTML = `
-      <div class="sel-ex-icon">${ex.icon}</div>
-      <div>
-        <div class="sel-ex-name">${ex.name}</div>
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text-dim)">${ex.cat}</div>
+    const hasOverride = Array.isArray(ex.days) && ex.days.length > 0;
+    const isOpen = openDayPanels.has(id);
+    const dayLabel = hasOverride
+      ? ex.days.map(i => DAY_NAMES[i]).join(' ')
+      : 'Oletus';
+    const wrapper = document.createElement('div');
+    wrapper.className = 'sel-ex-wrapper';
+    wrapper.innerHTML = `
+      <div class="sel-ex-row">
+        <div class="sel-ex-icon">${ex.icon}</div>
+        <div>
+          <div class="sel-ex-name">${ex.name}</div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text-dim)">${ex.cat}</div>
+        </div>
+        <input class="mini-input" type="text" value="${ex.sets}" placeholder="sarjat" title="Sarjat"
+          onchange="selected['${id}'].sets = this.value">
+        <input class="mini-input" type="text" value="${ex.duration}" placeholder="kesto" title="Kesto"
+          onchange="selected['${id}'].duration = this.value" style="width:90px">
+        <button class="day-toggle-btn${hasOverride ? ' has-override' : ''}" onclick="toggleDaysPanel('${id}')" title="Mukauta harjoituspäiviä">📅 ${dayLabel}</button>
+        <button class="remove-btn" onclick="removeEx('${id}')" title="Poista">✕</button>
       </div>
-      <input class="mini-input" type="text" value="${ex.sets}" placeholder="sarjat" title="Sarjat"
-        onchange="selected['${id}'].sets = this.value">
-      <input class="mini-input" type="text" value="${ex.duration}" placeholder="kesto" title="Kesto"
-        onchange="selected['${id}'].duration = this.value" style="width:90px">
-      <button class="remove-btn" onclick="removeEx('${id}')">✕</button>
+      <div class="sel-ex-days${isOpen ? ' open' : ''}" id="days-${id}">
+        <div class="days-mini-header">
+          <label style="margin:0">Harjoituspäivät tälle harjoitukselle</label>
+          ${hasOverride
+            ? `<button class="reset-default-btn" onclick="resetExerciseDays('${id}')">Palauta oletukseen</button>`
+            : `<span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text-faint);letter-spacing:0.1em">KÄYTÖSSÄ OLETUSAIKATAULU</span>`}
+        </div>
+        <div class="days-mini-grid">
+          ${DAY_NAMES.map((d, i) => {
+            const isOn = hasOverride && ex.days.includes(i);
+            return `<button class="day-mini-btn${isOn ? ' on' : ''}" onclick="toggleExerciseDay('${id}', ${i})">${d.charAt(0)}</button>`;
+          }).join('')}
+        </div>
+      </div>
     `;
-    el.appendChild(row);
+    el.appendChild(wrapper);
   });
 }
 
 function removeEx(id) {
   delete selected[id];
+  openDayPanels.delete(id);
   buildLibrary();
+  buildSelected();
+}
+
+function toggleDaysPanel(id) {
+  if (openDayPanels.has(id)) openDayPanels.delete(id);
+  else openDayPanels.add(id);
+  buildSelected();
+}
+
+function toggleExerciseDay(id, dayIdx) {
+  const ex = selected[id];
+  if (!ex) return;
+  const current = Array.isArray(ex.days) ? ex.days.slice() : [];
+  const pos = current.indexOf(dayIdx);
+  if (pos >= 0) current.splice(pos, 1);
+  else current.push(dayIdx);
+  current.sort((a,b) => a-b);
+  if (current.length === 0) delete ex.days;
+  else ex.days = current;
+  buildSelected();
+}
+
+function resetExerciseDays(id) {
+  if (selected[id]) delete selected[id].days;
   buildSelected();
 }
 
@@ -858,16 +994,30 @@ function generateAndPreview() {
   const reminderTime = document.getElementById('reminderTime').value;
   const reminderText = document.getElementById('reminderText').value;
 
+  // Trim each exercise to the fields the athlete view needs; omit `days` unless overridden
+  const exercises = Object.values(selected).map(ex => {
+    const out = {
+      id: ex.id, name: ex.name, icon: ex.icon, cat: ex.cat,
+      unit: ex.unit, unitLabel: ex.unitLabel,
+      instructions: ex.instructions,
+      sets: ex.sets, duration: ex.duration
+    };
+    if (ex.materiaalit?.length) out.materiaalit = ex.materiaalit;
+    if (Array.isArray(ex.days) && ex.days.length > 0) out.days = ex.days;
+    return out;
+  });
+
   programData = {
-    exercises: Object.values(selected),
+    exercises,
     schedule: { days: trainingDays, durationWeeks: parseInt(dur), startDate: start },
     reminder: { time: reminderTime, text: reminderText },
     created: new Date().toISOString()
   };
 
   // Update summary
-  document.getElementById('sumEx').textContent = Object.keys(selected).length;
-  document.getElementById('sumDays').textContent = trainingDays.length;
+  const overrideCount = exercises.filter(ex => ex.days).length;
+  document.getElementById('sumEx').textContent = exercises.length;
+  document.getElementById('sumDays').textContent = trainingDays.length + (overrideCount ? ` (${overrideCount} mukautettu)` : '');
   document.getElementById('sumDur').textContent = dur + ' vk';
 
   // Phone preview
@@ -899,7 +1049,7 @@ function generateAndPreview() {
     document.getElementById('qrcode').textContent = '[QR-koodi generoidaan]';
   }
 
-  goStep(4);
+  goStep(3);
 }
 
 function copyLink() {
@@ -920,6 +1070,7 @@ function openProgram() {
 function newProgram() {
   selected = {};
   trainingDays = [1,3,5];
+  openDayPanels.clear();
   buildLibrary();
   buildSelected();
   buildDayGrid();

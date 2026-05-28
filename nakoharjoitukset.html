@@ -185,6 +185,19 @@
   /* EXERCISE CARDS */
   .exercises { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
 
+  .rest-day-card {
+    margin: 0 20px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius);
+    padding: 36px 20px;
+    text-align: center;
+  }
+
+  .rest-day-icon { font-size: 44px; margin-bottom: 14px; }
+  .rest-day-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .rest-day-text { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+
   .ex-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -198,8 +211,6 @@
     border-color: rgba(0,229,160,0.3);
     background: rgba(0,229,160,0.04);
   }
-
-  .ex-card.expanded { border-color: var(--accent); }
 
   .ex-header {
     display: flex;
@@ -245,60 +256,6 @@
     border-color: var(--success);
     color: #000;
   }
-
-  /* EXPANDED PANEL */
-  .ex-body {
-    display: none;
-    padding: 0 16px 16px;
-    border-top: 1px solid var(--border);
-    margin-top: 0;
-    padding-top: 16px;
-  }
-
-  .ex-card.expanded .ex-body { display: block; }
-
-  .ex-instructions {
-    font-size: 13px;
-    line-height: 1.7;
-    color: var(--text-dim);
-    margin-bottom: 16px;
-  }
-
-  .ex-instructions strong { color: var(--text); font-weight: 600; }
-
-  .material-links {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 14px;
-    margin-bottom: 4px;
-  }
-
-  .material-btn {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    background: rgba(0,212,255,0.06);
-    border: 1px solid rgba(0,212,255,0.2);
-    border-radius: 10px;
-    color: var(--accent);
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    text-decoration: none;
-    transition: background 0.18s, border-color 0.18s;
-  }
-
-  .material-btn:active { background: rgba(0,212,255,0.14); border-color: rgba(0,212,255,0.4); }
-
-  .material-btn-icon {
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-
-  .material-btn-text { flex: 1; }
-  .material-btn-label { font-size: 12px; color: var(--text); font-family: 'Syne', sans-serif; font-weight: 600; }
-  .material-btn-hint { font-size: 10px; color: var(--text-dim); margin-top: 1px; }
 
   .log-section { margin-top: 12px; }
 
@@ -382,6 +339,153 @@
     color: var(--success);
     border: 1px solid rgba(0,229,160,0.3);
   }
+
+  /* EXERCISE MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(8,13,26,0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 100;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    display: none;
+  }
+
+  .modal-overlay.open { display: block; }
+
+  .modal-content {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding: 0 0 40px;
+    background: var(--bg);
+  }
+
+  .modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bg);
+    padding: 20px 20px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .modal-close {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+
+  .modal-close:hover { border-color: var(--accent); color: var(--accent); }
+
+  .modal-header-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .modal-header-text { flex: 1; min-width: 0; }
+  .modal-header-name { font-size: 14px; font-weight: 700; line-height: 1.2; }
+  .modal-header-cat {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .modal-body { padding: 18px 20px; }
+
+  .modal-section { margin-bottom: 22px; }
+
+  .modal-section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text-faint);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .modal-instructions {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-dim);
+  }
+
+  .modal-instructions strong { color: var(--text); font-weight: 600; }
+
+  .modal-material {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .modal-material-title {
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .modal-pdf-frame {
+    width: 100%;
+    height: 360px;
+    border: none;
+    background: white;
+    display: block;
+  }
+
+  .modal-material-actions {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    background: var(--surface2);
+  }
+
+  .modal-material-btn {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.15s;
+  }
+
+  .modal-material-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .modal-material-btn:active { transform: scale(0.97); }
 
   /* WEEK CALENDAR */
   .week-section { padding: 24px 20px 0; }
@@ -598,25 +702,25 @@
       <div class="header-top" style="justify-content:flex-end">
         <div class="streak-badge"><span class="streak-fire">🔥</span> <span id="streakCount">0</span> pv putki</div>
       </div>
-      <h1>Tänään on<br><span>harjoituspäivä</span></h1>
+      <h1 id="todayHeadline">Tänään on<br><span>harjoituspäivä</span></h1>
       <div class="date-line" id="dateLine"><span class="live-dot"></span></div>
     </div>
 
-    <div class="notif-banner">
+    <div class="notif-banner" id="notifBanner">
       <span class="notif-icon">👁️</span>
       <span>Muista: tee harjoitukset ennen iltaa, mieluiten <strong>luonnonvalossa</strong> tai hyvässä valaistuksessa.</span>
     </div>
 
-    <div class="today-card">
+    <div class="today-card" id="todayCard">
       <div class="today-label">Tämän päivän edistyminen</div>
-      <div class="today-title">4 harjoitusta · n. 20 min</div>
+      <div class="today-title" id="todaySummary">— harjoitusta</div>
       <div class="today-progress">
         <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-        <div class="progress-text" id="progressText">0 / 4</div>
+        <div class="progress-text" id="progressText">0 / 0</div>
       </div>
     </div>
 
-    <div class="section-title">Harjoitukset — sunnuntai</div>
+    <div class="section-title" id="todayLabel">Harjoitukset</div>
     <div class="exercises" id="exerciseList"></div>
 
     <div class="week-section">
@@ -666,6 +770,21 @@
     </div>
   </div>
 
+</div>
+
+<!-- EXERCISE MODAL -->
+<div class="modal-overlay" id="exerciseModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeExerciseModal()" aria-label="Sulje">✕</button>
+      <div class="modal-header-icon" id="modalIcon">🎯</div>
+      <div class="modal-header-text">
+        <div class="modal-header-name" id="modalName">—</div>
+        <div class="modal-header-cat" id="modalCat">—</div>
+      </div>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
 </div>
 
 <!-- BOTTOM NAV -->
@@ -774,20 +893,68 @@ const DIARY_DATA = [
 
 // ── STATE ─────────────────────────────────────────────────────────────────
 let completed = {};
-let expanded = null;
+let modalExId = null; // id of exercise currently open in modal
+let TODAY_EXERCISES = []; // populated by applyTodaySchedule() in init
+
+// 0=Mon, 1=Tue, ..., 6=Sun — matches admin.html convention
+const DAY_NAMES_LONG = ['maanantai','tiistai','keskiviikko','torstai','perjantai','lauantai','sunnuntai'];
+
+function computeTodayExercises(dayIdx) {
+  const defaultDays = URL_PROGRAM?.schedule?.days ?? [0,1,2,3,4,5,6];
+  return EXERCISES.filter(ex => {
+    const days = Array.isArray(ex.days) && ex.days.length > 0 ? ex.days : defaultDays;
+    return days.includes(dayIdx);
+  });
+}
+
+function applyTodaySchedule(dayIdx) {
+  TODAY_EXERCISES = computeTodayExercises(dayIdx);
+  const isRestDay = TODAY_EXERCISES.length === 0;
+  const headline = document.getElementById('todayHeadline');
+  const todayCard = document.getElementById('todayCard');
+  const todayLabel = document.getElementById('todayLabel');
+  const notif = document.getElementById('notifBanner');
+  const todaySummary = document.getElementById('todaySummary');
+
+  if (isRestDay) {
+    headline.innerHTML = 'Tänään on<br><span>lepopäivä</span>';
+    todayCard.style.display = 'none';
+    todayLabel.style.display = 'none';
+    notif.style.display = 'none';
+  } else {
+    headline.innerHTML = 'Tänään on<br><span>harjoituspäivä</span>';
+    todayCard.style.display = '';
+    todayLabel.style.display = '';
+    notif.style.display = '';
+    todaySummary.textContent = `${TODAY_EXERCISES.length} harjoitus${TODAY_EXERCISES.length === 1 ? '' : 'ta'}`;
+    todayLabel.textContent = `Harjoitukset — ${DAY_NAMES_LONG[dayIdx]}`;
+  }
+}
 
 // ── BUILD EXERCISE LIST ───────────────────────────────────────────────────
 function buildExercises() {
   const container = document.getElementById('exerciseList');
   container.innerHTML = '';
 
-  EXERCISES.forEach((ex, i) => {
+  if (TODAY_EXERCISES.length === 0) {
+    container.innerHTML = `
+      <div class="rest-day-card">
+        <div class="rest-day-icon">🌙</div>
+        <div class="rest-day-title">Tänään ei ole harjoituksia</div>
+        <div class="rest-day-text">Lepää ja palaa ohjelman seuraavana harjoituspäivänä.</div>
+      </div>`;
+    updateProgress();
+    return;
+  }
+
+  TODAY_EXERCISES.forEach((ex) => {
     const card = document.createElement('div');
     card.className = 'ex-card' + (completed[ex.id] ? ' done' : '');
     card.id = 'card-' + ex.id;
+    card.onclick = () => openExerciseModal(ex.id);
 
     card.innerHTML = `
-      <div class="ex-header" onclick="toggleCard('${ex.id}')">
+      <div class="ex-header">
         <div class="ex-icon">${ex.icon}</div>
         <div class="ex-info">
           <div class="ex-name">${ex.name}</div>
@@ -796,34 +963,7 @@ function buildExercises() {
             <span>${ex.sets}</span>
           </div>
         </div>
-        <div class="ex-status">${completed[ex.id] ? '✓' : ''}</div>
-      </div>
-      <div class="ex-body">
-        <div class="ex-instructions">${ex.instructions}</div>
-        ${ex.materiaalit?.length ? `
-        <div class="material-links">
-          ${ex.materiaalit.map(m => `
-          <a class="material-btn" href="./materiaalit/${m.tiedosto}" target="_blank" rel="noopener">
-            <div class="material-btn-icon">📄</div>
-            <div class="material-btn-text">
-              <div class="material-btn-label">${m.nimi}</div>
-              <div class="material-btn-hint">Avautuu uuteen välilehteen · tulosta tai tallenna PDF</div>
-            </div>
-            <div style="font-size:16px;color:var(--text-dim)">↗</div>
-          </a>`).join('')}
-        </div>` : ''}
-        <div class="log-section">
-          <div class="log-label">Kirjaa tulos</div>
-          <div class="log-row">
-            <input class="log-input narrow" id="num-${ex.id}" type="number" placeholder="—" inputmode="decimal">
-            <div class="unit-badge">${ex.unitLabel}</div>
-          </div>
-          <div class="log-label" style="margin-top:10px">Muistiinpano (vapaaehtoinen)</div>
-          <textarea class="log-textarea" id="note-${ex.id}" placeholder="Esim. vasen silmä väsyi, parempi kuin eilen..."></textarea>
-        </div>
-        <button class="done-btn ${completed[ex.id] ? 'completed' : ''}" onclick="markDone('${ex.id}')">
-          ${completed[ex.id] ? '✓ Merkitty tehdyksi' : 'Merkitse tehdyksi'}
-        </button>
+        <div class="ex-status">${completed[ex.id] ? '✓' : '›'}</div>
       </div>
     `;
     container.appendChild(card);
@@ -832,36 +972,97 @@ function buildExercises() {
   updateProgress();
 }
 
-function toggleCard(id) {
-  if (expanded === id) {
-    document.getElementById('card-' + id).classList.remove('expanded');
-    expanded = null;
-  } else {
-    if (expanded) document.getElementById('card-' + expanded)?.classList.remove('expanded');
-    document.getElementById('card-' + id).classList.add('expanded');
-    expanded = id;
-  }
+// ── EXERCISE MODAL ────────────────────────────────────────────────────────
+function fileExt(name) { return (name.split('.').pop() || '').toLowerCase(); }
+
+function openExerciseModal(id) {
+  const ex = TODAY_EXERCISES.find(e => e.id === id);
+  if (!ex) return;
+  modalExId = id;
+  const prev = completed[id] || { num: '', note: '' };
+
+  document.getElementById('modalIcon').textContent = ex.icon;
+  document.getElementById('modalName').textContent = ex.name;
+  document.getElementById('modalCat').textContent = `${ex.cat} · ${ex.sets} · ${ex.duration}`;
+
+  const body = document.getElementById('modalBody');
+  const matsHtml = (ex.materiaalit?.length ? ex.materiaalit.map(m => {
+    const ext = fileExt(m.tiedosto);
+    const url = `./materiaalit/${m.tiedosto}`;
+    const isPdf = ext === 'pdf';
+    return `
+      <div class="modal-material">
+        <div class="modal-material-title">📄 ${m.nimi}</div>
+        <iframe class="modal-pdf-frame" src="${url}" title="${m.nimi}" loading="lazy"></iframe>
+        <div class="modal-material-actions">
+          <a class="modal-material-btn" href="${url}" target="_blank" rel="noopener">🔗 Avaa</a>
+          ${isPdf ? `<a class="modal-material-btn" href="${url}" download>📥 Lataa PDF</a>` : ''}
+        </div>
+      </div>`;
+  }).join('') : '');
+
+  body.innerHTML = `
+    ${ex.instructions ? `
+    <div class="modal-section">
+      <div class="modal-section-label">Ohje</div>
+      <div class="modal-instructions">${ex.instructions}</div>
+    </div>` : ''}
+    ${matsHtml ? `
+    <div class="modal-section">
+      <div class="modal-section-label">Tulostettavat materiaalit</div>
+      ${matsHtml}
+    </div>` : ''}
+    <div class="modal-section">
+      <div class="modal-section-label">Kirjaa tulos</div>
+      <div class="log-row">
+        <input class="log-input narrow" id="modalNum" type="number" placeholder="—" inputmode="decimal" value="${prev.num || ''}">
+        <div class="unit-badge">${ex.unitLabel || ''}</div>
+      </div>
+      <div class="log-label" style="margin-top:10px">Muistiinpano (vapaaehtoinen)</div>
+      <textarea class="log-textarea" id="modalNote" placeholder="Esim. vasen silmä väsyi, parempi kuin eilen...">${prev.note || ''}</textarea>
+    </div>
+    <button class="done-btn ${completed[id] ? 'completed' : ''}" onclick="markDoneFromModal()">
+      ${completed[id] ? '✓ Merkitty tehdyksi' : 'Merkitse tehdyksi'}
+    </button>
+  `;
+
+  document.getElementById('exerciseModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
-function markDone(id) {
-  const num = document.getElementById('num-' + id)?.value || '';
-  const note = document.getElementById('note-' + id)?.value || '';
-  completed[id] = { num, note, time: new Date().toISOString() };
+function closeExerciseModal() {
+  document.getElementById('exerciseModal').classList.remove('open');
+  document.body.style.overflow = '';
+  modalExId = null;
+}
 
-  // Save to localStorage
-  try { localStorage.setItem('completed_today', JSON.stringify(completed)); } catch(e) {}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && modalExId) closeExerciseModal();
+});
 
+document.getElementById('exerciseModal')?.addEventListener('click', e => {
+  if (e.target.id === 'exerciseModal') closeExerciseModal();
+});
+
+function markDoneFromModal() {
+  if (!modalExId) return;
+  const num = document.getElementById('modalNum')?.value || '';
+  const note = document.getElementById('modalNote')?.value || '';
+  completed[modalExId] = { num, note, time: new Date().toISOString() };
+  try { localStorage.setItem(todayKey, JSON.stringify(completed)); } catch(e) {}
+  closeExerciseModal();
   buildExercises();
-  // Re-expand card
-  document.getElementById('card-' + id).classList.add('done');
 }
 
 function updateProgress() {
-  const total = EXERCISES.length;
-  const done = Object.keys(completed).length;
-  const pct = Math.round((done / total) * 100);
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressText').textContent = done + ' / ' + total;
+  const total = TODAY_EXERCISES.length;
+  const todayIds = new Set(TODAY_EXERCISES.map(ex => ex.id));
+  const done = Object.keys(completed).filter(id => todayIds.has(id)).length;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  const fill = document.getElementById('progressFill');
+  const text = document.getElementById('progressText');
+  if (fill) fill.style.width = pct + '%';
+  if (text) text.textContent = done + ' / ' + total;
   document.getElementById('statTotal').textContent = done + 12; // simulate history
 }
 
@@ -954,6 +1155,10 @@ for (let i = 1; i <= 60; i++) {
   } catch(e) { break; }
 }
 document.getElementById('streakCount').textContent = streak;
+
+// Compute today's exercises based on per-exercise days override or program default
+const todayDayIdx = (now.getDay() + 6) % 7; // JS Sun=0..Sat=6 → Mon=0..Sun=6
+applyTodaySchedule(todayDayIdx);
 
 buildExercises();
 buildDiary();
