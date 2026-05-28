@@ -657,11 +657,7 @@
     </div>
     <div class="step-connector"></div>
     <div class="step" id="step2" onclick="goStep(2)">
-      <div class="step-num">2</div> Aikataulu
-    </div>
-    <div class="step-connector"></div>
-    <div class="step" id="step3" onclick="goStep(3)">
-      <div class="step-num">3</div> Jaa linkki
+      <div class="step-num">2</div> Jaa linkki
     </div>
   </div>
 
@@ -689,22 +685,13 @@
       </div>
     </div>
 
-    <div class="btn-row">
-      <div></div>
-      <button class="btn btn-primary" onclick="goStep(2)">Jatka aikatauluun →</button>
-    </div>
-  </div>
-
-  <!-- ── STEP 2: AIKATAULU ───────────────────────────────────────── -->
-  <div class="section" id="section2">
-
     <div class="card">
       <div class="card-title">
         <div class="card-title-icon">📅</div>
         Oletusaikataulu
       </div>
       <p style="font-size:12px;color:var(--text-dim);margin-bottom:14px;line-height:1.6">
-        Nämä päivät koskevat harjoituksia joille ei ole asetettu omaa aikataulua. Yksittäisen harjoituksen päiviä voi mukauttaa Harjoitukset-vaiheen 📅-napilla.
+        Nämä päivät koskevat harjoituksia joille ei ole asetettu omaa aikataulua. Yksittäisen harjoituksen päiviä voi mukauttaa kunkin harjoituksen 📅-napilla yllä.
       </p>
       <div class="schedule-grid" id="dayGrid"></div>
       <div class="duration-row">
@@ -743,13 +730,13 @@
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-secondary" onclick="goStep(1)">← Takaisin</button>
+      <div></div>
       <button class="btn btn-primary" onclick="generateAndPreview()">Luo ohjelma ja esikatselu →</button>
     </div>
   </div>
 
-  <!-- ── STEP 3: JAA LINKKI ───────────────────────────────────────── -->
-  <div class="section" id="section3">
+  <!-- ── STEP 2: JAA LINKKI ───────────────────────────────────────── -->
+  <div class="section" id="section2">
 
     <div class="card">
       <div class="card-title">
@@ -802,7 +789,7 @@
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-secondary" onclick="goStep(2)">← Takaisin</button>
+      <button class="btn btn-secondary" onclick="goStep(1)">← Takaisin</button>
       <button class="btn btn-primary" onclick="newProgram()">+ Uusi ohjelma</button>
     </div>
   </div>
@@ -1065,7 +1052,7 @@ function generateAndPreview() {
     }
   }
 
-  goStep(3);
+  goStep(2);
 }
 
 function copyLink() {
