@@ -595,8 +595,7 @@
   <!-- HOME VIEW -->
   <div class="view active" id="view-home">
     <div class="header">
-      <div class="header-top">
-        <div class="athlete-tag" id="athleteTag">Demo</div>
+      <div class="header-top" style="justify-content:flex-end">
         <div class="streak-badge"><span class="streak-fire">🔥</span> <span id="streakCount">0</span> pv putki</div>
       </div>
       <h1>Tänään on<br><span>harjoituspäivä</span></h1>
@@ -927,12 +926,6 @@ function showView(name, btn) {
 
 // ── INIT ──────────────────────────────────────────────────────────────────
 
-// Set athlete name and date from URL program
-const athleteName = URL_PROGRAM
-  ? (URL_PROGRAM.athlete.fname + ' ' + URL_PROGRAM.athlete.lname).trim()
-  : 'Demo-näkymä';
-document.getElementById('athleteTag').textContent = athleteName;
-
 const now = new Date();
 const fDays = ['SU','MA','TI','KE','TO','PE','LA'];
 const weekNum = Math.ceil((Math.floor((now - new Date(now.getFullYear(),0,1))/86400000) + 1) / 7);
@@ -943,8 +936,7 @@ document.getElementById('dateLine').innerHTML =
   ' — Viikko ' + weekNum;
 
 // Load today's completions (keyed by date so resets each day)
-const todayKey = 'completed_' + now.toISOString().split('T')[0] +
-  (URL_PROGRAM ? '_' + (URL_PROGRAM.athlete.fname||'').slice(0,4) : '');
+const todayKey = 'completed_' + now.toISOString().split('T')[0];
 try {
   const saved = localStorage.getItem(todayKey);
   if (saved) completed = JSON.parse(saved);
@@ -954,8 +946,7 @@ try {
 let streak = 0;
 for (let i = 1; i <= 60; i++) {
   const d = new Date(now); d.setDate(d.getDate() - i);
-  const k = 'completed_' + d.toISOString().split('T')[0] +
-    (URL_PROGRAM ? '_' + (URL_PROGRAM.athlete.fname||'').slice(0,4) : '');
+  const k = 'completed_' + d.toISOString().split('T')[0];
   try {
     const val = localStorage.getItem(k);
     if (val && Object.keys(JSON.parse(val)).length > 0) streak++;

@@ -361,19 +361,6 @@
     min-height: 320px;
   }
 
-  .phone-athlete {
-    font-family: 'DM Mono', monospace;
-    font-size: 7px;
-    color: #00d4ff;
-    letter-spacing: 0.15em;
-    background: rgba(0,212,255,0.1);
-    border: 1px solid rgba(0,212,255,0.2);
-    padding: 3px 8px;
-    border-radius: 100px;
-    display: inline-block;
-    margin-bottom: 10px;
-  }
-
   .phone-title {
     font-size: 15px;
     font-weight: 800;
@@ -529,36 +516,6 @@
     letter-spacing: 0.1em;
   }
 
-  /* ATHLETE LIST */
-  .athlete-list { display: flex; flex-direction: column; gap: 8px; }
-
-  .athlete-row {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px 16px;
-    display: flex; align-items: center; justify-content: space-between;
-    cursor: pointer;
-    transition: border-color 0.15s;
-  }
-
-  .athlete-row:hover { border-color: var(--accent2); }
-
-  .athlete-row-left { display: flex; align-items: center; gap: 12px; }
-
-  .athlete-avatar {
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    background: var(--accent);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; color: #fff; font-weight: 700;
-  }
-
-  .athlete-name { font-size: 14px; font-weight: 700; }
-  .athlete-meta { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--text-dim); margin-top: 2px; }
-
-  .chevron { color: var(--text-faint); font-size: 16px; }
-
   /* NOTIFICATION */
   .toast {
     position: fixed; bottom: 24px; right: 24px;
@@ -605,91 +562,20 @@
   <!-- STEPS -->
   <div class="steps">
     <div class="step active" id="step1" onclick="goStep(1)">
-      <div class="step-num">1</div> Urheilija
+      <div class="step-num">1</div> Harjoitukset
     </div>
     <div class="step-connector"></div>
     <div class="step" id="step2" onclick="goStep(2)">
-      <div class="step-num">2</div> Harjoitukset
+      <div class="step-num">2</div> Aikataulu
     </div>
     <div class="step-connector"></div>
     <div class="step" id="step3" onclick="goStep(3)">
-      <div class="step-num">3</div> Aikataulu
-    </div>
-    <div class="step-connector"></div>
-    <div class="step" id="step4" onclick="goStep(4)">
-      <div class="step-num">4</div> Jaa linkki
+      <div class="step-num">3</div> Jaa linkki
     </div>
   </div>
 
-  <!-- ── STEP 1: URHEILIJA ───────────────────────────────────────── -->
+  <!-- ── STEP 1: HARJOITUKSET ───────────────────────────────────────── -->
   <div class="section active" id="section1">
-
-    <div class="card">
-      <div class="card-title">
-        <div class="card-title-icon">👤</div>
-        Urheilijan tiedot
-      </div>
-      <div class="form-grid">
-        <div class="field">
-          <label>Etunimi</label>
-          <input type="text" id="fname" placeholder="Mikko" oninput="updatePreview()">
-        </div>
-        <div class="field">
-          <label>Sukunimi</label>
-          <input type="text" id="lname" placeholder="Virtanen" oninput="updatePreview()">
-        </div>
-        <div class="field">
-          <label>Laji / joukkue</label>
-          <input type="text" id="sport" placeholder="Jääkiekko / HIFK" oninput="updatePreview()">
-        </div>
-        <div class="field">
-          <label>Syntymävuosi</label>
-          <input type="number" id="byear" placeholder="1998" min="1950" max="2015">
-        </div>
-        <div class="field form-full">
-          <label>Muistiinpano optikolta (ei näy urheilijalle)</label>
-          <textarea id="optNote" placeholder="Esim. konvergenssivajavuus, suositellaan erityistä huomiota lähinäköön..."></textarea>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">
-        <div class="card-title-icon">📋</div>
-        Aiemmat urheilijat
-      </div>
-      <div class="athlete-list" id="athleteList">
-        <div class="athlete-row" onclick="loadAthlete('Mikko','Virtanen','Jääkiekko / HIFK')">
-          <div class="athlete-row-left">
-            <div class="athlete-avatar">MV</div>
-            <div>
-              <div class="athlete-name">Mikko Virtanen</div>
-              <div class="athlete-meta">Jääkiekko / HIFK · Ohjelma luotu 02.03.2026</div>
-            </div>
-          </div>
-          <div class="chevron">›</div>
-        </div>
-        <div class="athlete-row" onclick="loadAthlete('Sara','Leinonen','Sulkapallo')">
-          <div class="athlete-row-left">
-            <div class="athlete-avatar">SL</div>
-            <div>
-              <div class="athlete-name">Sara Leinonen</div>
-              <div class="athlete-meta">Sulkapallo · Ohjelma luotu 28.02.2026</div>
-            </div>
-          </div>
-          <div class="chevron">›</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="btn-row">
-      <div></div>
-      <button class="btn btn-primary" onclick="goStep(2)">Jatka harjoituksiin →</button>
-    </div>
-  </div>
-
-  <!-- ── STEP 2: HARJOITUKSET ───────────────────────────────────────── -->
-  <div class="section" id="section2">
 
     <div class="card">
       <div class="card-title">
@@ -745,13 +631,13 @@
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-secondary" onclick="goStep(1)">← Takaisin</button>
-      <button class="btn btn-primary" onclick="goStep(3)">Jatka aikatauluun →</button>
+      <div></div>
+      <button class="btn btn-primary" onclick="goStep(2)">Jatka aikatauluun →</button>
     </div>
   </div>
 
-  <!-- ── STEP 3: AIKATAULU ───────────────────────────────────────── -->
-  <div class="section" id="section3">
+  <!-- ── STEP 2: AIKATAULU ───────────────────────────────────────── -->
+  <div class="section" id="section2">
 
     <div class="card">
       <div class="card-title">
@@ -795,13 +681,13 @@
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-secondary" onclick="goStep(2)">← Takaisin</button>
+      <button class="btn btn-secondary" onclick="goStep(1)">← Takaisin</button>
       <button class="btn btn-primary" onclick="generateAndPreview()">Luo ohjelma ja esikatselu →</button>
     </div>
   </div>
 
-  <!-- ── STEP 4: JAA LINKKI ───────────────────────────────────────── -->
-  <div class="section" id="section4">
+  <!-- ── STEP 3: JAA LINKKI ───────────────────────────────────────── -->
+  <div class="section" id="section3">
 
     <div class="card">
       <div class="card-title">
@@ -812,14 +698,12 @@
         <div class="preview-phone">
           <div class="phone-notch"></div>
           <div class="phone-screen">
-            <div class="phone-athlete" id="previewName">Urheilija</div>
             <div class="phone-title">Tänään on<br><span>harjoituspäivä</span></div>
             <div id="phoneExList"></div>
           </div>
         </div>
         <div class="preview-info">
           <div class="summary-grid" id="summaryGrid">
-            <div class="summary-item"><div class="summary-label">Urheilija</div><div class="summary-value" id="sumName">—</div></div>
             <div class="summary-item"><div class="summary-label">Harjoituksia</div><div class="summary-value" id="sumEx">—</div></div>
             <div class="summary-item"><div class="summary-label">Harjoituspäiviä/vk</div><div class="summary-value" id="sumDays">—</div></div>
             <div class="summary-item"><div class="summary-label">Kesto</div><div class="summary-value" id="sumDur">—</div></div>
@@ -855,7 +739,7 @@
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-secondary" onclick="goStep(3)">← Takaisin</button>
+      <button class="btn btn-secondary" onclick="goStep(2)">← Takaisin</button>
       <button class="btn btn-primary" onclick="newProgram()">+ Uusi ohjelma</button>
     </div>
   </div>
@@ -880,7 +764,10 @@ let LIBRARY = [
     instructions:'Pidä <strong>kynää</strong> 10 cm silmistä ja katso vuorotellen kynän kärkeä ja kaukaista kohdetta (>5 m). Laske hitaasti 3 sekuntia per kohde.' },
   { id:'brock', name:'Brockin lanka', icon:'🪢', cat:'Binokulaarisuus', unit:'cm', unitLabel:'lähin risteyspiste (cm)',
     instructions:'Kiinnitä <strong>lanka</strong> (2 m) seinään. Aseta 3–4 helmeä eri etäisyyksille. Katso helmiä: näe kaksi lankaa risteytyä helmessä. Kirjaa etäisyys josta risteys häviää.',
-    materiaalit:[{ nimi:'Seurantalomake (A4, tulostettava)', tiedosto:'brock-lanka-seurantalomake.html' }] },
+    materiaalit:[
+      { nimi:'Harjoitusohje (PDF)', tiedosto:'brock-lanka-ohje.pdf' },
+      { nimi:'Seurantalomake (A4, tulostettava)', tiedosto:'brock-lanka-seurantalomake.html' }
+    ] },
   { id:'periferia', name:'Perifeerinen näkö', icon:'🌐', cat:'Silmänliike', unit:'°', unitLabel:'kulma-aste',
     instructions:'Katso suoraan eteenpäin. Vie käsi sivulle ja heiluta sormia — merkitse kulma jossa liike ensin näkyy. Toista molemmille puolille.' },
   { id:'pursuit', name:'Silmän seuranta (Pursuit)', icon:'🔄', cat:'Silmänliike', unit:'', unitLabel:'arvio 1–5',
@@ -900,15 +787,6 @@ function goStep(n) {
   document.getElementById('section' + n).classList.add('active');
   document.getElementById('step' + n).classList.add('active');
   window.scrollTo(0,0);
-}
-
-// ── LOAD EXAMPLE ATHLETE ─────────────────────────────────────────────────
-function loadAthlete(fn, ln, sport) {
-  document.getElementById('fname').value = fn;
-  document.getElementById('lname').value = ln;
-  document.getElementById('sport').value = sport;
-  showToast('Ladattu: ' + fn + ' ' + ln);
-  updatePreview();
 }
 
 // ── EXERCISE LIBRARY ─────────────────────────────────────────────────────
@@ -1025,16 +903,12 @@ function toggleDay(i, btn) {
 
 // ── GENERATE PROGRAM ─────────────────────────────────────────────────────
 function generateAndPreview() {
-  const fname = document.getElementById('fname').value.trim() || 'Urheilija';
-  const lname = document.getElementById('lname').value.trim() || '';
-  const sport = document.getElementById('sport').value.trim() || '';
   const dur = document.getElementById('progDuration').value;
   const start = document.getElementById('startDate').value || new Date().toISOString().split('T')[0];
   const reminderTime = document.getElementById('reminderTime').value;
   const reminderText = document.getElementById('reminderText').value;
 
   programData = {
-    athlete: { fname, lname, sport },
     exercises: Object.values(selected),
     schedule: { days: trainingDays, durationWeeks: parseInt(dur), startDate: start },
     reminder: { time: reminderTime, text: reminderText },
@@ -1042,13 +916,11 @@ function generateAndPreview() {
   };
 
   // Update summary
-  document.getElementById('sumName').textContent = fname + ' ' + lname;
   document.getElementById('sumEx').textContent = Object.keys(selected).length;
   document.getElementById('sumDays').textContent = trainingDays.length;
   document.getElementById('sumDur').textContent = dur + ' vk';
 
   // Phone preview
-  document.getElementById('previewName').textContent = fname + ' ' + lname;
   const phoneList = document.getElementById('phoneExList');
   phoneList.innerHTML = '';
   Object.values(selected).slice(0,3).forEach(ex => {
@@ -1078,13 +950,6 @@ function generateAndPreview() {
   }
 
   goStep(4);
-}
-
-function updatePreview() {
-  const fn = document.getElementById('fname')?.value || '';
-  const ln = document.getElementById('lname')?.value || '';
-  const el = document.getElementById('previewName');
-  if (el) el.textContent = (fn + ' ' + ln).trim() || 'Urheilija';
 }
 
 function copyLink() {
