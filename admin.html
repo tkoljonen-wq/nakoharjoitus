@@ -258,8 +258,14 @@
   .sel-ex-row {
     padding: 14px 16px;
     display: grid;
-    grid-template-columns: auto 1fr auto auto auto auto;
+    grid-template-columns: auto 1fr auto auto;
     gap: 12px;
+    align-items: center;
+  }
+
+  .sel-ex-controls {
+    display: flex;
+    gap: 8px;
     align-items: center;
   }
 
@@ -636,6 +642,17 @@
     .form-grid { grid-template-columns: 1fr; }
     .preview-wrap { flex-direction: column; }
     .summary-grid { grid-template-columns: 1fr; }
+    .sel-ex-row {
+      grid-template-columns: auto 1fr auto;
+      row-gap: 10px;
+    }
+    .sel-ex-controls {
+      grid-column: 1 / -1;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+    .sel-ex-controls .mini-input { width: auto !important; flex: 1 1 80px; min-width: 0; }
+    .sel-ex-controls .day-toggle-btn { flex: 1 1 100%; justify-content: center; }
   }
 </style>
 </head>
@@ -869,11 +886,13 @@ function buildSelected() {
           <div class="sel-ex-name">${ex.name}</div>
           <div style="font-family:'Roboto Mono',monospace;font-size:9px;color:var(--text-dim)">${ex.cat}</div>
         </div>
-        <input class="mini-input" type="text" value="${ex.sets}" placeholder="sarjat" title="Sarjat"
-          onchange="selected['${id}'].sets = this.value">
-        <input class="mini-input" type="text" value="${ex.duration}" placeholder="kesto" title="Kesto"
-          onchange="selected['${id}'].duration = this.value" style="width:90px">
-        <button class="day-toggle-btn${hasOverride ? ' has-override' : ''}" onclick="toggleDaysPanel('${id}')" title="Mukauta harjoituspäiviä">📅 ${dayLabel}</button>
+        <div class="sel-ex-controls">
+          <input class="mini-input" type="text" value="${ex.sets}" placeholder="sarjat" title="Sarjat"
+            onchange="selected['${id}'].sets = this.value">
+          <input class="mini-input" type="text" value="${ex.duration}" placeholder="kesto" title="Kesto"
+            onchange="selected['${id}'].duration = this.value" style="width:90px">
+          <button class="day-toggle-btn${hasOverride ? ' has-override' : ''}" onclick="toggleDaysPanel('${id}')" title="Mukauta harjoituspäiviä">📅 ${dayLabel}</button>
+        </div>
         <button class="remove-btn" onclick="removeEx('${id}')" title="Poista">✕</button>
       </div>
       <div class="sel-ex-days${isOpen ? ' open' : ''}" id="days-${id}">
