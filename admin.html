@@ -876,7 +876,7 @@ function buildSelected() {
     const isOpen = openDayPanels.has(id);
     const dayLabel = hasOverride
       ? ex.days.map(i => DAY_NAMES[i]).join(' ')
-      : 'Oletus';
+      : 'Aikataulu';
     const wrapper = document.createElement('div');
     wrapper.className = 'sel-ex-wrapper';
     wrapper.innerHTML = `
