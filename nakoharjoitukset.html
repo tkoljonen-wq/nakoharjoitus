@@ -1245,7 +1245,12 @@ function openExerciseModal(id) {
 
   const body = document.getElementById('modalBody');
   const guideHtml = (RICH_GUIDES[ex.id] || ex.instructions || '');
-  const matsHtml = (ex.materiaalit?.length ? ex.materiaalit.map(m => {
+  // Drop materials removed from the app (e.g. PDF korvattu kuvitetulla RICH_GUIDESilla).
+  // Vanhat localStorageen tallennetut / QR-jaetut ohjelmat voivat yhä viitata näihin
+  // tiedostoihin, jolloin iframe näyttäisi GitHubin 404-sivun.
+  const REMOVED_MATERIALS = ['brock-lanka-ohje.pdf', 'brock-lanka-seurantalomake.html'];
+  const mats = (ex.materiaalit || []).filter(m => !REMOVED_MATERIALS.includes(m.tiedosto));
+  const matsHtml = (mats.length ? mats.map(m => {
     const ext = fileExt(m.tiedosto);
     const url = `./materiaalit/${m.tiedosto}`;
     const isPdf = ext === 'pdf';
