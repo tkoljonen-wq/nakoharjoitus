@@ -468,6 +468,106 @@
 
   .modal-instructions strong { color: var(--text); font-weight: 600; }
 
+  /* Rich guide content (illustrated exercise instructions) */
+  .modal-instructions p { margin-bottom: 12px; }
+  .modal-instructions h4 {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+    margin: 22px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-instructions ul,
+  .modal-instructions ol { margin: 0 0 14px; padding-left: 20px; }
+  .modal-instructions li { margin-bottom: 7px; line-height: 1.6; }
+  .modal-instructions figure { margin: 0 0 16px; }
+  .modal-instructions figure img {
+    width: 100%;
+    display: block;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: #fff;
+  }
+  .modal-instructions figcaption {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 10px;
+    color: var(--text-faint);
+    letter-spacing: 0.03em;
+    margin-top: 6px;
+    text-align: center;
+  }
+  .guide-warn {
+    background: rgba(240,100,40,0.07);
+    border: 1px solid rgba(240,100,40,0.3);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 18px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text);
+  }
+  .guide-warn strong { color: var(--warn); }
+  .guide-callout {
+    background: var(--surface2);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 4px 0 18px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text);
+  }
+  .guide-callout strong { color: var(--accent); }
+  .guide-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .guide-meta > div {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 11px;
+    line-height: 1.45;
+    color: var(--text);
+  }
+  .guide-meta span {
+    display: block;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .guide-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+  .guide-table th,
+  .guide-table td {
+    border: 1px solid var(--border);
+    padding: 8px 9px;
+    text-align: left;
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .guide-table th {
+    background: var(--surface2);
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.03em;
+  }
+
   .modal-material {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -934,10 +1034,7 @@ const EXERCISES = URL_PROGRAM ? URL_PROGRAM.exercises : [
     sets: '1 sarja',
     unit: 'min',
     unitLabel: 'harjoituksen kesto (min)',
-    instructions: `<strong>Tarvikkeet:</strong> n. 1 m lanka ja 3 erivärisiä helmiä.<br><br><strong>Valmistelu:</strong> Kiinnitä langan toinen pää kiinteään kohtaan (esim. ovenkahva). Aseta helmet eri etäisyyksille: yksi lähelle nenää (~10 cm), yksi keskelle, yksi kauas. Pidä langan toinen pää nenän kärjessä.<br><br><strong>Vaiheet:</strong><br>1. Katso kauimmaista helmeä — langan pitäisi näyttää jakautuvan kahtia (X-kuvio helmen kohdalla). Etummaiset helmet näkyvät kahtena.<br>2. Siirrä katse keskimmäiseen helmeen — X-kuvio siirtyy sen kohdalle.<br>3. Siirrä katse lähimpään helmeen — X-kuvio muodostuu sen kohdalla.<br>4. Toista hitaasti edestakaisin: kauas → keskelle → lähelle → takaisin.<br><br><strong>Variaatio:</strong> tee harjoitus myös eri kulmissa, esim. yläviistoon.<br><br><strong>Tavoite:</strong> parantaa silmien kykyä kääntyä hallitusti ja tarkentaa lähelle ja kauas.<br><br><em>Tarkemmat valokuvalliset ohjeet: katso PDF alla.</em>`,
-    materiaalit: [
-      { nimi: 'Harjoitusohje valokuvineen (PDF)', tiedosto: 'brock-lanka-ohje.pdf' }
-    ]
+    instructions: `<strong>Tarvikkeet:</strong> n. 1 m lanka ja 3 erivärisiä helmiä.<br><br><strong>Valmistelu:</strong> Kiinnitä langan toinen pää kiinteään kohtaan (esim. ovenkahva). Aseta helmet eri etäisyyksille: yksi lähelle nenää (~10 cm), yksi keskelle, yksi kauas. Pidä langan toinen pää nenän kärjessä.<br><br><strong>Vaiheet:</strong><br>1. Katso kauimmaista helmeä — langan pitäisi näyttää jakautuvan kahtia (X-kuvio helmen kohdalla). Etummaiset helmet näkyvät kahtena.<br>2. Siirrä katse keskimmäiseen helmeen — X-kuvio siirtyy sen kohdalle.<br>3. Siirrä katse lähimpään helmeen — X-kuvio muodostuu sen kohdalla.<br>4. Toista hitaasti edestakaisin: kauas → keskelle → lähelle → takaisin.<br><br><strong>Variaatio:</strong> tee harjoitus myös eri kulmissa, esim. yläviistoon.<br><br><strong>Tavoite:</strong> parantaa silmien kykyä kääntyä hallitusti ja tarkentaa lähelle ja kauas.`
   }
 ];
 
@@ -1051,6 +1148,88 @@ function buildExercises() {
   updateProgress();
 }
 
+// ── RICH GUIDES ───────────────────────────────────────────────────────────
+// Illustrated, full-length exercise guides keyed by exercise id. Kept HERE
+// (not in the shared URL/QR program) so the link stays small. The modal prefers
+// RICH_GUIDES[ex.id] over the short ex.instructions when one exists. Images live
+// in ./materiaalit/ and are pre-cached by the service worker for offline use.
+const RICH_GUIDES = {
+  brock: `
+    <div class="guide-warn">
+      <strong>Tärkeää.</strong> Tee harjoitus optikon, optometristin tai muun näönhuollon ammattilaisen ohjeiden mukaan. Keskeytä ja kysy neuvoa, jos oireet ovat voimakkaita, lisääntyvät tai eivät helpota levossa.
+    </div>
+
+    <div class="guide-meta">
+      <div><span>Tarvikkeet</span>n. 1 m lanka ja 3 eriväristä helmeä</div>
+      <div><span>Kesto</span>Harjoitusohjelman mukaisesti</div>
+      <div><span>Tavoite</span>Tehtävä hallitusti lähimmän helmen ollessa n. 5 cm etäisyydellä</div>
+    </div>
+
+    <h4>1. Valmistelu</h4>
+    <ul>
+      <li>Kiinnitä langan toinen pää tukevasti esim. ovenkahvaan tai kiinnityspisteeseen.</li>
+      <li>Pujota langalle kolme helmeä: yksi lähelle nenää, yksi keskelle, yksi kauas. Lähimmän aloitusetäisyys n. <strong>10–20 cm</strong> nenästä.</li>
+      <li>Pidä langan vapaa pää kevyesti nenän kärjessä — lanka kulkee suoraan nenästä kohti kiinnityspistettä.</li>
+      <li>Tee harjoitus rauhallisessa ympäristössä, molemmat silmät auki.</li>
+    </ul>
+    <figure>
+      <img src="./materiaalit/brock-tarvikkeet.jpg" alt="Lanka ja kolme eriväristä helmeä" loading="lazy">
+      <figcaption>Kuva 1. Tarvittavat välineet: lanka ja kolme eriväristä helmeä.</figcaption>
+    </figure>
+    <p><strong>Hyvä lähtöasento:</strong> pidä pää mahdollisimman paikallaan ja liikuta vain katsetta helmestä toiseen. Älä peitä kumpaakaan silmää.</p>
+
+    <h4>2. Harjoituksen vaiheet</h4>
+    <p>Etene rauhallisesti. Pysähdy jokaisen helmen kohdalle ja tarkista, miltä lanka ja muut helmet näyttävät.</p>
+
+    <p><strong>1. Aloita kauimmaisesta helmestä.</strong> Sen pitäisi näkyä yhtenä ja tarkkana. Lanka näyttää jakautuvan kahtia ja muodostaa <strong>X-kuvion</strong>, jonka risteys on katsottavan helmen kohdalla. Lähempänä olevat helmet näkyvät kahtena.</p>
+    <figure>
+      <img src="./materiaalit/brock-vaihe1-kauas.jpg" alt="X-kuvion risteys kauimmaisen helmen kohdalla" loading="lazy">
+      <figcaption>X-kuvion risteys kauimmaisen helmen kohdalla.</figcaption>
+    </figure>
+
+    <p><strong>2. Siirry keskimmäiseen helmeen.</strong> X-kuvion pitäisi siirtyä keskimmäisen helmen kohdalle. Lähin ja kauimmainen helmi näkyvät kahtena.</p>
+    <figure>
+      <img src="./materiaalit/brock-vaihe2-keski.jpg" alt="X-kuvio keskimmäisen helmen kohdalla" loading="lazy">
+      <figcaption>X-kuvio keskimmäisen helmen kohdalla.</figcaption>
+    </figure>
+
+    <p><strong>3. Siirry lähimpään helmeen.</strong> X-kuvion risteyksen pitäisi olla lähimmän helmen kohdalla. Keskimmäinen ja kauimmainen helmi näkyvät kahtena.</p>
+    <figure>
+      <img src="./materiaalit/brock-vaihe3-lahi.jpg" alt="X-kuvion risteys lähimmän helmen kohdalla" loading="lazy">
+      <figcaption>X-kuvion risteys lähimmän helmen kohdalla.</figcaption>
+    </figure>
+
+    <div class="guide-callout">
+      <strong>Muistisääntö.</strong> Se helmi, jota katsot, näkyy yhtenä. Muut näkyvät kahtena. Lanka muodostaa X:n katsottavan helmen kohdalla.
+    </div>
+
+    <h4>3. Harjoittelun rytmi</h4>
+    <ul>
+      <li>Vaihda katsetta hitaasti: kauimmainen → keskimmäinen → lähin → keskimmäinen → kauimmainen.</li>
+      <li>Pidä jokaisessa kohdassa rauhallinen pysähdys. Tavoite ei ole nopeus vaan kuvan hallinta.</li>
+      <li>Jos X-kuvio katoaa, pysähdy. Räpäytä silmiä, hengitä rauhallisesti ja yritä saada kuva takaisin hallintaan.</li>
+      <li>Harjoittele 5 minuuttia kerrallaan joka toinen päivä 12 viikon ajan, ellei muuta ole ohjeistettu. Sen jälkeen ylläpito 1–2 kertaa viikossa.</li>
+    </ul>
+
+    <h4>4. Jos kuva ei näytä oikealta</h4>
+    <table class="guide-table">
+      <thead><tr><th>Havainto</th><th>Mahdollinen merkitys</th><th>Mitä voit tehdä</th></tr></thead>
+      <tbody>
+        <tr><td>Näet vain yhden langan.</td><td>Toisen silmän kuva voi vaimentua tai yhteistoiminta ei pysy vakaana.</td><td>Pysähdy helpompaan helmeen (keski/kauas). Tee lyhyemmin ja rauhallisemmin.</td></tr>
+        <tr><td>Katsottava helmi näkyy kahtena.</td><td>Katseen kohdistus ei ole vielä tarkasti helmessä.</td><td>Hidasta. Tarkista että lanka on nenän kärjessä ja molemmat silmät auki.</td></tr>
+        <tr><td>Silmät väsyvät tai lievää päänsärkyä.</td><td>Normaalia harjoituksen aiheuttamaa rasitusta.</td><td>Pidä tauko. Jos oireet ovat voimakkaita tai toistuvia, kysy neuvoa.</td></tr>
+      </tbody>
+    </table>
+
+    <h4>5. Variaatiot</h4>
+    <ul>
+      <li>Tee harjoitus eri katsesuunnissa.</li>
+      <li>Urheilussa voit suunnata harjoituksen lajinomaiseen katsesuuntaan, esim. ampumasuuntaan yläviistoon.</li>
+      <li>Kun perusharjoitus sujuu, siirrä lähintä helmeä asteittain lähemmäs, kunnes se on noin <strong>5 cm</strong> nenästä.</li>
+    </ul>
+  `
+};
+
 // ── EXERCISE MODAL ────────────────────────────────────────────────────────
 function fileExt(name) { return (name.split('.').pop() || '').toLowerCase(); }
 
@@ -1065,6 +1244,7 @@ function openExerciseModal(id) {
   document.getElementById('modalCat').textContent = `${ex.cat} · ${ex.sets} · ${ex.duration}`;
 
   const body = document.getElementById('modalBody');
+  const guideHtml = (RICH_GUIDES[ex.id] || ex.instructions || '');
   const matsHtml = (ex.materiaalit?.length ? ex.materiaalit.map(m => {
     const ext = fileExt(m.tiedosto);
     const url = `./materiaalit/${m.tiedosto}`;
@@ -1081,10 +1261,10 @@ function openExerciseModal(id) {
   }).join('') : '');
 
   body.innerHTML = `
-    ${ex.instructions ? `
+    ${guideHtml ? `
     <div class="modal-section">
       <div class="modal-section-label">Ohje</div>
-      <div class="modal-instructions">${ex.instructions}</div>
+      <div class="modal-instructions">${guideHtml}</div>
     </div>` : ''}
     ${matsHtml ? `
     <div class="modal-section">
