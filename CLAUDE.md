@@ -74,18 +74,33 @@ Uusien harjoitusten lisäys vaatii koodimuokkauksen.
 ## Tulostettavat materiaalit
 
 Kansio `materiaalit/` sisältää harjoituksiin liitettäviä tiedostoja. Tuetut tyypit:
-- **PDF** — kopioidaan suoraan kansioon, Chrome avaa selaimessa
-- **HTML** — tulostusoptimoitu pohja: `@media print` piilottaa yläpalkin, `window.print()`-nappi, A4-muotoilu (`max-width: 210mm`)
+- **HTML** — tulostusoptimoitu pohja: `@media print` piilottaa yläpalkin, `window.print()`-nappi, A4-muotoilu (`max-width: 210mm`). Esim. `sakkadi-numerotaulu.html`.
+- **Kuvat (JPG/PNG/SVG)** — käytetään rich-ohjeissa (ks. alla `RICH_GUIDES`) `<img>`-tageilla, esim. `brock-tarvikkeet.jpg`.
+- **PDF** — tuettu yhä (iframe-preview + Avaa/Lataa-napit), mutta **ei suositeltu** harjoitusohjeisiin: mobiilissa kömpelö ja raskas offline-cachettaa. Käytä mieluummin `RICH_GUIDES`-mallia.
 
-**Tiedostonimeäminen:** vain pieniä kirjaimia, viivoja ja numeroita — ei välilyöntejä eikä ääkkösiä. Esim. `brock-lanka-ohje.pdf` ✓
+**Tiedostonimeäminen:** vain pieniä kirjaimia, viivoja ja numeroita — ei välilyöntejä eikä ääkkösiä. Esim. `brock-vaihe1-kauas.jpg` ✓
 
-**Uuden materiaalin lisääminen:**
-1. Kopioi tiedosto (`*.pdf` tai `*.html`) `materiaalit/`-kansioon
-2. Lisää viite `admin.html`:n `LIBRARY`-kohteeseen: `materiaalit: [{ nimi: 'Näkyvä nimi', tiedosto: 'tiedostonimi.pdf' }]`
+**Uuden tulostettavan/ladattavan materiaalin lisääminen:**
+1. Kopioi tiedosto `materiaalit/`-kansioon
+2. Lisää viite `admin.html`:n `LIBRARY`-kohteeseen: `materiaalit: [{ nimi: 'Näkyvä nimi', tiedosto: 'tiedostonimi.html' }]`
 3. Lisää tiedosto `sw.js`:n `PRECACHE_ASSETS`-listalle jotta se on offline-saatavilla
 4. Bumppaa `CACHE_NAME` `sw.js`:ssä
 
-Harjoituksilla joilla on materiaali näytetään `📄 N tulostettava` -merkintä kirjastokortissa (admin.html) sekä latauslinkki(t) harjoituskortin sisällä (nakoharjoitukset.html). Linkki avautuu uuteen välilehteen.
+Harjoituksilla joilla on `materiaalit` näytetään `📄 N tulostettava` -merkintä kirjastokortissa (admin.html) sekä latauslinkki(t) harjoituskortin sisällä (nakoharjoitukset.html). Linkki avautuu uuteen välilehteen.
+
+## Kuvitetut harjoitusohjeet — `RICH_GUIDES` (nakoharjoitukset.html)
+
+Pitkät kuvitetut ohjeet (esim. Brockin lanka) elävät `nakoharjoitukset.html`:n `RICH_GUIDES`-objektissa, **avaimena harjoituksen `id`**. Modaali käyttää `guideHtml = RICH_GUIDES[ex.id] || ex.instructions` — eli jos id:lle löytyy rich-ohje, se korvaa lyhyen `instructions`-tekstin.
+
+**Miksi erillään jaetusta ohjelmasta:** iso HTML-ohje EI kulje URL-hashissa/QR:ssä (`buildProgramObject` serialisoi vain `id` + lyhyen `instructions`-tekstin yms.), joten jakolinkki pysyy pienenä. Koska RICH_GUIDES avaintuu id:llä, ohje näkyy oikein myös oikeilla (ei-demo) ohjelmilla.
+
+**Uuden rich-ohjeen lisääminen:**
+1. Kopioi kuvat `materiaalit/`-kansioon (pienet kirjaimet, ei ääkkösiä)
+2. Lisää `RICH_GUIDES['<id>'] = \`...html...\`` — käytä valmiita luokkia: `.guide-warn` (varoituslaatikko), `.guide-meta` (3-sarakkeinen tarvike/kesto/tavoite), `.guide-callout` (muistisääntö), `.guide-table` (vianetsintä), `<h4>` (osio-otsikko), `<figure><img><figcaption>` (kuvat)
+3. Lisää kuvat `sw.js`:n `PRECACHE_ASSETS`-listalle ja bumppaa `CACHE_NAME`
+4. Poista vastaava PDF-`materiaalit`-viittaus `admin.html`:stä ja `nakoharjoitukset.html`:n demo-datasta jos ohje korvaa PDF:n
+
+Esimerkki: `brock` — kuvat `brock-tarvikkeet.jpg`, `brock-vaihe1-kauas.jpg`, `brock-vaihe2-keski.jpg`, `brock-vaihe3-lahi.jpg` (purettu alkuperäisestä `brock-lanka-ohje.pdf`:stä, joka on sittemmin poistettu).
 
 ## Urheilijan näkymä (nakoharjoitukset.html)
 
@@ -95,13 +110,13 @@ Kolme välilehteä (bottom navigation): **Tänään / Päiväkirja / Kehitys**
 - Streak lasketaan käymällä läpi localStoragen avaimet taaksepäin
 - **Demotila** aktivoituu automaattisesti jos URL-hashissa ei ole `#program=...` JA localStoragessa ei ole tallennettua ohjelmaa (kovakoodattu 3 esimerkkiharjoitusta sakkadi/silmäkäsi/akkomodaatio)
 - `loadProgramFromURL()` käy läpi: (1) URL-hash → (2) tallennus localStorageen + paluu; (3) jos hash puuttuu, yritä localStorage
-- Fullscreen "Avaa harjoitus" -modaali: ohjeteksti + PDF-preview (iframe) + Avaa/Lataa-napit + tuloskirjaus
+- Fullscreen "Avaa harjoitus" -modaali: ohje (rich-ohje `RICH_GUIDES[id]` tai lyhyt `instructions`) + mahdolliset tulostettavat materiaalit (HTML-linkki / PDF-iframe) + tuloskirjaus
 
 ## PWA-tuki
 
 Sovellus on täysi PWA:
 - `manifest.json` — **`start_url: "nakoharjoitukset.html"`** (avaa urheilijasovelluksen suoraan, ei index.html:ää!), `scope: "."`, display `standalone`, theme `#9A5EA3`, background `#f7f5f9`
-- `sw.js` — network-first; pre-cachetä HTML/JS/PDF/HTML-materiaalit/logo/ikonit. **Bumppaa `CACHE_NAME` aina kun julkaiset uusia tiedostoja** (nykyinen: `nakoharjoitus-v2`)
+- `sw.js` — network-first; pre-cachetä HTML/JS/materiaalit (kuvat+HTML)/logo/ikonit. **Bumppaa `CACHE_NAME` aina kun julkaiset uusia tiedostoja** (nykyinen: `nakoharjoitus-v4`)
 - `icons/icon-192.svg`, `icon-512.svg`, `icon-maskable.svg` — silmäkuvio violetilla brändi-taustalla
 - Kaikki sivut (`index.html`, `admin.html`, `nakoharjoitukset.html`) rekisteröivät SW:n suhteellisella polulla `sw.js`
 
@@ -154,11 +169,28 @@ Suuri brändi-uudistus + tekninen modernisointi yhdessä istunnossa:
 | **Brändi: index.html** | Täysi uudelleenkirjoitus: vaalea bg + violetti grid, SILMÄASEMA-logo + "Urheilunäkö"-pill, h1 violetti aksentti |
 | **Brändi: kirjainvälit** | Otsikot `-0.01em` → `0.02em` (brändi +20), body letter-spacing `0.01em` (brändi +10) |
 | **QR-generointi** | Self-hosted `qrcode.min.js` (~20 KB) + LZString-kompressio (`lz-string.min.js`, ~5 KB) — väri musta maksikontrastia varten. URL 3175 → ~1000–1500 merkkiä |
-| **PWA** | `manifest.json`, `sw.js` (network-first, pre-cache CACHE_NAME `nakoharjoitus-v2`), `icons/` (silmä violetilla) |
+| **PWA** | `manifest.json`, `sw.js` (network-first, pre-cache), `icons/` (silmä violetilla) |
 | **PWA: start_url-korjaus** | `start_url: "."` → `"nakoharjoitukset.html"` (oli vienyt urheilijaa index.html:ään → "Optikon hallintapaneeli"-nappi!). LocalStorage-fallback ohjelmalle, jotta PWA-uudelleenavaus toimii hashittä |
 | **admin.html: 2-vaiheiseksi** | Aikataulu-välilehti yhdistetty Harjoitukset-välilehteen — kaikki muokattava yhdessä paikassa |
 | **Poistettuja** | `asennusohje.html` (tarpeeton), demo-nappi index.html:stä, esikatselun tagit (Toimii offline jne.) admin.html:stä, Muistutusviesti-kortti (ei toiminut ilman backendia) |
 | **Ikoni-valinta** | 4 ehdotusta esikatselusivulla → käyttäjä valitsi vaihtoehto 1 (silmäkuvio violetilla taustalla) |
+
+## Istunto 2026-05-29 — Brockin lanka: PDF → kuvitettu web-ohje — VALMIS
+
+Brockin lanka -harjoituksen ohje näkyy nyt urheilijan modaalissa natiivina kuvitettuna web-sisältönä, EI upotettuna PDF:nä. (Käyttäjän valinnat: säilytä PDF:n valokuvat, erilliset kuvatiedostot.)
+
+| Alue | Mitä tehtiin |
+|---|---|
+| **Kuvat** | Purettu `brock-lanka-ohje.pdf`:n 4 valokuvaa Node-skriptillä → `materiaalit/brock-tarvikkeet.jpg`, `brock-vaihe1-kauas.jpg`, `brock-vaihe2-keski.jpg`, `brock-vaihe3-lahi.jpg` |
+| **nakoharjoitukset.html** | Uusi `RICH_GUIDES`-objekti (avain = harjoituksen id) Brockin koko kuvitetulle ohjeelle. Modaali: `guideHtml = RICH_GUIDES[ex.id] \|\| ex.instructions`. Lisätty CSS: `.guide-warn/.guide-callout/.guide-meta/.guide-table` + `.modal-instructions` h4/ul/ol/figure. Demo-brockista poistettu PDF-materiaali |
+| **admin.html** | brock-LIBRARY-kohteesta poistettu `materiaalit`-PDF + "katso PDF alla" |
+| **sw.js** | `CACHE_NAME` v3 → **v4**; PDF pois precachesta, 4 brock-*.jpg lisätty |
+| **Poistettu** | `materiaalit/brock-lanka-ohje.pdf` (ei enää viitattu mistään) |
+| **Tarkistettu** | Live preview (412px): 4 kuvaa latautuu, 5 osiota, taulukko 3 riviä, ei PDF-iframea, "Tulostettavat materiaalit" -osio poissa ✓ |
+
+Malli dokumentoitu yllä osiossa **"Kuvitetut harjoitusohjeet — RICH_GUIDES"**.
+
+**Vielä tekemättä:** Deploy/push GitHubiin (kansio ei git-repo; käyttäjän tehtävä). SW on jo v4.
 
 ## Seuraavalla istunnolla — TODO
 
