@@ -393,7 +393,9 @@
     max-width: 430px;
     margin: 0 auto;
     min-height: 100vh;
-    padding: 0 0 40px;
+    /* Bottom padding clears the fixed bottom-nav (~88px) + iOS safe area,
+       so the "Merkitse tehdyksi" button isn't hidden behind the nav. */
+    padding: 0 0 calc(110px + env(safe-area-inset-bottom, 0px));
     background: var(--bg);
     box-shadow: 0 0 40px rgba(50,50,50,0.15);
   }
