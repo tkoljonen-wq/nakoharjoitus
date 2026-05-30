@@ -368,9 +368,31 @@ Kehitys (Tilastot) -välilehti käytti kovakoodattua demo-dataa (`buildChart`-ta
 
 **Pushattavat:** `nakoharjoitukset.html`, `sw.js` (käyttäjä pushaa itse — kansio ei ole git-repo).
 
+## Istunto 2026-05-30 (7) — Harjoituskohtaiset viivadiagrammit Kehitys-välilehdelle — VALMIS
+
+Lisätty Kehitys-välilehdelle uusi osio **"Harjoituskohtainen kehitys"**: SVG-viivadiagrammi neljälle harjoitukselle. Päivän arvo = sen päivän lukemien **keskiarvo** (monisarjaiset → ka, yksittäinen lukema → arvo itse).
+
+| Alue | Mitä tehtiin |
+|---|---|
+| **Kaaviot** | `brock` (cm), `silmakasi` (kiinniotot), `reaktio` (pisteet), `sakkadi` (kirjaimet). **Kissakortti jätetään pois** (`LINE_CHART_EXERCISES`-listassa ei). |
+| **`exerciseSeries(id)`** | Kronologinen sarja: kunkin päivän `nums`/`num` → keskiarvo (parseFloat, NaN-suodatus). Vain `done!==false`. |
+| **`lineChartSvg(points)`** | Inline-SVG viivadiagrammi (viimeiset 12 pistettä): pinta-alatäyttö (`--surface2`), viiva + pisteet (`--accent`), arvolabelit pisteiden yllä, x-akselin päivämäärät (DD.MM, joka toinen jos >7 pistettä). Yhden pisteen tapaus → keskitetty piste; tasainen sarja → viiva keskelle. |
+| **`buildLineCharts()`** | Renderöi kortin (`.chart-card`) per harjoitus `#lineCharts`-konttiin. Tyhjä → "Ei vielä dataa". |
+| **Apufunktiot** | `fmtAvg(v)` (kokonaisluku ilman desimaaleja, muuten 1 desim.), `shortDate(s)`. |
+| **CSS** | `.chart-card`, `.chart-card-title`, `.chart-card-sub`, `.chart-empty`. |
+| **Kytkennät** | Init, `showView('stats')` ja `markDoneFromModal` kutsuvat `buildLineCharts()`. |
+| **`sw.js`** | CACHE_NAME v22 → **v23** |
+
+**Huom:** x-akseli on **indeksipohjainen** (pisteet tasavälein), ei aikaskaalattu — päivämäärälabelit kertovat todelliset päivät. Riittää tähän käyttöön.
+
+**Testattu** previewillä (375px): 6 päivän data → brock laskeva 30→20, silmakasi nouseva 13→21 (ka:t 13/15/17.5/19/21 oikein), reaktio 11→15, sakkadi 40→50; yhden pisteen brock = keskitetty piste; tyhjät = "Ei vielä dataa". Ei konsolivirheitä. ✓
+
+**Pushattavat:** `nakoharjoitukset.html`, `sw.js` (käyttäjä pushaa itse — kansio ei ole git-repo).
+
 ## Nykytila
-- **SW `CACHE_NAME` = `nakoharjoitus-v22`** (bumppaa aina kun `src` muuttuu ennen pushia).
+- **SW `CACHE_NAME` = `nakoharjoitus-v23`** (bumppaa aina kun `src` muuttuu ennen pushia).
 - **Päiväkirja JA Kehitys** lukevat oikeaa dataa localStoragesta (ei enää demo-dataa). Molemmat välilehdet päivittyvät heti kun harjoitus merkitään tehdyksi.
+- **Kehitys-välilehti:** 4 tilastokorttia + viikon volyymipylväät + harjoituskohtaiset viivadiagrammit (`brock`, `silmakasi`, `reaktio`, `sakkadi` — päivän keskiarvo; kissakortti ei kuvaajaa).
 - Monisarjainen tuloskirjaus (`series: true`): **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`) ja **Tennispallon pudotus** (`reaktio`).
 - Yhden arvon kirjaus: **Brockin lanka** (`brock`, mitattava: lähimmän helmen etäisyys silmästä cm) ja **Kissakortti** (`kissakortti`, onnistuneet sulautumiset).
 - Aktiiviset harjoitukset: **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`), **Brockin lanka** (`brock`), **Kissakortti** (`kissakortti`), **Tennispallon pudotus** (`reaktio`).
