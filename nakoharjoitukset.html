@@ -999,23 +999,29 @@ const URL_PROGRAM = loadProgramFromURL();
 const EXERCISES = URL_PROGRAM ? URL_PROGRAM.exercises : [
   {
     id: 'sakkadi',
-    name: 'Sakkadinen silmänliike',
+    name: 'Fiksaatioharjoitus',
     icon: '↔️',
+    cat: 'Sakkadit / katseen kohdennus',
     duration: '5 min',
-    sets: '3 sarjaa',
-    unit: 'ms',
-    unitLabel: 'reaktioaika (ms)',
-    instructions: `Aseta <strong>numerotaulu</strong> seinälle silmien korkeudelle noin 1 m etäisyydelle. Lue numerot 1–20 järjestyksessä mahdollisimman nopeasti liikuttaen vain silmiä, ei päätä. Pidä 30 s tauko sarjojen välillä. Mittaa aika tai laske virheet.`
+    sets: '2–3 sarjaa',
+    unit: 'kirjaimet',
+    unitLabel: 'tunnistetut kirjaimet (1 min)',
+    materiaalit: [
+      { tiedosto: 'fiksaatiotaulu-1.pdf', nimi: 'Fiksaatiotaulu 1 (tulosta A4)' },
+      { tiedosto: 'fiksaatiotaulu-2.pdf', nimi: 'Fiksaatiotaulu 2 (tulosta A4)' }
+    ],
+    instructions: `Tulosta <strong>fiksaatiotaulut 1 ja 2</strong> ja kiinnitä ne seinälle silmien korkeudelle n. <strong>1,5 m</strong> päähän toisistaan. Asetu n. 2 m päähän. Pidä pää paikallaan ja liikuta vain silmiä: lue vuorotellen vasemman ja oikean taulun kirjaimet rivi kerrallaan mahdollisimman nopeasti mutta tarkasti. Kesto 1 min — laske montako kirjainta ehdit tunnistaa.`
   },
   {
     id: 'silmakasi',
     name: 'Silmä-käsikoordinaatio',
     icon: '🎯',
-    duration: '6 min',
-    sets: '4 sarjaa',
-    unit: 'pisteet',
-    unitLabel: 'osumia / 20',
-    instructions: `Pomppaa <strong>tennispallo</strong> seinään ja ota kiinni yhdellä kädellä vuorotellen. Etäisyys n. 2 m. Vaikeuta lisäämällä rytmi tai sulkemalla toinen silmä. Laske onnistuneet kiinniotot per sarja.`
+    cat: 'Silmä–käsi-koordinaatio',
+    duration: '5 min',
+    sets: '3 sarjaa',
+    unit: 'kiinniotot',
+    unitLabel: 'onnistuneet kiinniotot (30 s)',
+    instructions: `Seiso n. <strong>1,5–2 m</strong> päässä sileästä seinästä. Heitä <strong>tennispallo</strong> seinään vuorotellen oikealla ja vasemmalla kädellä ja ota se kiinni vastakkaisella kädellä. Pidä liike tasaisena ja kiinniotot hallittuina. Jatka 30 s ja laske onnistuneet kiinniotot.`
   },
   {
     id: 'akkomodaatio',
@@ -1156,6 +1162,114 @@ function buildExercises() {
 // RICH_GUIDES[ex.id] over the short ex.instructions when one exists. Images live
 // in ./materiaalit/ and are pre-cached by the service worker for offline use.
 const RICH_GUIDES = {
+  sakkadi: `
+    <div class="guide-warn">
+      <strong>Tärkeää.</strong> Tee harjoitus rauhassa ja tarkkuus edellä. Jos silmät väsyvät voimakkaasti, näet kaksoiskuvia tai tunnet huimausta, lopeta ja lepää. Kysy tarvittaessa neuvoa näönhuollon ammattilaiselta.
+    </div>
+
+    <div class="guide-meta">
+      <div><span>Tarvikkeet</span>Kaksi tulostettua fiksaatiotaulua, teippiä ja sekuntikello</div>
+      <div><span>Kesto</span>1 min / sarja, 2–3 sarjaa</div>
+      <div><span>Tavoite</span>Parantaa silmien nopeaa ja tarkkaa siirtymistä kohteesta toiseen (sakkadit) — laske tunnistetut kirjaimet 1 minuutissa</div>
+    </div>
+
+    <h4>1. Valmistelu</h4>
+    <ul>
+      <li>Tulosta <strong>fiksaatiotaulu 1 ja 2</strong> A4-paperille (tiedostot löytyvät alta kohdasta “Tulostettavat materiaalit”).</li>
+      <li>Kiinnitä taulut seinälle <strong>silmien korkeudelle</strong> noin <strong>1,5 m</strong> päähän toisistaan.</li>
+      <li>Asetu seisomaan tai istumaan noin <strong>2 m</strong> päähän tauluista, suunnilleen niiden puoliväliin.</li>
+      <li>Pidä pää paikallaan koko harjoituksen ajan — vain silmät liikkuvat.</li>
+    </ul>
+    <figure>
+      <img src="./materiaalit/fiksaatio-suoritus.jpg" alt="Urheilija katsoo kahta seinälle kiinnitettyä kirjaintaulua, jotka ovat 1,5 m päässä toisistaan ja 2 m katsojasta" loading="lazy">
+      <figcaption>Taulut silmien korkeudella n. 1,5 m välein, katsoja n. 2 m päässä. Vain silmät liikkuvat.</figcaption>
+    </figure>
+
+    <h4>2. Harjoituksen vaiheet</h4>
+    <ul>
+      <li>Katso <strong>vasemman taulun</strong> ensimmäistä kirjainta.</li>
+      <li>Siirrä katse nopeasti <strong>oikean taulun</strong> ensimmäiseen kirjaimeen.</li>
+      <li>Palaa vasemman taulun <strong>seuraavaan</strong> kirjaimeen, sitten oikean seuraavaan.</li>
+      <li>Jatka <strong>vasen–oikea–vasen–oikea</strong> -rytmissä rivi kerrallaan. Tunnista jokainen kirjain ennen kuin siirryt.</li>
+      <li>Tee liike mahdollisimman nopeasti mutta tarkasti — terävä ja hallittu, ei liukuva.</li>
+      <li>Jatka <strong>1 minuutin</strong> ajan ja laske, montako kirjainta ehdit tunnistaa.</li>
+    </ul>
+
+    <div class="guide-callout">
+      <strong>Muistisääntö.</strong> Pää paikallaan, katse hyppää terävästi kirjaimesta toiseen. Tarkkuus ensin, nopeus sen jälkeen.
+    </div>
+
+    <h4>3. Harjoittelun rytmi</h4>
+    <ul>
+      <li>Tee <strong>2–3 sarjaa</strong>, lepää 30–60 s sarjojen välissä.</li>
+      <li>Kirjaa jokaisen sarjan tunnistettujen kirjainten määrä ja seuraa kehitystä.</li>
+      <li>Harjoittele <strong>3–5 kertaa viikossa</strong>.</li>
+    </ul>
+
+    <h4>4. Variaatiot</h4>
+    <ul>
+      <li>Kiinnitä taulut <strong>päällekkäin</strong> ja tee sama liike pystysuunnassa (ylä- ja alataulu).</li>
+      <li>Kasvata etäisyyttä taulujen välillä tai katsojaan, kun perusliike sujuu hallitusti.</li>
+    </ul>
+
+    <h4>5. Vinkkejä</h4>
+    <ul>
+      <li>Keskity tarkkuuteen ennen nopeutta.</li>
+      <li>Silmien liikkeen tulee olla terävä ja hallittu, ei “liukuva”.</li>
+      <li>Jos silmät väsyvät tai näet kaksoiskuvia, lopeta harjoitus ja lepää.</li>
+    </ul>
+  `,
+  silmakasi: `
+    <div class="guide-warn">
+      <strong>Tärkeää.</strong> Tee harjoitus turvallisessa, esteettömässä tilassa. Keskeytä ja kysy neuvoa näönhuollon ammattilaiselta, jos ilmenee huimausta, pahoinvointia tai voimakasta silmien väsymistä.
+    </div>
+
+    <div class="guide-meta">
+      <div><span>Tarvikkeet</span>Tennispallo, sileä seinä ja sekuntikello</div>
+      <div><span>Kesto</span>30 s / sarja, harjoitusohjelman mukaisesti</div>
+      <div><span>Tavoite</span>Mitata ja kehittää silmä–käsi-koordinaatiota — laske onnistuneet kiinniotot 30 sekunnissa</div>
+    </div>
+
+    <h4>1. Valmistelu</h4>
+    <ul>
+      <li>Etsi tasainen, sileä seinä ja riittävästi tilaa eteesi.</li>
+      <li>Seiso noin <strong>1,5–2 m</strong> päässä seinästä, jalat hartioiden leveydellä ja paino tasaisesti molemmilla jaloilla.</li>
+      <li>Ota tennispallo toiseen käteen ja sekuntikello valmiiksi (puhelimen ajastin käy hyvin).</li>
+      <li>Pidä katse seinässä siinä kohdassa, johon pallo osuu — älä seuraa palloa pelkästään käsillä.</li>
+    </ul>
+    <figure>
+      <img src="./materiaalit/silmakasi-suoritus.jpg" alt="Henkilö heittämässä tennispalloa seinään ja valmistautumassa ottamaan se kiinni" loading="lazy">
+      <figcaption>Suoritusasento: seiso noin 1,5–2 m päässä seinästä ja pidä katse pallon osumakohdassa.</figcaption>
+    </figure>
+
+    <h4>2. Harjoituksen vaiheet</h4>
+    <p>Etene rytmikkäästi mutta hallitusti. Tavoite ei ole maksiminopeus vaan puhtaat, hallitut kiinniotot.</p>
+    <ul>
+      <li>Käynnistä sekuntikello ja <strong>heitä pallo seinään</strong>.</li>
+      <li>Heitä <strong>vuorotellen oikealla ja vasemmalla kädellä</strong> ja ota pallo kiinni vastakkaisella kädellä.</li>
+      <li>Pidä liike tasaisena ja kiinniotot hallittuina — pidä katse koko ajan pallossa.</li>
+      <li>Jatka yhtäjaksoisesti <strong>30 sekuntia</strong>.</li>
+      <li>Laske onnistuneiden kiinniottojen määrä ja merkitse tulos seurantaa varten.</li>
+    </ul>
+
+    <div class="guide-callout">
+      <strong>Muistisääntö.</strong> Katse pysyy pallossa, kädet tekevät työn. Mitä rauhallisempi rytmi, sitä puhtaammat kiinniotot.
+    </div>
+
+    <h4>3. Harjoittelun rytmi</h4>
+    <ul>
+      <li>Tee <strong>3 sarjaa</strong> à 30 s, pidä noin 30 s tauko sarjojen välillä.</li>
+      <li>Kirjaa jokaisen sarjan onnistuneet kiinniotot — näin seuraat kehitystä.</li>
+      <li>Aloita helpolla etäisyydellä ja lisää vaikeutta vasta kun kiinniotot ovat hallittuja.</li>
+    </ul>
+
+    <h4>4. Variaatiot</h4>
+    <ul>
+      <li><strong>Strobe-harjoitus.</strong> Käytä strobe-laseja (esim. Senaptec) ja valitse sopiva vaikeustaso — aloita helposta. Tee sama 30 s heitto vuorokäsin. Vertaa tulosta tavalliseen sarjaan: mitä pienempi pudotus lasien kanssa, sitä parempi tarkkaavuuden ylläpito häiriön alla.</li>
+      <li><strong>Tasapainohaaste.</strong> Tee harjoitus haastavammassa asennossa, esimerkiksi yhdellä jalalla seisten tai tasapainolaudalla seisten. Näin yhdistät silmä–käsi-koordinaatioon myös tasapainon hallinnan.</li>
+      <li>Vaikeuta myös pienentämällä palloa, kasvattamalla etäisyyttä tai nopeuttamalla rytmiä.</li>
+    </ul>
+  `,
   brock: `
     <div class="guide-warn">
       <strong>Tärkeää.</strong> Tee harjoitus optikon, optometristin tai muun näönhuollon ammattilaisen ohjeiden mukaan. Keskeytä ja kysy neuvoa, jos oireet ovat voimakkaita, lisääntyvät tai eivät helpota levossa.
@@ -1179,6 +1293,10 @@ const RICH_GUIDES = {
       <figcaption>Kuva 1. Tarvittavat välineet: lanka ja kolme eriväristä helmeä.</figcaption>
     </figure>
     <p><strong>Hyvä lähtöasento:</strong> pidä pää mahdollisimman paikallaan ja liikuta vain katsetta helmestä toiseen. Älä peitä kumpaakaan silmää.</p>
+    <figure>
+      <img src="./materiaalit/brock-suoritus.jpg" alt="Henkilö suorittamassa Brockin lanka -harjoitusta: lanka nenältä ovenkahvaan, kolme helmeä paikoillaan" loading="lazy">
+      <figcaption>Suoritusasento: lanka kulkee nenän kärjestä kiinnityspisteeseen ja kolme helmeä ovat eri etäisyyksillä.</figcaption>
+    </figure>
 
     <h4>2. Harjoituksen vaiheet</h4>
     <p>Etene rauhallisesti. Pysähdy jokaisen helmen kohdalle ja tarkista, miltä lanka ja muut helmet näyttävät.</p>

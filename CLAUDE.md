@@ -190,7 +190,15 @@ Brockin lanka -harjoituksen ohje näkyy nyt urheilijan modaalissa natiivina kuvi
 
 Malli dokumentoitu yllä osiossa **"Kuvitetut harjoitusohjeet — RICH_GUIDES"**.
 
-**Vielä tekemättä:** Deploy/push GitHubiin (kansio ei git-repo; käyttäjän tehtävä). SW on jo v4.
+**Julkaistu GitHubiin** (repo `tkoljonen-wq/nakoharjoitus`, Pages `https://tkoljonen-wq.github.io/nakoharjoitus/`). Koska kansio EI ole git-repo, push tehdään GitHub Git Data API:n kautta gh-tokenilla (blobs → tree base_tree:llä → commit → PATCH ref). Sha:null tree-itemissä poistaa tiedoston.
+
+**Korjaus (sama istunto, SW v5):** vaihekuvat olivat väärässä järjestyksessä — vaihe 1 ja 3 olivat ristissä. Oikea mappaus (X-risteys = katsottava helmi): **vaihe 1 = kauimmainen = SININEN**, **vaihe 2 = keskimmäinen = VIHREÄ**, **vaihe 3 = lähin = PUNAINEN**. Lisäksi keskikuva oli liian matala (PDF:n upotettu JPEG vain 1408×384). Korjaus: haettiin alkuperäinen PDF git-historiasta (blob-SHA `063fb6f…`), purettiin JPEG:t uudelleen, tunnistettiin värit, rajattiin keskikuva muiden kuvasuhteeseen (~1.83 → 704×384). Kuvankäsittely **PowerShell System.Drawingilla** — HUOM tämän koneen `convert` on Windowsin convert.exe (levynmuunnos), EI ImageMagick; ghostscriptia ei myöskään ole, joten PDF-rasterointi ei onnistu. Siksi keskikuva rajattiin ensin 704×384:ään.
+
+**Korjaus 2 (SW v6):** automaattinen keskirajaus leikkasi liikaa kuvasta pois. Käyttäjä toimitti alkuperäisen rajaamattoman kuvan (`Downloads/Brockin lanka vaihe 2.jpg`, 1408×768, suhde 1.833 = sama kuin muut). Se pakattiin laatu 88:lla (1.27 Mt → 86 kt) ja korvattiin `materiaalit/brock-vaihe2-keski.jpg`. Lopullinen vaihe2-kuva = täysi 1408×768, ei rajausta.
+
+**Korjaus 3 (SW v7):** live-Pagesilla Brockin modaalin "Tulostettavat materiaalit" -osio näytti 404-iframen (`brock-lanka-ohje.pdf` poistettu). Syy: käyttäjän localStorageen tallennettu ohjelma oli luotu VANHALLA admin-versiolla joka liitti Brockiin vielä PDF-materiaalin → vanha `ex.materiaalit` säilyy tallennetussa/QR-jaetussa ohjelmassa vaikka admin.html ja demo-data on siivottu. (Siksi vika näkyi vain Pagesilla, ei paikallisessa demo-tilassa.) Korjaus `openExerciseModal`-funktioon: `REMOVED_MATERIALS`-lista (`brock-lanka-ohje.pdf`, `brock-lanka-seurantalomake.html`) jolla `ex.materiaalit` suodatetaan ennen renderöintiä. Tulevat poistetut tiedostot lisätään samaan listaan.
+
+**Korjaus 4 (SW v8):** modaalin "Merkitse tehdyksi" -nappi jäi osittain fixed-bottom-navin taakse. `.modal-content`-alatäyte `40px` → `calc(110px + env(safe-area-inset-bottom, 0px))` (bottom-nav ~88px + iOS safe-area). Varmistettu previewillä (412px): nappi 36px navin yläpuolella. Nykyinen SW = **v8**.
 
 ## Seuraavalla istunnolla — TODO
 
