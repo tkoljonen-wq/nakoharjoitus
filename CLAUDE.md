@@ -76,7 +76,7 @@ Uusien harjoitusten lisäys vaatii koodimuokkauksen.
 Kansio `materiaalit/` sisältää harjoituksiin liitettäviä tiedostoja. Tuetut tyypit:
 - **HTML** — tulostusoptimoitu pohja: `@media print` piilottaa yläpalkin, `window.print()`-nappi, A4-muotoilu (`max-width: 210mm`). Esim. `sakkadi-numerotaulu.html`.
 - **Kuvat (JPG/PNG/SVG)** — käytetään rich-ohjeissa (ks. alla `RICH_GUIDES`) `<img>`-tageilla, esim. `brock-tarvikkeet.jpg`.
-- **PDF** — tuettu yhä (iframe-preview + Avaa/Lataa-napit), mutta **ei suositeltu** harjoitusohjeisiin: mobiilissa kömpelö ja raskas offline-cachettaa. Käytä mieluummin `RICH_GUIDES`-mallia.
+- **PDF** — tuettu yhä (iframe-preview + Avaa/Lataa-napit), mutta **ei suositeltu** harjoitusohjeisiin: mobiilissa kömpelö ja raskas offline-cachettaa. Käytä mieluummin `RICH_GUIDES`-mallia. (HUOM: **tulostettaviin A4-tauluihin** PDF on kuitenkin paras valinta — ks. istunto 2026-05-30 alla.)
 
 **Tiedostonimeäminen:** vain pieniä kirjaimia, viivoja ja numeroita — ei välilyöntejä eikä ääkkösiä. Esim. `brock-vaihe1-kauas.jpg` ✓
 
@@ -108,7 +108,7 @@ Kolme välilehteä (bottom navigation): **Tänään / Päiväkirja / Kehitys**
 
 - Nykyinen päivä tarkistetaan `new Date().toDateString()` -avaimella localStoragessa
 - Streak lasketaan käymällä läpi localStoragen avaimet taaksepäin
-- **Demotila** aktivoituu automaattisesti jos URL-hashissa ei ole `#program=...` JA localStoragessa ei ole tallennettua ohjelmaa (kovakoodattu 3 esimerkkiharjoitusta sakkadi/silmäkäsi/akkomodaatio)
+- **Demotila** aktivoituu automaattisesti jos URL-hashissa ei ole `#program=...` JA localStoragessa ei ole tallennettua ohjelmaa (kovakoodattu esimerkkiharjoitukset)
 - `loadProgramFromURL()` käy läpi: (1) URL-hash → (2) tallennus localStorageen + paluu; (3) jos hash puuttuu, yritä localStorage
 - Fullscreen "Avaa harjoitus" -modaali: ohje (rich-ohje `RICH_GUIDES[id]` tai lyhyt `instructions`) + mahdolliset tulostettavat materiaalit (HTML-linkki / PDF-iframe) + tuloskirjaus
 
@@ -116,7 +116,7 @@ Kolme välilehteä (bottom navigation): **Tänään / Päiväkirja / Kehitys**
 
 Sovellus on täysi PWA:
 - `manifest.json` — **`start_url: "nakoharjoitukset.html"`** (avaa urheilijasovelluksen suoraan, ei index.html:ää!), `scope: "."`, display `standalone`, theme `#9A5EA3`, background `#f7f5f9`
-- `sw.js` — network-first; pre-cachetä HTML/JS/materiaalit (kuvat+HTML)/logo/ikonit. **Bumppaa `CACHE_NAME` aina kun julkaiset uusia tiedostoja** (nykyinen: `nakoharjoitus-v4`)
+- `sw.js` — network-first; pre-cachetä HTML/JS/materiaalit (kuvat+HTML)/logo/ikonit. **Bumppaa `CACHE_NAME` aina kun julkaiset uusia tiedostoja** (nykyinen versio: ks. "Nykytila"-osio alla)
 - `icons/icon-192.svg`, `icon-512.svg`, `icon-maskable.svg` — silmäkuvio violetilla brändi-taustalla
 - Kaikki sivut (`index.html`, `admin.html`, `nakoharjoitukset.html`) rekisteröivät SW:n suhteellisella polulla `sw.js`
 
@@ -198,7 +198,89 @@ Malli dokumentoitu yllä osiossa **"Kuvitetut harjoitusohjeet — RICH_GUIDES"**
 
 **Korjaus 3 (SW v7):** live-Pagesilla Brockin modaalin "Tulostettavat materiaalit" -osio näytti 404-iframen (`brock-lanka-ohje.pdf` poistettu). Syy: käyttäjän localStorageen tallennettu ohjelma oli luotu VANHALLA admin-versiolla joka liitti Brockiin vielä PDF-materiaalin → vanha `ex.materiaalit` säilyy tallennetussa/QR-jaetussa ohjelmassa vaikka admin.html ja demo-data on siivottu. (Siksi vika näkyi vain Pagesilla, ei paikallisessa demo-tilassa.) Korjaus `openExerciseModal`-funktioon: `REMOVED_MATERIALS`-lista (`brock-lanka-ohje.pdf`, `brock-lanka-seurantalomake.html`) jolla `ex.materiaalit` suodatetaan ennen renderöintiä. Tulevat poistetut tiedostot lisätään samaan listaan.
 
-**Korjaus 4 (SW v8):** modaalin "Merkitse tehdyksi" -nappi jäi osittain fixed-bottom-navin taakse. `.modal-content`-alatäyte `40px` → `calc(110px + env(safe-area-inset-bottom, 0px))` (bottom-nav ~88px + iOS safe-area). Varmistettu previewillä (412px): nappi 36px navin yläpuolella. Nykyinen SW = **v8**.
+**Korjaus 4 (SW v8):** modaalin "Merkitse tehdyksi" -nappi jäi osittain fixed-bottom-navin taakse. `.modal-content`-alatäyte `40px` → `calc(110px + env(safe-area-inset-bottom, 0px))` (bottom-nav ~88px + iOS safe-area). Varmistettu previewillä (412px): nappi 36px navin yläpuolella.
+
+## Istunto 2026-05-30 — Harjoitusten uudistus + sisältöarkkitehtuurin korjaus — VALMIS
+
+Lisättiin suorituskuvat, uudistettiin/lisättiin harjoituksia, korjattiin tallennettujen ohjelmien sisällön päivittyminen, poistettiin 3 harjoitusta, ja korjattiin modaalin vieritys. **SW v8 → v13.** Kansio ei ole git-repo → käyttäjä pushaa itse (tiedostot `nakoharjoitukset.html`, `admin.html`, `sw.js` + uudet `materiaalit/`).
+
+| Vaihe | Mitä tehtiin |
+|---|---|
+| **Brockin lanka: suorituskuva** | Lisätty `materiaalit/brock-suoritus.jpg` (leikepöydältä, pakattu ~83 kt) rich-ohjeen "1. Valmistelu" -osioon |
+| **Silmä-käsikoordinaatio: uudistus** | Korvattiin uudella sisällöllä: brock-tyylinen `RICH_GUIDES['silmakasi']`, suorituskuva `silmakasi-suoritus.jpg` (~87 kt), Tasapainohaaste-variaatio. Päivitetty unit→`kiinniotot`, unitLabel→`onnistuneet kiinniotot (30 s)` |
+| **Sakkadi → Fiksaatioharjoitus** | "Sakkadinen silmänliike" korvattiin Fiksaatioharjoituksella (id pysyi `sakkadi`). Uusi `RICH_GUIDES['sakkadi']`, suorituskuva `fiksaatio-suoritus.jpg` (~96 kt), **kaksi tulostettavaa A4-PDF-taulua** `fiksaatiotaulu-1.pdf` / `fiksaatiotaulu-2.pdf` `materiaalit`-taulukossa. unit→`kirjaimet` |
+| **PDF-taulujen tapa** | Päätös: tulostettaviin A4-tauluihin **PDF on paras** (kiinteä asettelu, luotettava tulostus) ja sovelluksen valmis `materiaalit`-mekanismi näyttää ne "Tulostettavat materiaalit" -osiossa (iframe + Avaa + Lataa). Parempi kuin HTML-tulostussivu A4-tarkkuuden takia |
+| **Poistettu 3 harjoitusta** | Akkomodaatio (`akkomodaatio`), Silmän seuranta (`pursuit`), Perifeerinen näkö (`periferia`) — poistettu `admin.html` LIBRARY:stä ja `nakoharjoitukset.html` katalogista + lisätty `REMOVED_EXERCISE_IDS`-listaan (katoavat myös jo jaetuista ohjelmista) |
+| **Modaalin vieritys** | `openExerciseModal` nollaa nyt `overlay.scrollTop = 0` joka avauksella → harjoitus avautuu aina ylhäältä (overlay on vierittyvä elementti ja sitä käytetään uudelleen, joten scroll jäi muistiin) |
+
+### ⭐ Sisältöarkkitehtuuri — harjoitusdatan KAKSI lähdettä (tärkein oppi)
+Sisältö elää **kahdessa paikassa**, ja molemmat on päivitettävä kun harjoitusta muokataan:
+
+1. **`admin.html` → `LIBRARY`** = lähde **uusille** generoitaville ohjelmille. Kun ohjelma generoidaan, harjoitusten sisältö (ml. `materiaalit`) leivotaan QR-koodiin/linkkiin (`out.materiaalit = ex.materiaalit`). Kentät: `{ id, name, icon, cat, unit, unitLabel, instructions, materiaalit? }` (ei duration/sets — ne asetetaan ohjelmakohtaisesti).
+
+2. **`nakoharjoitukset.html` → `DEFAULT_EXERCISES`** = sisäänrakennettu katalogi (myös demo-fallback). Aktiivinen lista rakennetaan:
+   ```js
+   const REMOVED_EXERCISE_IDS = ['akkomodaatio','periferia','pursuit'];
+   const EXERCISES = (URL_PROGRAM?.exercises || DEFAULT_EXERCISES)
+     .filter(ex => !REMOVED_EXERCISE_IDS.includes(ex.id))   // poistetut pois myös vanhoista ohjelmista
+     .map(ex => {
+       const cat = DEFAULT_EXERCISES.find(c => c.id === ex.id);
+       if (!cat) return ex;                                  // ei katalogissa → säilytä ohjelman sisältö
+       return { ...ex,                                       // ohjelma: days, sets, duration
+         name: cat.name ?? ex.name, icon: cat.icon ?? ex.icon, cat: cat.cat ?? ex.cat,
+         unit: cat.unit ?? ex.unit, unitLabel: cat.unitLabel ?? ex.unitLabel,
+         instructions: cat.instructions ?? ex.instructions,
+         materiaalit: cat.materiaalit ?? ex.materiaalit };   // CONTENT katalogista id:n perusteella
+     });
+   ```
+
+**Kultainen sääntö:** tallennettu/QR-jaettu ohjelma määrää vain **mitkä** harjoitukset + aikataulun (`days`, `sets`, `duration`). **Kaikki sisältö (name, icon, cat, unit, unitLabel, instructions, materiaalit) virkistetään aina `DEFAULT_EXERCISES`:stä id:n perusteella.** → Sisältömuutokset näkyvät myös jo jaetuissa ohjelmissa **ilman uutta QR-koodia**. (Tämä korjasi bugin jossa vanha "Numerotaulu"-materiaali jäi näkymään päivityksen jälkeen.)
+
+Apulistat `nakoharjoitukset.html`:ssä:
+- **`REMOVED_EXERCISE_IDS`** — poistetut harjoitus-id:t (suodattuvat pois myös vanhoista ohjelmista).
+- **`REMOVED_MATERIALS`** (`openExerciseModal`:ssa) — poistettujen materiaalitiedostojen nimet. Nyt: `brock-lanka-ohje.pdf`, `brock-lanka-seurantalomake.html`, `sakkadi-numerotaulu.html`.
+- **`RICH_GUIDES`** — kuvitetut ohjeet id:n mukaan.
+
+### Nykyiset harjoitukset (2026-05-30)
+| id | nimi | rich-ohje | materiaalit |
+|----|------|-----------|-------------|
+| `sakkadi` | Fiksaatioharjoitus | kyllä | `fiksaatiotaulu-1.pdf`, `fiksaatiotaulu-2.pdf` |
+| `silmakasi` | Silmä-käsikoordinaatio | kyllä | – |
+| `brock` | Brockin lanka | kyllä | – (kuvat rich-ohjeessa) |
+
+### Kuvanpakkaus-resepti (PowerShell System.Drawing)
+Pakkaa kaikki uudet valokuvat ennen käyttöä: ~1200 px leveä JPG, laatu 82 (~85–100 kt). Käyttäjän alkuperäiskuva on usein **leikepöydällä tiedostona** — hae polku: `[System.Windows.Forms.Clipboard]::GetFileDropList()`.
+```powershell
+Add-Type -AssemblyName System.Drawing
+$img=[System.Drawing.Image]::FromFile($src); $maxW=1200
+if($img.Width -gt $maxW){$newW=$maxW;$newH=[int]($img.Height*$maxW/$img.Width)}else{$newW=$img.Width;$newH=$img.Height}
+$bmp=New-Object System.Drawing.Bitmap $newW,$newH
+$g=[System.Drawing.Graphics]::FromImage($bmp);$g.InterpolationMode='HighQualityBicubic';$g.DrawImage($img,0,0,$newW,$newH);$g.Dispose()
+$codec=[System.Drawing.Imaging.ImageCodecInfo]::GetImageEncoders()|?{$_.MimeType -eq 'image/jpeg'}
+$ep=New-Object System.Drawing.Imaging.EncoderParameters 1
+$ep.Param[0]=New-Object System.Drawing.Imaging.EncoderParameter ([System.Drawing.Imaging.Encoder]::Quality),([long]82)
+$bmp.Save($dst,$codec,$ep)
+```
+
+### ⭐ RESEPTI: uuden harjoituksen lisääminen
+1. **Kuva/PDF:t** → pakkaa kuva (yllä) ja kopioi `materiaalit/`-kansioon selkein nimin (esim. `<id>-suoritus.jpg`, `<id>-taulu-1.pdf`). Vain pieniä kirjaimia, viivoja, numeroita — ei ääkkösiä/välilyöntejä.
+2. **`admin.html` `LIBRARY`** → lisää objekti `{ id, name, icon, cat, unit, unitLabel, instructions, materiaalit? }`. id uniikki ja lyhyt.
+3. **`nakoharjoitukset.html` `DEFAULT_EXERCISES`** → lisää **sama** objekti (lisää myös `duration` ja `sets` demo-arvoiksi). Sama id.
+4. **`nakoharjoitukset.html` `RICH_GUIDES`** → lisää `<id>: \`...\`` kuvitettu ohje brock/silmakasi/sakkadi-tyylillä (`.guide-warn`, `.guide-meta`, `<h4>`, `<figure>`, `.guide-callout`...). Valinnainen jos lyhyt `instructions` riittää.
+5. **`sw.js`** → lisää uudet `materiaalit/`-tiedostot `PRECACHE_ASSETS`-listaan **ja bumppaa `CACHE_NAME`**.
+6. Kerro käyttäjälle pushattavat tiedostot.
+
+### ⭐ RESEPTI: harjoituksen poistaminen
+1. Poista objekti `admin.html` `LIBRARY`:stä.
+2. Poista objekti `nakoharjoitukset.html` `DEFAULT_EXERCISES`:stä (+ mahd. `RICH_GUIDES`-merkintä ja demo-päiväkirjaviittaukset).
+3. Lisää id `REMOVED_EXERCISE_IDS`-listaan → katoaa myös jo jaetuista ohjelmista.
+4. (Valinnainen) lisää vanhentuneet materiaalitiedostot `REMOVED_MATERIALS`-listaan.
+5. Bumppaa `CACHE_NAME`.
+
+## Nykytila
+- **SW `CACHE_NAME` = `nakoharjoitus-v13`** (bumppaa aina kun `src` muuttuu ennen pushia).
+- Aktiiviset harjoitukset: **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`), **Brockin lanka** (`brock`).
+- Repo `tkoljonen-wq/nakoharjoitus`, Pages `https://tkoljonen-wq.github.io/nakoharjoitus/`. Kansio ei ole git-repo tällä koneella → **käyttäjä pushaa itse**.
 
 ## Seuraavalla istunnolla — TODO
 
@@ -207,10 +289,9 @@ Tärkein:
 - **Testaa oikealla puhelimella** PWA-asennus + offline-tila (Android Chrome ja iOS Safari 16.4+). Erityisesti: skannaa QR → asenna PWA → sulje selain → avaa PWA aloitusnäytöltä → varmista että urheilijan oma ohjelma näkyy (eikä demo-tila)
 
 Mahdollisia jatkokehityksiä (kysy käyttäjältä haluaako):
+- **Uusien harjoitusten lisäys** — käytä yllä olevaa reseptiä (istunto 2026-05-30)
 - **Kalenterimuistutus** (.ics-tiedosto) — jos halutaan korvata aiemmin poistettu Muistutusviesti-toiminto oikeasti toimivalla ratkaisulla
 - **Asennusohjeen palautus** brändi-uudistettuna — jos halutaan auttaa urheilijoita PWA-asennuksessa
-- **Uusien harjoitusten lisäys** LIBRARY-taulukkoon ja niiden materiaalit `materiaalit/`-kansioon
-- **Brändi-uudistus tarvittaessa** sakkadi-numerotaulu.html:lle (materiaalit/) — nyt vielä vanhoilla väreillä?
 
 ## Brändi-fontit täsmäävät brändikäsikirjaan
 
@@ -220,3 +301,6 @@ Tarkistettu 2026-05-28 brändikäsikirjasta (s. 25):
 - ⚠️ Numerot Roboto Mono — ei brändi-mainintaa, mutta ei myöskään kiellettyä. Säilytetty.
 - ✅ Kirjainvälit: otsikot 0.02em, leipä 0.01em
 - ✅ Värit: violetti #9A5EA3, oranssi #F06428, musta #323232
+
+## Sessiohuomio — työkalujen tulostepuskurointi
+Tässä ympäristössä Read/Grep/Bash-tulokset saattavat ajoittain palautua tyhjinä ja "huuhtoutua" vasta seuraavalla kierroksella. Kierto: aja komento uudelleen `echo "MARKER_$(date +%s)"`-etuliitteellä, niin oikea tuloste tulee näkyviin.
