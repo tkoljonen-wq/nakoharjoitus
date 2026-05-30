@@ -3,7 +3,7 @@
 // Bumppaa CACHE_NAME aina kun julkaiset uudet HTML/CSS/JS/materiaali-tiedostot,
 // jotta vanha cache puretaan automaattisesti.
 
-const CACHE_NAME = 'nakoharjoitus-v14';
+const CACHE_NAME = 'nakoharjoitus-v15';
 
 const PRECACHE_ASSETS = [
   './',
@@ -28,7 +28,8 @@ const PRECACHE_ASSETS = [
   './materiaalit/silmakasi-suoritus.jpg',
   './materiaalit/kissakortti.pdf',
   './materiaalit/kissakortti-suoritus.jpg',
-  './materiaalit/kissakortti-tavoite.jpg'
+  './materiaalit/kissakortti-tavoite.jpg',
+  './materiaalit/reaktio-suoritus.jpg'
 ];
 
 // Install: pre-cache kaikki kriittiset resurssit

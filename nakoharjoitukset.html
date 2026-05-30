@@ -1048,6 +1048,17 @@ const DEFAULT_EXERCISES = [
       { tiedosto: 'kissakortti.pdf', nimi: 'Kissakortti (tulosta A4)' }
     ],
     instructions: `Tulosta <strong>kissakortti</strong> (kaksi kissakuvaa rinnakkain). Pidä korttia silmien tasolla n. <strong>40 cm</strong> päässä ja kynää kortin ja kasvojen välissä n. <strong>15 cm</strong> päässä silmistä, kärki kuvien keskellä. Katso kynän kärkeä — kissat tuplaantuvat (näet neljä). Jatka kunnes keskimmäiset kissat sulautuvat yhdeksi: näet kolme kissaa, joista keskimmäinen on kolmiulotteinen ja terävä. Pidä 5–10 s, rentouta ja toista 5–10 kertaa.`
+  },
+  {
+    id: 'reaktio',
+    name: 'Tennispallon pudotus',
+    icon: '⚡',
+    cat: 'Reaktio / perifeerinen näkö',
+    duration: '5 min',
+    sets: '10 pudotusta',
+    unit: 'pisteet',
+    unitLabel: 'pisteet (max 20, 10 pudotusta)',
+    instructions: `Tarvitset <strong>parin</strong> (esim. valmentaja) ja kaksi tennispalloa. Pari seisoo kädet suorina sivuilla, yksi pallo kummassakin kädessä. Urheilija kyykistyy parin eteen kädet selän takana, katse suoraan eteenpäin. Pari pudottaa yhden pallon kerrallaan — urheilija yrittää ottaa sen kiinni reagoiden perifeerisen näön avulla. <strong>Pisteytys:</strong> 2 = puhdas kiinniotto, 1 = kiinni mutta ei puhdas, 0 = pallo putoaa. Yhteensä <strong>10 pudotusta</strong> (max 20 pistettä).`
   }
 ];
 
@@ -1439,6 +1450,59 @@ const RICH_GUIDES = {
         <tr><td>Kuva katoaa tai muuttuu kaksoiskuvaksi.</td><td>Silmät väsyvät.</td><td>Pidä tauko, rentouta katse ja aloita uudelleen.</td></tr>
       </tbody>
     </table>
+  `,
+  reaktio: `
+    <div class="guide-warn">
+      <strong>Tärkeää.</strong> Tee harjoitus turvallisessa, esteettömässä tilassa. Keskeytä, jos ilmenee huimausta tai kipua. Harjoitus tehdään yhdessä parin (esim. valmentajan) kanssa.
+    </div>
+
+    <div class="guide-meta">
+      <div><span>Tarvikkeet</span>Kaksi tennispalloa ja pari (valmentaja tai harjoituskaveri)</div>
+      <div><span>Kesto</span>10 pudotusta / sarja</div>
+      <div><span>Tavoite</span>Kehittää reaktionopeutta ja perifeeristä havainnointia — pisteytä kiinniotot (max 20 pistettä)</div>
+    </div>
+
+    <h4>1. Valmistelu</h4>
+    <ul>
+      <li><strong>Pari</strong> seisoo seisten, kädet suorina sivuilla, yksi tennispallo kummassakin kädessä.</li>
+      <li><strong>Urheilija</strong> kyykistyy tai polvistuu parin eteen, kädet selän takana.</li>
+      <li>Urheilijan katse on <strong>suoraan eteenpäin</strong> — palloja ei saa katsoa suoraan, vaan havainnoida perifeerisesti (silmäkulmasta).</li>
+    </ul>
+    <figure>
+      <img src="./materiaalit/reaktio-suoritus.jpg" alt="Pari seisoo kädet sivuilla tennispallot käsissä, urheilija kyykyssä edessä kädet selän takana katse eteenpäin" loading="lazy">
+      <figcaption>Suoritusasento: pari seisoo pallot suorilla käsillä sivuilla, urheilija kyykyssä edessä katse suoraan eteenpäin.</figcaption>
+    </figure>
+
+    <h4>2. Harjoituksen vaiheet</h4>
+    <ul>
+      <li>Pari pudottaa <strong>yhden pallon</strong> kerrallaan ilman ennakkomerkkiä, vuorotellen oikeasta ja vasemmasta kädestä.</li>
+      <li>Urheilija reagoi perifeerisen näön havaintoon ja <strong>yrittää ottaa pallon kiinni</strong> ennen kuin se osuu maahan.</li>
+      <li>Pari vaihtelee pudotushetkeä ja -kättä, jotta urheilija ei voi ennakoida.</li>
+      <li>Toista yhteensä <strong>10 pudotusta</strong>.</li>
+    </ul>
+
+    <h4>3. Pisteytys</h4>
+    <table class="guide-table">
+      <thead><tr><th>Tulos</th><th>Pisteet</th></tr></thead>
+      <tbody>
+        <tr><td>Pallo kiinni <strong>puhtaasti</strong></td><td>2 pistettä</td></tr>
+        <tr><td>Pallo kiinni, <strong>mutta ei puhtaasti</strong></td><td>1 piste</td></tr>
+        <tr><td>Pallo <strong>putoaa</strong></td><td>0 pistettä</td></tr>
+      </tbody>
+    </table>
+    <p>Laske 10 pudotuksen yhteispisteet (max <strong>20 pistettä</strong>) ja merkitse tulos seurantaa varten.</p>
+
+    <div class="guide-callout">
+      <strong>Muistisääntö.</strong> Katse pysyy suoraan edessä — pallo havaitaan silmäkulmasta, ei kääntämällä katsetta. Mitä laajempi perifeerinen havainto, sitä nopeampi reaktio.
+    </div>
+
+    <h4>4. Eteneminen ja variaatiot</h4>
+    <ul>
+      <li>Kasvata etäisyyttä parin ja urheilijan välillä, jolloin reaktioaika lyhenee.</li>
+      <li>Pari voi pudottaa pallon yllättävämmällä rytmillä tai molemmista käsistä peräkkäin.</li>
+      <li>Tee harjoitus seisaaltaan tai tasapainoa haastavassa asennossa, kun perusliike sujuu.</li>
+      <li>Seuraa pistekehitystä viikoittain — tavoite on lähestyä 20 pistettä.</li>
+    </ul>
   `
 };
 

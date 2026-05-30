@@ -248,6 +248,7 @@ Apulistat `nakoharjoitukset.html`:ssä:
 | `silmakasi` | Silmä-käsikoordinaatio | kyllä | – |
 | `brock` | Brockin lanka | kyllä | – (kuvat rich-ohjeessa) |
 | `kissakortti` | Kissakortti | kyllä | `kissakortti.pdf` (tulostettava kortti) |
+| `reaktio` | Tennispallon pudotus | kyllä | – (kuva rich-ohjeessa, ei PDF) |
 
 ### Kuvanpakkaus-resepti (PowerShell System.Drawing)
 Pakkaa kaikki uudet valokuvat ennen käyttöä: ~1200 px leveä JPG, laatu 82 (~85–100 kt). Käyttäjän alkuperäiskuva on usein **leikepöydällä tiedostona** — hae polku: `[System.Windows.Forms.Clipboard]::GetFileDropList()`.
@@ -295,9 +296,21 @@ Lisätty harjoitus **Kissakortti** (`id: kissakortti`) — stereonäön/konverge
 - `kissakortti-tavoite.jpg` — tavoitenäkymä (kolme kissaa, keskimmäinen kolmiulotteinen)
 Pakkaa kuvanpakkaus-reseptillä (~1200 px, laatu 82) ennen kopiointia. Ennen näiden lisäystä rich-ohjeen `<figure>`-kuvat näyttävät rikkinäisen kuvan (muu sisältö toimii).
 
+## Istunto 2026-05-30 (3) — Uusi harjoitus: Tennispallon pudotus (reaktio) — VALMIS
+
+Lisätty harjoitus **Tennispallon pudotus** (`id: reaktio`) — reaktio- ja perifeerisen näön harjoitus (pari pudottaa tennispallon, urheilija ottaa kiinni katse suoraan eteenpäin). Lähteet: `Desktop/Näköharjoitteet/Reaktio ja perifeerinen näkö ohje.docx/.pdf` + kuva `materiaalit/Reaktioharjoitus.png`. **Ei PDF-materiaaleja** (vaatii parin, ei tulostettavaa). Pisteytys: 10 pudotusta, 2/1/0 pistettä → max 20.
+
+| Alue | Mitä tehtiin |
+|---|---|
+| **`admin.html` LIBRARY** | Lisätty reaktio-objekti (icon ⚡, cat "Reaktio / perifeerinen näkö", unit "pisteet", ei materiaaleja) |
+| **`nakoharjoitukset.html` DEFAULT_EXERCISES** | Sama objekti + `duration: '5 min'`, `sets: '10 pudotusta'` |
+| **`nakoharjoitukset.html` RICH_GUIDES** | Uusi `reaktio`-kuvitettu ohje (guide-warn, guide-meta, suorituskuva, pisteytystaulukko, callout, variaatiot) |
+| **`materiaalit/reaktio-suoritus.jpg`** | Pakattu `Reaktioharjoitus.png`:stä (1,78 Mt → 94 kt, 1200×900); alkuperäinen PNG poistettu |
+| **`sw.js`** | CACHE_NAME v14 → **v15**; lisätty `reaktio-suoritus.jpg` |
+
 ## Nykytila
-- **SW `CACHE_NAME` = `nakoharjoitus-v14`** (bumppaa aina kun `src` muuttuu ennen pushia).
-- Aktiiviset harjoitukset: **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`), **Brockin lanka** (`brock`), **Kissakortti** (`kissakortti`).
+- **SW `CACHE_NAME` = `nakoharjoitus-v15`** (bumppaa aina kun `src` muuttuu ennen pushia).
+- Aktiiviset harjoitukset: **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`), **Brockin lanka** (`brock`), **Kissakortti** (`kissakortti`), **Tennispallon pudotus** (`reaktio`).
 - Repo `tkoljonen-wq/nakoharjoitus`, Pages `https://tkoljonen-wq.github.io/nakoharjoitus/`. Kansio ei ole git-repo tällä koneella → **käyttäjä pushaa itse**.
 
 ## Seuraavalla istunnolla — TODO
