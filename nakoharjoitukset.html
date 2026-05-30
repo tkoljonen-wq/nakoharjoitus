@@ -329,6 +329,16 @@
     white-space: nowrap;
   }
 
+  .series-label {
+    display: flex; align-items: center;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+    min-width: 56px;
+    white-space: nowrap;
+  }
+
   .log-textarea {
     width: 100%;
     background: var(--bg);
@@ -1004,7 +1014,8 @@ const DEFAULT_EXERCISES = [
     icon: '↔️',
     cat: 'Sakkadit / katseen kohdennus',
     duration: '5 min',
-    sets: '2–3 sarjaa',
+    sets: '3 sarjaa',
+    series: 3,
     unit: 'kirjaimet',
     unitLabel: 'tunnistetut kirjaimet (1 min)',
     materiaalit: [
@@ -1083,6 +1094,7 @@ const EXERCISES = (URL_PROGRAM?.exercises || DEFAULT_EXERCISES)
     unitLabel: cat.unitLabel ?? ex.unitLabel,
     instructions: cat.instructions ?? ex.instructions,
     materiaalit: cat.materiaalit ?? ex.materiaalit,
+    series: cat.series ?? ex.series,
   };
 });
 
@@ -1521,6 +1533,24 @@ function openExerciseModal(id) {
 
   const body = document.getElementById('modalBody');
   const guideHtml = (RICH_GUIDES[ex.id] || ex.instructions || '');
+
+  // Tuloskirjaus: harjoituksella voi olla useita sarjoja (ex.series). Tällöin
+  // jokaiselle sarjalle oma syöttökenttä ja tulokset tallennetaan taulukkona
+  // (prev.nums). Yhden tuloksen harjoitukset käyttävät yhä yksittäistä kenttää (prev.num).
+  const seriesCount = (ex.series && ex.series > 1) ? ex.series : 0;
+  const prevNums = Array.isArray(prev.nums) ? prev.nums : (prev.num ? [prev.num] : []);
+  const logInputsHtml = seriesCount
+    ? Array.from({ length: seriesCount }, (_, i) => `
+        <div class="log-row">
+          <div class="series-label">Sarja ${i + 1}</div>
+          <input class="log-input narrow" id="modalNum${i}" type="number" placeholder="—" inputmode="decimal" value="${prevNums[i] || ''}">
+          <div class="unit-badge">${ex.unitLabel || ''}</div>
+        </div>`).join('')
+    : `
+        <div class="log-row">
+          <input class="log-input narrow" id="modalNum" type="number" placeholder="—" inputmode="decimal" value="${prev.num || ''}">
+          <div class="unit-badge">${ex.unitLabel || ''}</div>
+        </div>`;
   // Drop materials removed from the app (e.g. PDF korvattu kuvitetulla RICH_GUIDESilla).
   // Vanhat localStorageen tallennetut / QR-jaetut ohjelmat voivat yhä viitata näihin
   // tiedostoihin, jolloin iframe näyttäisi GitHubin 404-sivun.
@@ -1553,11 +1583,8 @@ function openExerciseModal(id) {
       ${matsHtml}
     </div>` : ''}
     <div class="modal-section">
-      <div class="modal-section-label">Kirjaa tulos</div>
-      <div class="log-row">
-        <input class="log-input narrow" id="modalNum" type="number" placeholder="—" inputmode="decimal" value="${prev.num || ''}">
-        <div class="unit-badge">${ex.unitLabel || ''}</div>
-      </div>
+      <div class="modal-section-label">${seriesCount ? 'Kirjaa tulokset (' + seriesCount + ' sarjaa)' : 'Kirjaa tulos'}</div>
+      ${logInputsHtml}
       <div class="log-label" style="margin-top:10px">Muistiinpano (vapaaehtoinen)</div>
       <textarea class="log-textarea" id="modalNote" placeholder="Esim. vasen silmä väsyi, parempi kuin eilen...">${prev.note || ''}</textarea>
     </div>
@@ -1591,9 +1618,19 @@ document.getElementById('exerciseModal')?.addEventListener('click', e => {
 
 function markDoneFromModal() {
   if (!modalExId) return;
-  const num = document.getElementById('modalNum')?.value || '';
+  const ex = TODAY_EXERCISES.find(e => e.id === modalExId);
   const note = document.getElementById('modalNote')?.value || '';
-  completed[modalExId] = { num, note, time: new Date().toISOString() };
+  const seriesCount = (ex && ex.series && ex.series > 1) ? ex.series : 0;
+  if (seriesCount) {
+    const nums = [];
+    for (let i = 0; i < seriesCount; i++) {
+      nums.push(document.getElementById('modalNum' + i)?.value || '');
+    }
+    completed[modalExId] = { nums, note, time: new Date().toISOString() };
+  } else {
+    const num = document.getElementById('modalNum')?.value || '';
+    completed[modalExId] = { num, note, time: new Date().toISOString() };
+  }
   try { localStorage.setItem(todayKey, JSON.stringify(completed)); } catch(e) {}
   closeExerciseModal();
   buildExercises();

@@ -279,6 +279,24 @@ $bmp.Save($dst,$codec,$ep)
 4. (Valinnainen) lisää vanhentuneet materiaalitiedostot `REMOVED_MATERIALS`-listaan.
 5. Bumppaa `CACHE_NAME`.
 
+## Istunto 2026-05-30 (4) — Monisarjainen tuloskirjaus (Fiksaatioharjoitus) — VALMIS
+
+Fiksaatioharjoitus (`sakkadi`) kerää nyt **kolmen sarjan** tulokset yhden sijaan. Toteutus on **geneerinen**: harjoituksen kenttä `series: N` saa modaalin piirtämään N numeroitua "Sarja 1…N" -syöttökenttää, ja tulokset tallennetaan taulukkona.
+
+| Alue | Mitä tehtiin |
+|---|---|
+| **`nakoharjoitukset.html` DEFAULT_EXERCISES** | sakkadi: `series: 3`, `sets: '2–3 sarjaa'` → `'3 sarjaa'` |
+| **EXERCISES refresh-map** | lisätty `series: cat.series ?? ex.series` → propagoituu myös jo jaettuihin/QR-ohjelmiin id:n perusteella (kultainen sääntö) |
+| **`admin.html` LIBRARY** | sakkadi: `series:3` (yhtenäisyys; ei serialisoidu — `buildProgramObject` ei sisällä `series`-kenttää, mutta refresh-map hoitaa sen) |
+| **`openExerciseModal`** | jos `ex.series>1`: N riviä `.series-label` + `#modalNum0..N-1`. Muuten yksi `#modalNum` kuten ennen. Esitäyttö `prev.nums[i]` (tai vanha `prev.num`). Otsikko "Kirjaa tulokset (N sarjaa)" |
+| **`markDoneFromModal`** | series → tallentaa `{ nums:[...], note, time }`; yksittäinen → yhä `{ num, note, time }` (taaksepäin yhteensopiva) |
+| **CSS** | uusi `.series-label` (Roboto Condensed, min-width 56px) |
+| **`sw.js`** | CACHE_NAME v15 → **v16** |
+
+**⭐ Tallennusmuoto (tärkeä Päiväkirja-työlle):** monisarjainen harjoitus tallentuu `completed[id] = { nums:['42','45','48'], note, time }`, yksittäinen `{ num, note, time }`. Tuleva päiväkirja-renderöinti (nyt vielä demo, lukee vain `DIARY_DATA`a) pitää osata näyttää **molemmat muodot**.
+
+**Testattu** live-previewillä (412px): 3 saraketta "Sarja 1/2/3" + yksikkö, tallennus → localStorage `nums:['42','45','48']`, uudelleenavaus esitäyttää arvot, kortti merkitty tehdyksi. ✓
+
 ## Istunto 2026-05-30 (2) — Uusi harjoitus: Kissakortti — KOODI VALMIS, kuvat puuttuvat
 
 Lisätty harjoitus **Kissakortti** (`id: kissakortti`) — stereonäön/konvergenssin harjoitus (kynä + kortti jossa 2 kissaa → keskimmäiset sulautuvat "kolmanneksi kissaksi" joka näkyy kolmiulotteisena). Lähteet: `Desktop/Näköharjoitteet/Kissakortti.pdf` (tulostettava kortti) + `Kissakortti ohje.docx/.pdf` (ohjeteksti).
@@ -309,7 +327,7 @@ Lisätty harjoitus **Tennispallon pudotus** (`id: reaktio`) — reaktio- ja peri
 | **`sw.js`** | CACHE_NAME v14 → **v15**; lisätty `reaktio-suoritus.jpg` |
 
 ## Nykytila
-- **SW `CACHE_NAME` = `nakoharjoitus-v15`** (bumppaa aina kun `src` muuttuu ennen pushia).
+- **SW `CACHE_NAME` = `nakoharjoitus-v16`** (bumppaa aina kun `src` muuttuu ennen pushia).
 - Aktiiviset harjoitukset: **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`), **Brockin lanka** (`brock`), **Kissakortti** (`kissakortti`), **Tennispallon pudotus** (`reaktio`).
 - Repo `tkoljonen-wq/nakoharjoitus`, Pages `https://tkoljonen-wq.github.io/nakoharjoitus/`. Kansio ei ole git-repo tällä koneella → **käyttäjä pushaa itse**.
 
