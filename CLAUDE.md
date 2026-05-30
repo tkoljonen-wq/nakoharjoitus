@@ -294,7 +294,7 @@ Koska osatulokset persistoituvat jo "Tallenna"-napilla (ettei data katoa modaali
 
 | Alue | Mitä tehtiin |
 |---|---|
-| **DEFAULT_EXERCISES / admin LIBRARY** | sakkadi: `series: true` (oli väliaikaisesti `3`). EXERCISES refresh-map propagoi `series`:n jaettuihin ohjelmiin |
+| **DEFAULT_EXERCISES / admin LIBRARY** | `series: true` lisätty **sakkadille**, **silmakasille** ja **reaktiolle**. EXERCISES refresh-map propagoi `series`:n jaettuihin ohjelmiin |
 | **`openExerciseModal`** | `isMulti = !!ex.series`. Multi → `<div id="seriesContainer">` jonka `renderSeriesSection()` täyttää; init `modalSeries` `prev.nums`:sta. Single → yksi `#modalNum` kuten ennen |
 | **Uudet fn:t** | `renderSeriesSection()`, `updateSeriesSaveBtn()`, `addSeriesEntry()`, `removeSeriesEntry(i)`, `persistSeriesProgress()`. Tila: `let modalSeries = []` |
 | **CSS** | `.series-unit`, `.series-row`, `.series-value` (surface2-tausta), `.series-save` (violetti, disabled kun tyhjä), `.series-del` (✕) |
@@ -334,7 +334,9 @@ Lisätty harjoitus **Tennispallon pudotus** (`id: reaktio`) — reaktio- ja peri
 | **`sw.js`** | CACHE_NAME v14 → **v15**; lisätty `reaktio-suoritus.jpg` |
 
 ## Nykytila
-- **SW `CACHE_NAME` = `nakoharjoitus-v17`** (bumppaa aina kun `src` muuttuu ennen pushia).
+- **SW `CACHE_NAME` = `nakoharjoitus-v20`** (bumppaa aina kun `src` muuttuu ennen pushia).
+- Monisarjainen tuloskirjaus (`series: true`): **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`) ja **Tennispallon pudotus** (`reaktio`).
+- Yhden arvon kirjaus: **Brockin lanka** (`brock`, mitattava: lähimmän helmen etäisyys silmästä cm) ja **Kissakortti** (`kissakortti`, onnistuneet sulautumiset).
 - Aktiiviset harjoitukset: **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`), **Brockin lanka** (`brock`), **Kissakortti** (`kissakortti`), **Tennispallon pudotus** (`reaktio`).
 - Repo `tkoljonen-wq/nakoharjoitus`, Pages `https://tkoljonen-wq.github.io/nakoharjoitus/`. Kansio ei ole git-repo tällä koneella → **käyttäjä pushaa itse**.
 

@@ -3,7 +3,7 @@
 // Bumppaa CACHE_NAME aina kun julkaiset uudet HTML/CSS/JS/materiaali-tiedostot,
 // jotta vanha cache puretaan automaattisesti.
 
-const CACHE_NAME = 'nakoharjoitus-v17';
+const CACHE_NAME = 'nakoharjoitus-v20';
 
 const PRECACHE_ASSETS = [
   './',

@@ -1072,6 +1072,7 @@ const DEFAULT_EXERCISES = [
     cat: 'Silmä–käsi-koordinaatio',
     duration: '5 min',
     sets: '3 sarjaa',
+    series: true,
     unit: 'kiinniotot',
     unitLabel: 'onnistuneet kiinniotot (30 s)',
     instructions: `Seiso n. <strong>1,5–2 m</strong> päässä sileästä seinästä. Heitä <strong>tennispallo</strong> seinään vuorotellen oikealla ja vasemmalla kädellä ja ota se kiinni vastakkaisella kädellä. Pidä liike tasaisena ja kiinniotot hallittuina. Jatka 30 s ja laske onnistuneet kiinniotot.`
@@ -1083,8 +1084,8 @@ const DEFAULT_EXERCISES = [
     cat: 'Binokulaarisuus',
     duration: '5 min',
     sets: '1 sarja',
-    unit: 'min',
-    unitLabel: 'harjoituksen kesto (min)',
+    unit: 'cm',
+    unitLabel: 'lähimmän helmen etäisyys silmästä (cm)',
     instructions: `<strong>Tarvikkeet:</strong> n. 1 m lanka ja 3 erivärisiä helmiä.<br><br><strong>Valmistelu:</strong> Kiinnitä langan toinen pää kiinteään kohtaan (esim. ovenkahva). Aseta helmet eri etäisyyksille: yksi lähelle nenää (~10 cm), yksi keskelle, yksi kauas. Pidä langan toinen pää nenän kärjessä.<br><br><strong>Vaiheet:</strong><br>1. Katso kauimmaista helmeä — langan pitäisi näyttää jakautuvan kahtia (X-kuvio helmen kohdalla). Etummaiset helmet näkyvät kahtena.<br>2. Siirrä katse keskimmäiseen helmeen — X-kuvio siirtyy sen kohdalle.<br>3. Siirrä katse lähimpään helmeen — X-kuvio muodostuu sen kohdalla.<br>4. Toista hitaasti edestakaisin: kauas → keskelle → lähelle → takaisin.<br><br><strong>Variaatio:</strong> tee harjoitus myös eri kulmissa, esim. yläviistoon.<br><br><strong>Tavoite:</strong> parantaa silmien kykyä kääntyä hallitusti ja tarkentaa lähelle ja kauas.`
   },
   {
@@ -1108,6 +1109,7 @@ const DEFAULT_EXERCISES = [
     cat: 'Reaktio / perifeerinen näkö',
     duration: '5 min',
     sets: '10 pudotusta',
+    series: true,
     unit: 'pisteet',
     unitLabel: 'pisteet (max 20, 10 pudotusta)',
     instructions: `Tarvitset <strong>parin</strong> (esim. valmentaja) ja kaksi tennispalloa. Pari seisoo kädet suorina sivuilla, yksi pallo kummassakin kädessä. Urheilija kyykistyy parin eteen kädet selän takana, katse suoraan eteenpäin. Pari pudottaa yhden pallon kerrallaan — urheilija yrittää ottaa sen kiinni reagoiden perifeerisen näön avulla. <strong>Pisteytys:</strong> 2 = puhdas kiinniotto, 1 = kiinni mutta ei puhdas, 0 = pallo putoaa. Yhteensä <strong>10 pudotusta</strong> (max 20 pistettä).`
