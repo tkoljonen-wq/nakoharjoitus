@@ -825,6 +825,18 @@
     text-align: right;
     max-width: 140px;
   }
+  .diary-empty {
+    margin: 40px 20px;
+    padding: 28px 20px;
+    text-align: center;
+    font-family: 'Roboto Flex', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-dim);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+  }
 
   /* STATS VIEW */
   .stats-grid { padding: 0 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -1140,34 +1152,6 @@ const EXERCISES = (URL_PROGRAM?.exercises || DEFAULT_EXERCISES)
     series: cat.series ?? ex.series,
   };
 });
-
-// Simulate saved diary data
-const DIARY_DATA = [
-  {
-    date: '2026-03-06',
-    dateLabel: 'PE 06.03.2026',
-    entries: [
-      { name: 'Sakkadinen silmänliike', result: '420 ms', note: 'Parempi kuin viimeksi' },
-      { name: 'Brockin lanka', result: '22 cm', note: 'Vasen silmä dominoi' },
-    ]
-  },
-  {
-    date: '2026-03-04',
-    dateLabel: 'KE 04.03.2026',
-    entries: [
-      { name: 'Sakkadinen silmänliike', result: '450 ms', note: '' },
-      { name: 'Silmä-käsikoordinaatio', result: '16/20', note: 'Oikea käsi parempi' },
-    ]
-  },
-  {
-    date: '2026-03-02',
-    dateLabel: 'MA 02.03.2026',
-    entries: [
-      { name: 'Sakkadinen silmänliike', result: '480 ms', note: 'Ensimmäinen kerta' },
-      { name: 'Brockin lanka', result: '28 cm', note: '' },
-    ]
-  }
-];
 
 // ── STATE ─────────────────────────────────────────────────────────────────
 let completed = {};
@@ -1757,20 +1741,85 @@ function updateProgress() {
 }
 
 // ── DIARY ─────────────────────────────────────────────────────────────────
+// Harjoituksen metatiedot (nimi + yksikkö) id:n perusteella. DEFAULT_EXERCISES
+// on aina käytettävissä (myös harjoituksille joita ei ole tämän päivän
+// ohjelmassa), joten päiväkirja näyttää oikeat nimet kaikille tallennuksille.
+function diaryExMeta(id) {
+  return DEFAULT_EXERCISES.find(e => e.id === id)
+      || EXERCISES.find(e => e.id === id)
+      || { name: id, unit: '' };
+}
+
+// Muotoile tallennetun tuloksen näkymä. Monisarjainen { nums:[...] } → arvot
+// erotettuna · -merkillä, yksittäinen { num } → yksi arvo. Yksikkö perään.
+function formatDiaryResult(entry, unit) {
+  const u = unit ? ' ' + unit : '';
+  if (Array.isArray(entry.nums)) {
+    const vals = entry.nums.filter(v => v !== '' && v != null);
+    if (vals.length === 0) return '—';
+    return vals.join(' · ') + u;
+  }
+  if (entry.num !== undefined && entry.num !== '') return entry.num + u;
+  return '—';
+}
+
+// HTML-escape muistiinpanoja varten (käyttäjän syöte).
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c =>
+    ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
+
 function buildDiary() {
   const container = document.getElementById('diaryList');
   container.innerHTML = '';
-  DIARY_DATA.forEach(day => {
+
+  // Kerää kaikki localStoragen päiväkohtaiset suoritukset (avain completed_YYYY-MM-DD).
+  const days = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    const m = key && key.match(/^completed_(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m) continue;
+    let data;
+    try { data = JSON.parse(localStorage.getItem(key)); } catch(e) { continue; }
+    if (!data || typeof data !== 'object') continue;
+
+    // Vain tehdyiksi merkityt harjoitukset (done !== false; vanhat liputtomat mukaan).
+    const entries = Object.keys(data)
+      .filter(id => data[id] && data[id].done !== false)
+      .map(id => {
+        const meta = diaryExMeta(id);
+        return {
+          name: meta.name,
+          result: formatDiaryResult(data[id], meta.unit),
+          note: data[id].note || ''
+        };
+      });
+    if (entries.length === 0) continue;
+
+    const d = new Date(+m[1], +m[2] - 1, +m[3]);
+    const dateLabel = fDays[d.getDay()] + ' ' + m[3] + '.' + m[2] + '.' + m[1];
+    days.push({ date: key, dateLabel, entries });
+  }
+
+  // Uusin ensin.
+  days.sort((a, b) => b.date.localeCompare(a.date));
+
+  if (days.length === 0) {
+    container.innerHTML = `<div class="diary-empty">Ei vielä merkintöjä.<br>Tee harjoitus ja merkitse se tehdyksi — se ilmestyy tähän.</div>`;
+    return;
+  }
+
+  days.forEach(day => {
     const el = document.createElement('div');
     el.className = 'diary-entry';
     el.innerHTML = `
       <div class="diary-date">${day.dateLabel}</div>
       ${day.entries.map(e => `
         <div class="diary-item">
-          <div class="diary-ex-name">${e.name}</div>
+          <div class="diary-ex-name">${escapeHtml(e.name)}</div>
           <div>
-            <div class="diary-result">${e.result}</div>
-            ${e.note ? `<div class="diary-note">${e.note}</div>` : ''}
+            <div class="diary-result">${escapeHtml(e.result)}</div>
+            ${e.note ? `<div class="diary-note">${escapeHtml(e.note)}</div>` : ''}
           </div>
         </div>
       `).join('')}
@@ -1813,6 +1862,9 @@ function showView(name, btn) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
   btn.classList.add('active');
+  // Päiväkirja rakennetaan uudelleen joka avauksella, jotta tämän istunnon
+  // aikana tehdyt merkinnät näkyvät heti (buildDiary lukee localStoragesta).
+  if (name === 'diary') buildDiary();
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────

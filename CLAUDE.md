@@ -333,8 +333,27 @@ Lisätty harjoitus **Tennispallon pudotus** (`id: reaktio`) — reaktio- ja peri
 | **`materiaalit/reaktio-suoritus.jpg`** | Pakattu `Reaktioharjoitus.png`:stä (1,78 Mt → 94 kt, 1200×900); alkuperäinen PNG poistettu |
 | **`sw.js`** | CACHE_NAME v14 → **v15**; lisätty `reaktio-suoritus.jpg` |
 
+## Istunto 2026-05-30 (5) — Päiväkirja näyttää oikeaa dataa — VALMIS
+
+Päiväkirja-välilehti luki aiemmin kovakoodattua `DIARY_DATA`-demoa. Nyt `buildDiary()` lukee oikeat suoritukset localStoragesta (`completed_YYYY-MM-DD`-avaimet) ja näyttää ne uusin päivä ensin.
+
+| Alue | Mitä tehtiin |
+|---|---|
+| **`nakoharjoitukset.html`** | Poistettu demo-`DIARY_DATA`. `buildDiary()` skannaa kaikki `completed_*`-avaimet, suodattaa vain tehdyt (`done !== false`, sama logiikka kuin `isDone`), muotoilee tuloksen (monisarjainen `nums` → `42 · 45 · 48 yksikkö`, yksittäinen `num` → `22 cm`) ja hakee nimen+yksikön (`unit`) DEFAULT_EXERCISESista id:n perusteella |
+| **Apufunktiot** | `diaryExMeta(id)` (nimi+yksikkö DEFAULT_EXERCISESista, fallback EXERCISES→id), `formatDiaryResult(entry, unit)`, `escapeHtml()` (käyttäjän muistiinpanot escapataan) |
+| **Tyhjä tila** | `.diary-empty`-kortti "Ei vielä merkintöjä…" kun localStoragessa ei ole tehtyjä suorituksia |
+| **Päivitys** | `showView('diary')` kutsuu `buildDiary()`n uudelleen → istunnon aikana tehdyt merkinnät näkyvät heti ilman reloadia |
+| **`sw.js`** | CACHE_NAME v20 → **v21** |
+
+**Tallennusmuoto-muistutus:** monisarjainen `{ nums:['42','45'], note, done, time }`, yksittäinen `{ num:'22', note, done, time }`. Päiväkirja osaa molemmat. `done:false` (osatulos, ei merkitty tehdyksi) suodatetaan pois.
+
+**Testattu** previewillä (375px): 3 päivää uusin-ensin, `42 · 45 · 48 kirjaimet` + `22 cm` + `7 toistot`, muistiinpanot näkyvät, `done:false`-rivi pois, tyhjä tila näyttää placeholderin. ✓
+
+**Pushattavat:** `nakoharjoitukset.html`, `sw.js` (käyttäjä pushaa itse — kansio ei ole git-repo).
+
 ## Nykytila
-- **SW `CACHE_NAME` = `nakoharjoitus-v20`** (bumppaa aina kun `src` muuttuu ennen pushia).
+- **SW `CACHE_NAME` = `nakoharjoitus-v21`** (bumppaa aina kun `src` muuttuu ennen pushia).
+- **Päiväkirja** lukee oikeaa dataa localStoragesta (ei enää demo-`DIARY_DATA`). **Kehitys-välilehti** käyttää yhä demo-dataa (`buildChart`, `statTotal`) — luonteva seuraava jatkokehitys.
 - Monisarjainen tuloskirjaus (`series: true`): **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`) ja **Tennispallon pudotus** (`reaktio`).
 - Yhden arvon kirjaus: **Brockin lanka** (`brock`, mitattava: lähimmän helmen etäisyys silmästä cm) ja **Kissakortti** (`kissakortti`, onnistuneet sulautumiset).
 - Aktiiviset harjoitukset: **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`), **Brockin lanka** (`brock`), **Kissakortti** (`kissakortti`), **Tennispallon pudotus** (`reaktio`).
