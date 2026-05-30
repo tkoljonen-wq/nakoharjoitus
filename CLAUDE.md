@@ -247,6 +247,7 @@ Apulistat `nakoharjoitukset.html`:ssä:
 | `sakkadi` | Fiksaatioharjoitus | kyllä | `fiksaatiotaulu-1.pdf`, `fiksaatiotaulu-2.pdf` |
 | `silmakasi` | Silmä-käsikoordinaatio | kyllä | – |
 | `brock` | Brockin lanka | kyllä | – (kuvat rich-ohjeessa) |
+| `kissakortti` | Kissakortti | kyllä | `kissakortti.pdf` (tulostettava kortti) |
 
 ### Kuvanpakkaus-resepti (PowerShell System.Drawing)
 Pakkaa kaikki uudet valokuvat ennen käyttöä: ~1200 px leveä JPG, laatu 82 (~85–100 kt). Käyttäjän alkuperäiskuva on usein **leikepöydällä tiedostona** — hae polku: `[System.Windows.Forms.Clipboard]::GetFileDropList()`.
@@ -277,9 +278,26 @@ $bmp.Save($dst,$codec,$ep)
 4. (Valinnainen) lisää vanhentuneet materiaalitiedostot `REMOVED_MATERIALS`-listaan.
 5. Bumppaa `CACHE_NAME`.
 
+## Istunto 2026-05-30 (2) — Uusi harjoitus: Kissakortti — KOODI VALMIS, kuvat puuttuvat
+
+Lisätty harjoitus **Kissakortti** (`id: kissakortti`) — stereonäön/konvergenssin harjoitus (kynä + kortti jossa 2 kissaa → keskimmäiset sulautuvat "kolmanneksi kissaksi" joka näkyy kolmiulotteisena). Lähteet: `Desktop/Näköharjoitteet/Kissakortti.pdf` (tulostettava kortti) + `Kissakortti ohje.docx/.pdf` (ohjeteksti).
+
+| Alue | Mitä tehtiin |
+|---|---|
+| **`admin.html` LIBRARY** | Lisätty kissakortti-objekti (icon 🐱, cat "Konvergenssi / stereonäkö", unit "toistot", materiaalit `kissakortti.pdf`) |
+| **`nakoharjoitukset.html` DEFAULT_EXERCISES** | Sama objekti + `duration: '5 min'`, `sets: '5–10 toistoa'` |
+| **`nakoharjoitukset.html` RICH_GUIDES** | Uusi `kissakortti`-kuvitettu ohje brock/sakkadi-tyylillä (guide-warn, guide-meta, 5 osiota + vianetsintätaulukko). Viittaa kuviin `kissakortti-suoritus.jpg` + `kissakortti-tavoite.jpg` |
+| **`materiaalit/kissakortti.pdf`** | Kopioitu `Desktop/Näköharjoitteet/Kissakortti.pdf`:stä |
+| **`sw.js`** | CACHE_NAME v13 → **v14**; lisätty `kissakortti.pdf`, `kissakortti-suoritus.jpg`, `kissakortti-tavoite.jpg` |
+
+**⚠️ PUUTTUU (käyttäjän tehtävä):** kaksi valokuvaa liitettiin chattiin mutta EI levylle. Käyttäjän pitää tallentaa ne kansioon `materiaalit/` nimillä:
+- `kissakortti-suoritus.jpg` — havainnekuva (henkilö pitää kissakorttia + kynää osoittimena)
+- `kissakortti-tavoite.jpg` — tavoitenäkymä (kolme kissaa, keskimmäinen kolmiulotteinen)
+Pakkaa kuvanpakkaus-reseptillä (~1200 px, laatu 82) ennen kopiointia. Ennen näiden lisäystä rich-ohjeen `<figure>`-kuvat näyttävät rikkinäisen kuvan (muu sisältö toimii).
+
 ## Nykytila
-- **SW `CACHE_NAME` = `nakoharjoitus-v13`** (bumppaa aina kun `src` muuttuu ennen pushia).
-- Aktiiviset harjoitukset: **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`), **Brockin lanka** (`brock`).
+- **SW `CACHE_NAME` = `nakoharjoitus-v14`** (bumppaa aina kun `src` muuttuu ennen pushia).
+- Aktiiviset harjoitukset: **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`), **Brockin lanka** (`brock`), **Kissakortti** (`kissakortti`).
 - Repo `tkoljonen-wq/nakoharjoitus`, Pages `https://tkoljonen-wq.github.io/nakoharjoitus/`. Kansio ei ole git-repo tällä koneella → **käyttäjä pushaa itse**.
 
 ## Seuraavalla istunnolla — TODO
