@@ -417,12 +417,25 @@ Ei-`training`-tiloissa näkyy viestikortti + **opt-in-nappi** (`revealAllExercis
 
 **Pushattavat:** `nakoharjoitukset.html`, `sw.js` (käyttäjä pushaa itse — kansio ei ole git-repo).
 
+## Istunto 2026-05-30 (9) — "Tämä viikko" -ruudukko oikeaan dataan — VALMIS
+
+Aloitusnäytön `week-grid` oli viimeinen staattinen demo-elementti (kovakoodatut ✓/—/numero). Nyt `buildWeekGrid()` renderöi kuluvan viikon (ma–su) jokaisen päivän tilan localStoragesta:
+- tehty (≥1 done) → vihreä **✓** (`done-day`)
+- tänään (ei vielä tehty) → korostettu **päivänumero** (`today`)
+- mennyt ilman suoritusta → himmeä **—** (`rest`)
+- tuleva päivä → himmeä **·** (`rest`)
+
+HTML: `week-grid` on nyt tyhjä `#weekGrid`-kontti. Kytketty initiin ja `markDoneFromModal`:iin (tänään → ✓ heti). Käyttää jaettuja `currentWeekDays()` + `loadAllCompletions()` + `doneCountForDay()`. **SW v24 → v25.**
+
+**Testattu** previewillä (375px): viikko ma25✓ ti— ke27✓ to— pe29✓ la30(tänään) su·; tämän päivän brock-merkintä muutti LA:n vihreäksi ✓:ksi. Ei konsolivirheitä. ✓
+
+**Pushattavat:** `nakoharjoitukset.html`, `sw.js` (käyttäjä pushaa itse — kansio ei ole git-repo).
+
 ## Nykytila
-- **SW `CACHE_NAME` = `nakoharjoitus-v24`** (bumppaa aina kun `src` muuttuu ennen pushia).
-- **Päiväkirja JA Kehitys** lukevat oikeaa dataa localStoragesta (ei enää demo-dataa). Molemmat välilehdet päivittyvät heti kun harjoitus merkitään tehdyksi.
+- **SW `CACHE_NAME` = `nakoharjoitus-v25`** (bumppaa aina kun `src` muuttuu ennen pushia).
+- **Kaikki näkymät lukevat oikeaa dataa localStoragesta** — ei enää demo-/kovakoodattua dataa missään (Tänään, "Tämä viikko" -ruudukko, Päiväkirja, Kehitys). Päivittyvät heti kun harjoitus merkitään tehdyksi.
 - **Kehitys-välilehti:** 4 tilastokorttia + viikon volyymipylväät + harjoituskohtaiset viivadiagrammit (`brock`, `silmakasi`, `reaktio`, `sakkadi` — päivän keskiarvo; kissakortti ei kuvaajaa).
 - **"Tänään"-tilakone:** `training`/`rest`/`before`/`ended` (`DAY_STATE.mode`). Ei-treenipäivänä opt-in-nappi paljastaa koko ohjelman harjoitukset vapaaehtoisina. Jakso lasketaan `schedule.startDate`+`durationWeeks`:stä (puuttuessa → aina aktiivinen).
-- **Vielä demo-dataa:** "Tämä viikko" -ruudukko (`week-grid`) aloitusnäytössä on yhä staattinen — luonteva seuraava korjaus.
 - Monisarjainen tuloskirjaus (`series: true`): **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`) ja **Tennispallon pudotus** (`reaktio`).
 - Yhden arvon kirjaus: **Brockin lanka** (`brock`, mitattava: lähimmän helmen etäisyys silmästä cm) ja **Kissakortti** (`kissakortti`, onnistuneet sulautumiset).
 - Aktiiviset harjoitukset: **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`), **Brockin lanka** (`brock`), **Kissakortti** (`kissakortti`), **Tennispallon pudotus** (`reaktio`).

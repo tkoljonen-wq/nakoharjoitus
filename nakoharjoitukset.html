@@ -1000,15 +1000,7 @@
 
     <div class="week-section">
       <div class="section-title" style="padding:0; margin-bottom:12px">Tämä viikko</div>
-      <div class="week-grid">
-        <div class="week-day"><div class="week-label">MA</div><div class="week-dot done-day">✓</div></div>
-        <div class="week-day"><div class="week-label">TI</div><div class="week-dot rest">—</div></div>
-        <div class="week-day"><div class="week-label">KE</div><div class="week-dot done-day">✓</div></div>
-        <div class="week-day"><div class="week-label">TO</div><div class="week-dot rest">—</div></div>
-        <div class="week-day"><div class="week-label">PE</div><div class="week-dot done-day">✓</div></div>
-        <div class="week-day"><div class="week-label">LA</div><div class="week-dot rest">—</div></div>
-        <div class="week-day"><div class="week-label">SU</div><div class="week-dot today">8</div></div>
-      </div>
+      <div class="week-grid" id="weekGrid"></div>
     </div>
   </div>
 
@@ -1877,6 +1869,7 @@ function markDoneFromModal() {
   try { localStorage.setItem(todayKey, JSON.stringify(completed)); } catch(e) {}
   closeExerciseModal();
   buildExercises();
+  buildWeekGrid(); // päivitä viikkoruudukko (tänään → ✓)
   buildStats(); // päivitä tilastokortit + putki heti
   buildLineCharts(); // päivitä viivadiagrammit heti
 }
@@ -2076,6 +2069,26 @@ function buildStats() {
   set('streakCount', streak); // header-putki samasta laskennasta
 }
 
+// Aloitusnäytön "Tämä viikko" -ruudukko: kunkin päivän tila kuluvalta viikolta.
+// Tehty (≥1 done) → vihreä ✓, tänään → korostettu päivänumero, mennyt ilman
+// suoritusta → himmeä —, tuleva → himmeä ·.
+function buildWeekGrid() {
+  const container = document.getElementById('weekGrid');
+  if (!container) return;
+  const all = loadAllCompletions();
+  const labels = ['MA','TI','KE','TO','PE','LA','SU'];
+  const todayIdx = (now.getDay() + 6) % 7;
+  container.innerHTML = currentWeekDays().map((d, i) => {
+    const done = doneCountForDay(all[d.key]) > 0;
+    let cls, content;
+    if (done) { cls = 'done-day'; content = '✓'; }
+    else if (i === todayIdx) { cls = 'today'; content = String(+d.key.split('-')[2]); }
+    else if (d.future) { cls = 'rest'; content = '·'; }
+    else { cls = 'rest'; content = '—'; }
+    return `<div class="week-day"><div class="week-label">${labels[i]}</div><div class="week-dot ${cls}">${content}</div></div>`;
+  }).join('');
+}
+
 // ── HARJOITUSKOHTAISET VIIVADIAGRAMMIT ─────────────────────────────────────
 // Mille harjoituksille piirretään oma viivadiagrammi (kissakortti jätetään pois).
 const LINE_CHART_EXERCISES = ['brock', 'silmakasi', 'reaktio', 'sakkadi'];
@@ -2200,6 +2213,7 @@ try {
 applyTodaySchedule();
 
 buildExercises();
+buildWeekGrid(); // aloitusnäytön "Tämä viikko" -ruudukko
 buildDiary();
 buildChart();
 buildStats(); // täyttää tilastokortit + header-putken (streakCount)
