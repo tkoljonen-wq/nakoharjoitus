@@ -339,6 +339,47 @@
     white-space: nowrap;
   }
 
+  .series-unit {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  .series-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+
+  .series-value {
+    flex: 1; max-width: 100px; text-align: center;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'Roboto Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .series-save {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 700; font-size: 12px;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    background: var(--accent); color: #fff;
+    border: none; border-radius: 10px;
+    padding: 0 16px; min-height: 40px;
+    cursor: pointer; white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .series-save:hover:not(:disabled) { background: var(--accent-dark); }
+  .series-save:disabled { background: var(--border); color: var(--text-faint); cursor: default; }
+
+  .series-del {
+    background: none; border: none;
+    color: var(--text-faint); font-size: 16px;
+    cursor: pointer; padding: 0 6px; line-height: 1;
+  }
+  .series-del:hover { color: var(--warn); }
+
   .log-textarea {
     width: 100%;
     background: var(--bg);
@@ -1015,7 +1056,7 @@ const DEFAULT_EXERCISES = [
     cat: 'Sakkadit / katseen kohdennus',
     duration: '5 min',
     sets: '3 sarjaa',
-    series: 3,
+    series: true,
     unit: 'kirjaimet',
     unitLabel: 'tunnistetut kirjaimet (1 min)',
     materiaalit: [
@@ -1129,7 +1170,17 @@ const DIARY_DATA = [
 // ── STATE ─────────────────────────────────────────────────────────────────
 let completed = {};
 let modalExId = null; // id of exercise currently open in modal
+let modalSeries = []; // in-progress series results for the open multi-result exercise
 let TODAY_EXERCISES = []; // populated by applyTodaySchedule() in init
+
+// Onko harjoitus merkitty valmiiksi? Monisarjaisten harjoitusten osatulokset
+// tallentuvat jo "Tallenna"-napilla (done:false), mutta kortti merkitään
+// tehdyksi vasta "Merkitse tehdyksi" -napilla (done:true). Vanhat tallennukset
+// (ennen done-lippua) tulkitaan tehdyiksi, koska ne kirjattiin vain markDone-napilla.
+function isDone(id) {
+  const c = completed[id];
+  return !!c && c.done !== false;
+}
 
 // 0=Mon, 1=Tue, ..., 6=Sun — matches admin.html convention
 const DAY_NAMES_LONG = ['maanantai','tiistai','keskiviikko','torstai','perjantai','lauantai','sunnuntai'];
@@ -1184,7 +1235,7 @@ function buildExercises() {
 
   TODAY_EXERCISES.forEach((ex) => {
     const card = document.createElement('div');
-    card.className = 'ex-card' + (completed[ex.id] ? ' done' : '');
+    card.className = 'ex-card' + (isDone(ex.id) ? ' done' : '');
     card.id = 'card-' + ex.id;
     card.onclick = () => openExerciseModal(ex.id);
 
@@ -1198,7 +1249,7 @@ function buildExercises() {
             <span>${ex.sets}</span>
           </div>
         </div>
-        <div class="ex-status">${completed[ex.id] ? '✓' : '›'}</div>
+        <div class="ex-status">${isDone(ex.id) ? '✓' : '›'}</div>
       </div>
     `;
     container.appendChild(card);
@@ -1534,18 +1585,16 @@ function openExerciseModal(id) {
   const body = document.getElementById('modalBody');
   const guideHtml = (RICH_GUIDES[ex.id] || ex.instructions || '');
 
-  // Tuloskirjaus: harjoituksella voi olla useita sarjoja (ex.series). Tällöin
-  // jokaiselle sarjalle oma syöttökenttä ja tulokset tallennetaan taulukkona
-  // (prev.nums). Yhden tuloksen harjoitukset käyttävät yhä yksittäistä kenttää (prev.num).
-  const seriesCount = (ex.series && ex.series > 1) ? ex.series : 0;
-  const prevNums = Array.isArray(prev.nums) ? prev.nums : (prev.num ? [prev.num] : []);
-  const logInputsHtml = seriesCount
-    ? Array.from({ length: seriesCount }, (_, i) => `
-        <div class="log-row">
-          <div class="series-label">Sarja ${i + 1}</div>
-          <input class="log-input narrow" id="modalNum${i}" type="number" placeholder="—" inputmode="decimal" value="${prevNums[i] || ''}">
-          <div class="unit-badge">${ex.unitLabel || ''}</div>
-        </div>`).join('')
+  // Tuloskirjaus: monisarjainen harjoitus (ex.series) kerää vaihtelevan määrän
+  // sarjoja dynaamisesti — yksi syöttökenttä kerrallaan + "Tallenna"-nappi lisää
+  // tuloksen listaan ja antaa syöttää seuraavan. Lista täytetään renderSeriesSection():lla.
+  // Yhden tuloksen harjoitukset käyttävät yhtä kenttää kuten ennen (prev.num).
+  const isMulti = !!ex.series;
+  if (isMulti) {
+    modalSeries = Array.isArray(prev.nums) ? prev.nums.slice() : (prev.num ? [prev.num] : []);
+  }
+  const logInputsHtml = isMulti
+    ? `<div id="seriesContainer"></div>`
     : `
         <div class="log-row">
           <input class="log-input narrow" id="modalNum" type="number" placeholder="—" inputmode="decimal" value="${prev.num || ''}">
@@ -1583,15 +1632,18 @@ function openExerciseModal(id) {
       ${matsHtml}
     </div>` : ''}
     <div class="modal-section">
-      <div class="modal-section-label">${seriesCount ? 'Kirjaa tulokset (' + seriesCount + ' sarjaa)' : 'Kirjaa tulos'}</div>
+      <div class="modal-section-label">${isMulti ? 'Kirjaa tulokset' : 'Kirjaa tulos'}</div>
+      ${isMulti ? `<div class="series-unit">${ex.unitLabel || ''}</div>` : ''}
       ${logInputsHtml}
       <div class="log-label" style="margin-top:10px">Muistiinpano (vapaaehtoinen)</div>
       <textarea class="log-textarea" id="modalNote" placeholder="Esim. vasen silmä väsyi, parempi kuin eilen...">${prev.note || ''}</textarea>
     </div>
-    <button class="done-btn ${completed[id] ? 'completed' : ''}" onclick="markDoneFromModal()">
-      ${completed[id] ? '✓ Merkitty tehdyksi' : 'Merkitse tehdyksi'}
+    <button class="done-btn ${isDone(id) ? 'completed' : ''}" onclick="markDoneFromModal()">
+      ${isDone(id) ? '✓ Merkitty tehdyksi' : 'Merkitse tehdyksi'}
     </button>
   `;
+
+  if (isMulti) renderSeriesSection();
 
   const overlay = document.getElementById('exerciseModal');
   overlay.classList.add('open');
@@ -1600,6 +1652,61 @@ function openExerciseModal(id) {
   // scrollTop would otherwise persist from the previous exercise (opening
   // scrolled down). Reset it so every exercise opens from the top.
   overlay.scrollTop = 0;
+}
+
+// ── MONISARJAINEN TULOSKIRJAUS ────────────────────────────────────────────
+// Piirtää jo tallennetut sarjatulokset + aktiivisen syöttörivin. Kutsutaan
+// uudelleen jokaisen lisäyksen/poiston jälkeen. modalSeries pitää nykytilan.
+function renderSeriesSection() {
+  const c = document.getElementById('seriesContainer');
+  if (!c) return;
+  const saved = modalSeries.map((v, i) => `
+    <div class="series-row">
+      <div class="series-label">Sarja ${i + 1}</div>
+      <div class="series-value">${v}</div>
+      <button class="series-del" onclick="removeSeriesEntry(${i})" aria-label="Poista sarja ${i + 1}">✕</button>
+    </div>`).join('');
+  c.innerHTML = `
+    ${saved}
+    <div class="log-row">
+      <div class="series-label">Sarja ${modalSeries.length + 1}</div>
+      <input class="log-input narrow" id="seriesInput" type="number" placeholder="—" inputmode="decimal"
+             oninput="updateSeriesSaveBtn()" onkeydown="if(event.key==='Enter'){event.preventDefault();addSeriesEntry();}">
+      <button class="series-save" id="seriesSaveBtn" onclick="addSeriesEntry()" disabled>Tallenna</button>
+    </div>`;
+}
+
+function updateSeriesSaveBtn() {
+  const input = document.getElementById('seriesInput');
+  const btn = document.getElementById('seriesSaveBtn');
+  if (input && btn) btn.disabled = input.value.trim() === '';
+}
+
+// Tallentaa aktiivisen syöttökentän arvon listaan ja persistoi heti
+// localStorageen (done:false) — näin osatulokset eivät katoa jos modaali suljetaan.
+function addSeriesEntry() {
+  const input = document.getElementById('seriesInput');
+  if (!input) return;
+  const val = input.value.trim();
+  if (val === '') return;
+  modalSeries.push(val);
+  persistSeriesProgress();
+  renderSeriesSection();
+  document.getElementById('seriesInput')?.focus();
+}
+
+function removeSeriesEntry(i) {
+  modalSeries.splice(i, 1);
+  persistSeriesProgress();
+  renderSeriesSection();
+}
+
+function persistSeriesProgress() {
+  if (!modalExId) return;
+  const note = document.getElementById('modalNote')?.value || '';
+  const wasDone = completed[modalExId]?.done === true;
+  completed[modalExId] = { nums: modalSeries.slice(), note, done: wasDone, time: new Date().toISOString() };
+  try { localStorage.setItem(todayKey, JSON.stringify(completed)); } catch(e) {}
 }
 
 function closeExerciseModal() {
@@ -1620,16 +1727,16 @@ function markDoneFromModal() {
   if (!modalExId) return;
   const ex = TODAY_EXERCISES.find(e => e.id === modalExId);
   const note = document.getElementById('modalNote')?.value || '';
-  const seriesCount = (ex && ex.series && ex.series > 1) ? ex.series : 0;
-  if (seriesCount) {
-    const nums = [];
-    for (let i = 0; i < seriesCount; i++) {
-      nums.push(document.getElementById('modalNum' + i)?.value || '');
-    }
-    completed[modalExId] = { nums, note, time: new Date().toISOString() };
+  const isMulti = !!(ex && ex.series);
+  if (isMulti) {
+    // Ota mukaan myös arvo joka on aktiivisessa kentässä mutta jota ei vielä
+    // painettu "Tallenna" — ettei viimeinen sarja huku.
+    const pending = document.getElementById('seriesInput')?.value.trim();
+    if (pending) modalSeries.push(pending);
+    completed[modalExId] = { nums: modalSeries.slice(), note, done: true, time: new Date().toISOString() };
   } else {
     const num = document.getElementById('modalNum')?.value || '';
-    completed[modalExId] = { num, note, time: new Date().toISOString() };
+    completed[modalExId] = { num, note, done: true, time: new Date().toISOString() };
   }
   try { localStorage.setItem(todayKey, JSON.stringify(completed)); } catch(e) {}
   closeExerciseModal();
@@ -1638,8 +1745,7 @@ function markDoneFromModal() {
 
 function updateProgress() {
   const total = TODAY_EXERCISES.length;
-  const todayIds = new Set(TODAY_EXERCISES.map(ex => ex.id));
-  const done = Object.keys(completed).filter(id => todayIds.has(id)).length;
+  const done = TODAY_EXERCISES.filter(ex => isDone(ex.id)).length;
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
   const fill = document.getElementById('progressFill');
   const text = document.getElementById('progressText');
@@ -1732,7 +1838,10 @@ for (let i = 1; i <= 60; i++) {
   const k = 'completed_' + d.toISOString().split('T')[0];
   try {
     const val = localStorage.getItem(k);
-    if (val && Object.keys(JSON.parse(val)).length > 0) streak++;
+    // Päivä lasketaan streakiin vain jos vähintään yksi harjoitus on merkitty
+    // tehdyksi (done !== false; vanhat done-liputtomat tallennukset lasketaan mukaan).
+    const day = val ? JSON.parse(val) : null;
+    if (day && Object.values(day).some(e => e && e.done !== false)) streak++;
     else break;
   } catch(e) { break; }
 }

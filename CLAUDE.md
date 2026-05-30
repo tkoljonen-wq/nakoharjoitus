@@ -279,23 +279,30 @@ $bmp.Save($dst,$codec,$ep)
 4. (Valinnainen) lisää vanhentuneet materiaalitiedostot `REMOVED_MATERIALS`-listaan.
 5. Bumppaa `CACHE_NAME`.
 
-## Istunto 2026-05-30 (4) — Monisarjainen tuloskirjaus (Fiksaatioharjoitus) — VALMIS
+## Istunto 2026-05-30 (4) — Monisarjainen tuloskirjaus (dynaaminen) + done-lippu — VALMIS
 
-Fiksaatioharjoitus (`sakkadi`) kerää nyt **kolmen sarjan** tulokset yhden sijaan. Toteutus on **geneerinen**: harjoituksen kenttä `series: N` saa modaalin piirtämään N numeroitua "Sarja 1…N" -syöttökenttää, ja tulokset tallennetaan taulukkona.
+Fiksaatioharjoitus (`sakkadi`) kerää nyt **vaihtelevan määrän** sarjatuloksia. Toteutus on **geneerinen ja dynaaminen**: kenttä `series: true` saa modaalin näyttämään yhden syöttökentän kerrallaan + **"Tallenna"-napin**, joka lisää tuloksen listaan ja antaa syöttää seuraavan. "Merkitse tehdyksi" päättää harjoituksen. → Ei tarvitse tietää etukäteen montako sarjaa tehdään.
+
+**Käyttövirta:** tyhjä kenttä "Sarja 1" → kirjoita arvo (Tallenna-nappi aktivoituu) → Tallenna (tai Enter) → rivi listaan, uusi kenttä "Sarja 2" → … → Merkitse tehdyksi. Jokaisella tallennetulla rivillä ✕-poistonappi. Aktiivisessa kentässä oleva kirjoittamaton arvo otetaan mukaan myös "Merkitse tehdyksi" -painalluksessa.
+
+### ⭐ done-lippu (tärkeä arkkitehtuurimuutos)
+Koska osatulokset persistoituvat jo "Tallenna"-napilla (ettei data katoa modaalin sulkeutuessa), kortin "tehty"-tila EI voi enää perustua pelkkään `completed[id]`:n olemassaoloon. Lisätty **`done`-lippu**:
+- "Tallenna" → `completed[id] = { nums:[...], note, done:false, time }` (kortti EI vihreä)
+- "Merkitse tehdyksi" → `done:true` (kortti vihreä)
+- Apufunktio **`isDone(id)`** = `!!c && c.done !== false`. **Vanhat done-liputtomat tallennukset tulkitaan tehdyiksi** (ne kirjattiin vain markDone-napilla) → taaksepäin yhteensopiva.
+- `isDone` korvaa vanhan "presence"-tarkistuksen: korttirenderöinti, ex-status, modaalin done-nappi, `updateProgress` (`done = TODAY_EXERCISES.filter(ex=>isDone(ex.id))`), streak-laskenta (`Object.values(day).some(e=>e.done!==false)`).
 
 | Alue | Mitä tehtiin |
 |---|---|
-| **`nakoharjoitukset.html` DEFAULT_EXERCISES** | sakkadi: `series: 3`, `sets: '2–3 sarjaa'` → `'3 sarjaa'` |
-| **EXERCISES refresh-map** | lisätty `series: cat.series ?? ex.series` → propagoituu myös jo jaettuihin/QR-ohjelmiin id:n perusteella (kultainen sääntö) |
-| **`admin.html` LIBRARY** | sakkadi: `series:3` (yhtenäisyys; ei serialisoidu — `buildProgramObject` ei sisällä `series`-kenttää, mutta refresh-map hoitaa sen) |
-| **`openExerciseModal`** | jos `ex.series>1`: N riviä `.series-label` + `#modalNum0..N-1`. Muuten yksi `#modalNum` kuten ennen. Esitäyttö `prev.nums[i]` (tai vanha `prev.num`). Otsikko "Kirjaa tulokset (N sarjaa)" |
-| **`markDoneFromModal`** | series → tallentaa `{ nums:[...], note, time }`; yksittäinen → yhä `{ num, note, time }` (taaksepäin yhteensopiva) |
-| **CSS** | uusi `.series-label` (Roboto Condensed, min-width 56px) |
-| **`sw.js`** | CACHE_NAME v15 → **v16** |
+| **DEFAULT_EXERCISES / admin LIBRARY** | sakkadi: `series: true` (oli väliaikaisesti `3`). EXERCISES refresh-map propagoi `series`:n jaettuihin ohjelmiin |
+| **`openExerciseModal`** | `isMulti = !!ex.series`. Multi → `<div id="seriesContainer">` jonka `renderSeriesSection()` täyttää; init `modalSeries` `prev.nums`:sta. Single → yksi `#modalNum` kuten ennen |
+| **Uudet fn:t** | `renderSeriesSection()`, `updateSeriesSaveBtn()`, `addSeriesEntry()`, `removeSeriesEntry(i)`, `persistSeriesProgress()`. Tila: `let modalSeries = []` |
+| **CSS** | `.series-unit`, `.series-row`, `.series-value` (surface2-tausta), `.series-save` (violetti, disabled kun tyhjä), `.series-del` (✕) |
+| **`sw.js`** | CACHE_NAME v15 → **v17** |
 
-**⭐ Tallennusmuoto (tärkeä Päiväkirja-työlle):** monisarjainen harjoitus tallentuu `completed[id] = { nums:['42','45','48'], note, time }`, yksittäinen `{ num, note, time }`. Tuleva päiväkirja-renderöinti (nyt vielä demo, lukee vain `DIARY_DATA`a) pitää osata näyttää **molemmat muodot**.
+**⭐ Tallennusmuoto (Päiväkirja-työlle):** monisarjainen `completed[id] = { nums:['42','45','48'], note, done, time }`, yksittäinen `{ num, note, done, time }`. Tuleva päiväkirja-renderöinti (yhä demo, lukee vain `DIARY_DATA`a) pitää osata näyttää **molemmat muodot**.
 
-**Testattu** live-previewillä (412px): 3 saraketta "Sarja 1/2/3" + yksikkö, tallennus → localStorage `nums:['42','45','48']`, uudelleenavaus esitäyttää arvot, kortti merkitty tehdyksi. ✓
+**Testattu** live-previewillä (412px): alkutila 1 kenttä + disabloitu Tallenna; kirjoitus aktivoi napin; Tallenna lisää rivin + tyhjentää kentän + uusi "Sarja N+1"; Enter toimii; osatulos → localStorage `done:false`, kortti EI vihreä; aktiivinen kirjoittamaton arvo mukaan "Merkitse tehdyksi":ssä → `nums:['42','45','48'] done:true`; uudelleenavaus palauttaa rivit + "Sarja 4" jatkoa varten; ✕ poistaa; single-input (brock) toimii ennallaan `{num,done:true}`. ✓
 
 ## Istunto 2026-05-30 (2) — Uusi harjoitus: Kissakortti — KOODI VALMIS, kuvat puuttuvat
 
@@ -327,7 +334,7 @@ Lisätty harjoitus **Tennispallon pudotus** (`id: reaktio`) — reaktio- ja peri
 | **`sw.js`** | CACHE_NAME v14 → **v15**; lisätty `reaktio-suoritus.jpg` |
 
 ## Nykytila
-- **SW `CACHE_NAME` = `nakoharjoitus-v16`** (bumppaa aina kun `src` muuttuu ennen pushia).
+- **SW `CACHE_NAME` = `nakoharjoitus-v17`** (bumppaa aina kun `src` muuttuu ennen pushia).
 - Aktiiviset harjoitukset: **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`), **Brockin lanka** (`brock`), **Kissakortti** (`kissakortti`), **Tennispallon pudotus** (`reaktio`).
 - Repo `tkoljonen-wq/nakoharjoitus`, Pages `https://tkoljonen-wq.github.io/nakoharjoitus/`. Kansio ei ole git-repo tällä koneella → **käyttäjä pushaa itse**.
 
