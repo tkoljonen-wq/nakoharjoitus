@@ -389,10 +389,40 @@ Lisätty Kehitys-välilehdelle uusi osio **"Harjoituskohtainen kehitys"**: SVG-v
 
 **Pushattavat:** `nakoharjoitukset.html`, `sw.js` (käyttäjä pushaa itse — kansio ei ole git-repo).
 
+## Istunto 2026-05-30 (8) — Harjoittelu lepopäivänä + jakson päättyminen — VALMIS
+
+Urheilija pääsee nyt tekemään harjoituksen myös ei-treenipäivänä (lepopäivä, ennen jaksoa, jakson jälkeen). Käyttäjän valinnat: **B (lepopäiväkortti + opt-in-nappi)** ja **jakson päättyminen mukaan**.
+
+**Löydös:** `nakoharjoitukset.html` EI aiemmin käyttänyt `schedule.startDate`/`durationWeeks`-kenttiä lainkaan (vain `schedule.days`). Eli jaksoa ei valvottu — harjoitukset näkyivät treenipäivinä loputtomiin. Ainoa umpikuja oli ei-treeniviikonpäivä.
+
+**Tämän päivän tilakone** (`computeDayState()` → `DAY_STATE.mode`):
+- `training` — aktiivinen jakso + treeniviikonpäivä → entinen näkymä (edistymiskortti + muistutusbanneri + aikataulutetut harjoitukset).
+- `rest` — aktiivinen jakso + ei-treeniviikonpäivä → 🌙 "Tänään on lepopäivä".
+- `before` — ennen `startDate` → 📅 "Ohjelmasi alkaa DD.MM.YYYY".
+- `ended` — `today >= startDate + durationWeeks*7` → 🎉 "Ohjelmasi on päättynyt".
+
+Ei-`training`-tiloissa näkyy viestikortti + **opt-in-nappi** (`revealAllExercises()`). Painalluksella `showAllToday=true` → näytetään KOKO ohjelman harjoitukset (`EXERCISES`) vapaaehtoisina: yläpuolella `.voluntary-note` + "Piilota"-toggle (`hideAllExercises()`). Suoritukset tallentuvat normaalisti tämän päivän avaimeen → näkyvät päiväkirjassa/tilastoissa/putkessa.
+
+| Alue | Mitä tehtiin |
+|---|---|
+| **`getProgramPhase()`** | Laskee jakson tilan `startDate`+`durationWeeks`:stä (end exclusive). Ilman näitä kenttiä (demo/vanha linkki) → aina `active` (ei rajoitusta, taaksepäin yhteensopiva). |
+| **`computeDayState()` / `restMessage(mode)`** | Tila + per-tila ikoni/otsikko/teksti/napin-teksti/vapaaehtois-note. |
+| **`applyTodaySchedule()`** | Ei enää parametria; asettaa `DAY_STATE`, `TODAY_EXERCISES` (vain treenipäivänä), otsikon ja korttien näkyvyyden tilan mukaan. |
+| **`buildExercises()`** | Haarautuu: `training`→aikataulutetut; muu+`!showAllToday`→viestikortti+nappi; muu+`showAllToday`→note+koko `EXERCISES`. |
+| **Modaalihaut** | `openExerciseModal`/`markDoneFromModal`: `TODAY_EXERCISES.find` → **`EXERCISES.find`** (paljastetut harjoitukset avautuvat). |
+| **CSS** | `.reveal-btn`, `.voluntary-note` (+ "Piilota"-nappi). |
+| **`sw.js`** | CACHE_NAME v23 → **v24** |
+
+**Testattu** previewillä (375px) localStorageen syötetyillä ohjelmilla: kaikki 4 tilaa (training/rest/before/ended) oikein, opt-in paljastaa koko ohjelman + note + Piilota, modaali avautuu paljastetulle harjoitukselle, Piilota palauttaa viestikorttiin, demo-tila (5 korttia) ennallaan. Ei konsolivirheitä. ✓
+
+**Pushattavat:** `nakoharjoitukset.html`, `sw.js` (käyttäjä pushaa itse — kansio ei ole git-repo).
+
 ## Nykytila
-- **SW `CACHE_NAME` = `nakoharjoitus-v23`** (bumppaa aina kun `src` muuttuu ennen pushia).
+- **SW `CACHE_NAME` = `nakoharjoitus-v24`** (bumppaa aina kun `src` muuttuu ennen pushia).
 - **Päiväkirja JA Kehitys** lukevat oikeaa dataa localStoragesta (ei enää demo-dataa). Molemmat välilehdet päivittyvät heti kun harjoitus merkitään tehdyksi.
 - **Kehitys-välilehti:** 4 tilastokorttia + viikon volyymipylväät + harjoituskohtaiset viivadiagrammit (`brock`, `silmakasi`, `reaktio`, `sakkadi` — päivän keskiarvo; kissakortti ei kuvaajaa).
+- **"Tänään"-tilakone:** `training`/`rest`/`before`/`ended` (`DAY_STATE.mode`). Ei-treenipäivänä opt-in-nappi paljastaa koko ohjelman harjoitukset vapaaehtoisina. Jakso lasketaan `schedule.startDate`+`durationWeeks`:stä (puuttuessa → aina aktiivinen).
+- **Vielä demo-dataa:** "Tämä viikko" -ruudukko (`week-grid`) aloitusnäytössä on yhä staattinen — luonteva seuraava korjaus.
 - Monisarjainen tuloskirjaus (`series: true`): **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`) ja **Tennispallon pudotus** (`reaktio`).
 - Yhden arvon kirjaus: **Brockin lanka** (`brock`, mitattava: lähimmän helmen etäisyys silmästä cm) ja **Kissakortti** (`kissakortti`, onnistuneet sulautumiset).
 - Aktiiviset harjoitukset: **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`), **Brockin lanka** (`brock`), **Kissakortti** (`kissakortti`), **Tennispallon pudotus** (`reaktio`).

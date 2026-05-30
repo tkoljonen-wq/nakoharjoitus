@@ -221,6 +221,31 @@
   .rest-day-title { font-family: 'Roboto Condensed', sans-serif; font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
   .rest-day-text { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
 
+  /* Opt-in: tee harjoitus lepopäivänä / jakson jälkeen */
+  .reveal-btn {
+    margin-top: 18px;
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--accent); color: #fff;
+    font-family: 'Roboto Condensed', sans-serif; font-size: 14px; font-weight: 700;
+    letter-spacing: 0.02em; text-transform: uppercase;
+    border: none; border-radius: 10px; padding: 12px 22px; cursor: pointer;
+  }
+  .reveal-btn:active { transform: scale(0.98); }
+
+  .voluntary-note {
+    margin-bottom: 10px;
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 12px;
+    padding: 12px 14px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    font-family: 'Roboto Flex', sans-serif; font-size: 12px; color: var(--text-dim);
+    line-height: 1.4;
+  }
+  .voluntary-note button {
+    background: none; border: none; color: var(--accent);
+    font-family: 'Roboto Condensed', sans-serif; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer; flex-shrink: 0;
+  }
+
   .ex-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -1210,6 +1235,12 @@ function isDone(id) {
 // 0=Mon, 1=Tue, ..., 6=Sun — matches admin.html convention
 const DAY_NAMES_LONG = ['maanantai','tiistai','keskiviikko','torstai','perjantai','lauantai','sunnuntai'];
 
+// Opt-in: kun tänään ei ole harjoituspäivä (lepo / ennen jaksoa / jakson jälkeen),
+// urheilija voi silti paljastaa koko ohjelman harjoitukset tällä lipulla.
+let showAllToday = false;
+// Tämän päivän tila: { mode:'training'|'rest'|'before'|'ended', dayIdx, phase }.
+let DAY_STATE = { mode: 'training', dayIdx: 0, phase: { phase: 'active' } };
+
 function computeTodayExercises(dayIdx) {
   const defaultDays = URL_PROGRAM?.schedule?.days ?? [0,1,2,3,4,5,6];
   return EXERCISES.filter(ex => {
@@ -1218,47 +1249,127 @@ function computeTodayExercises(dayIdx) {
   });
 }
 
-function applyTodaySchedule(dayIdx) {
-  TODAY_EXERCISES = computeTodayExercises(dayIdx);
-  const isRestDay = TODAY_EXERCISES.length === 0;
+// Ohjelman jakso aikatauluun perustuen. Ilman startDate/durationWeeks (demo tai
+// vanha linkki) → aina 'active' (ei jaksorajoitusta, kuten ennen).
+function getProgramPhase() {
+  const sch = URL_PROGRAM?.schedule;
+  if (!sch || !sch.startDate || !sch.durationWeeks) return { phase: 'active', start: null, end: null };
+  const p = String(sch.startDate).split('-');
+  const start = new Date(+p[0], +p[1] - 1, +p[2]); start.setHours(0, 0, 0, 0);
+  const end = new Date(start); end.setDate(start.getDate() + sch.durationWeeks * 7); // exclusive
+  const today = new Date(now); today.setHours(0, 0, 0, 0);
+  if (today < start) return { phase: 'before', start, end };
+  if (today >= end) return { phase: 'ended', start, end };
+  return { phase: 'active', start, end };
+}
+
+function computeDayState() {
+  const phase = getProgramPhase();
+  const dayIdx = (now.getDay() + 6) % 7; // JS Sun=0..Sat=6 → Mon=0..Sun=6
+  let mode;
+  if (phase.phase === 'before') mode = 'before';
+  else if (phase.phase === 'ended') mode = 'ended';
+  else mode = computeTodayExercises(dayIdx).length > 0 ? 'training' : 'rest';
+  return { mode, dayIdx, phase };
+}
+
+// Viesti + opt-in-tekstit ei-harjoituspäiville.
+function restMessage(mode) {
+  if (mode === 'rest') return {
+    icon: '🌙', title: 'Tänään on lepopäivä',
+    text: 'Lepo on osa ohjelmaa. Voit silti tehdä harjoituksen, jos haluat.',
+    btn: 'Tee harjoitus silti',
+    voluntary: 'Lepopäivä — teet vapaaehtoisen harjoituksen.'
+  };
+  if (mode === 'before') {
+    const d = DAY_STATE.phase.start;
+    const ds = d ? `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}` : '';
+    return {
+      icon: '📅', title: ds ? `Ohjelmasi alkaa ${ds}` : 'Ohjelmasi ei ole vielä alkanut',
+      text: 'Voit halutessasi tutustua harjoituksiin jo ennen aloitusta.',
+      btn: 'Näytä harjoitukset',
+      voluntary: 'Ohjelma ei ole vielä alkanut — harjoittelet etukäteen.'
+    };
+  }
+  return { // ended
+    icon: '🎉', title: 'Ohjelmasi on päättynyt',
+    text: 'Hienoa työtä! Voit jatkaa harjoittelua omatoimisesti milloin haluat.',
+    btn: 'Näytä harjoitukset',
+    voluntary: 'Ohjelma on päättynyt — jatkat omatoimisesti.'
+  };
+}
+
+function applyTodaySchedule() {
+  DAY_STATE = computeDayState();
+  const mode = DAY_STATE.mode;
+  TODAY_EXERCISES = mode === 'training' ? computeTodayExercises(DAY_STATE.dayIdx) : [];
+
   const headline = document.getElementById('todayHeadline');
   const todayCard = document.getElementById('todayCard');
   const todayLabel = document.getElementById('todayLabel');
   const notif = document.getElementById('notifBanner');
   const todaySummary = document.getElementById('todaySummary');
 
-  if (isRestDay) {
-    headline.innerHTML = 'Tänään on<br><span>lepopäivä</span>';
-    todayCard.style.display = 'none';
-    todayLabel.style.display = 'none';
-    notif.style.display = 'none';
-  } else {
-    headline.innerHTML = 'Tänään on<br><span>harjoituspäivä</span>';
+  const HEADLINES = {
+    training: 'Tänään on<br><span>harjoituspäivä</span>',
+    rest:     'Tänään on<br><span>lepopäivä</span>',
+    before:   'Ohjelmasi<br><span>alkaa pian</span>',
+    ended:    'Ohjelmasi<br><span>on päättynyt</span>'
+  };
+  headline.innerHTML = HEADLINES[mode];
+
+  if (mode === 'training') {
     todayCard.style.display = '';
-    todayLabel.style.display = '';
     notif.style.display = '';
+    todayLabel.style.display = '';
+    todayLabel.textContent = `Harjoitukset — ${DAY_NAMES_LONG[DAY_STATE.dayIdx]}`;
     todaySummary.textContent = `${TODAY_EXERCISES.length} harjoitus${TODAY_EXERCISES.length === 1 ? '' : 'ta'}`;
-    todayLabel.textContent = `Harjoitukset — ${DAY_NAMES_LONG[dayIdx]}`;
+  } else {
+    // Lepo / ennen / jälkeen: ei edistymiskorttia eikä muistutusbanneria.
+    todayCard.style.display = 'none';
+    notif.style.display = 'none';
+    if (showAllToday) { todayLabel.style.display = ''; todayLabel.textContent = 'Kaikki harjoitukset'; }
+    else todayLabel.style.display = 'none';
   }
 }
+
+// Opt-in togglet: paljasta / piilota koko ohjelman harjoitukset ei-treenipäivänä.
+function revealAllExercises() { showAllToday = true;  applyTodaySchedule(); buildExercises(); }
+function hideAllExercises()   { showAllToday = false; applyTodaySchedule(); buildExercises(); }
 
 // ── BUILD EXERCISE LIST ───────────────────────────────────────────────────
 function buildExercises() {
   const container = document.getElementById('exerciseList');
   container.innerHTML = '';
+  const mode = DAY_STATE.mode;
 
-  if (TODAY_EXERCISES.length === 0) {
+  // Ei-harjoituspäivä (lepo / ennen jaksoa / jakson jälkeen): näytä viesti +
+  // opt-in-nappi. Kun käyttäjä on painanut nappia (showAllToday), näytetään koko
+  // ohjelman harjoitukset vapaaehtoisina.
+  if (mode !== 'training' && !showAllToday) {
+    const m = restMessage(mode);
     container.innerHTML = `
       <div class="rest-day-card">
-        <div class="rest-day-icon">🌙</div>
-        <div class="rest-day-title">Tänään ei ole harjoituksia</div>
-        <div class="rest-day-text">Lepää ja palaa ohjelman seuraavana harjoituspäivänä.</div>
+        <div class="rest-day-icon">${m.icon}</div>
+        <div class="rest-day-title">${m.title}</div>
+        <div class="rest-day-text">${m.text}</div>
+        <button class="reveal-btn" onclick="revealAllExercises()">${m.btn}</button>
       </div>`;
     updateProgress();
     return;
   }
 
-  TODAY_EXERCISES.forEach((ex) => {
+  // Lista: treenipäivänä aikataulutetut, muuten (opt-in) koko ohjelma.
+  const list = (mode === 'training') ? TODAY_EXERCISES : EXERCISES;
+
+  if (mode !== 'training' && showAllToday) {
+    const note = document.createElement('div');
+    note.className = 'voluntary-note';
+    note.innerHTML = `<span>${restMessage(mode).voluntary}</span><button onclick="hideAllExercises()">Piilota</button>`;
+    container.appendChild(note);
+  }
+
+  list.forEach((ex) => {
     const card = document.createElement('div');
     card.className = 'ex-card' + (isDone(ex.id) ? ' done' : '');
     card.id = 'card-' + ex.id;
@@ -1598,7 +1709,7 @@ const RICH_GUIDES = {
 function fileExt(name) { return (name.split('.').pop() || '').toLowerCase(); }
 
 function openExerciseModal(id) {
-  const ex = TODAY_EXERCISES.find(e => e.id === id);
+  const ex = EXERCISES.find(e => e.id === id);
   if (!ex) return;
   modalExId = id;
   const prev = completed[id] || { num: '', note: '' };
@@ -1750,7 +1861,7 @@ document.getElementById('exerciseModal')?.addEventListener('click', e => {
 
 function markDoneFromModal() {
   if (!modalExId) return;
-  const ex = TODAY_EXERCISES.find(e => e.id === modalExId);
+  const ex = EXERCISES.find(e => e.id === modalExId);
   const note = document.getElementById('modalNote')?.value || '';
   const isMulti = !!(ex && ex.series);
   if (isMulti) {
@@ -2085,9 +2196,8 @@ try {
   if (saved) completed = JSON.parse(saved);
 } catch(e) {}
 
-// Compute today's exercises based on per-exercise days override or program default
-const todayDayIdx = (now.getDay() + 6) % 7; // JS Sun=0..Sat=6 → Mon=0..Sun=6
-applyTodaySchedule(todayDayIdx);
+// Tämän päivän tila (treeni / lepo / ennen jaksoa / jakson jälkeen) + harjoituslista
+applyTodaySchedule();
 
 buildExercises();
 buildDiary();
