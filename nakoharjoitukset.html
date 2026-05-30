@@ -995,8 +995,9 @@ function loadProgramFromURL() {
 
 const URL_PROGRAM = loadProgramFromURL();
 
-// Use URL program exercises, or fall back to demo data
-const EXERCISES = URL_PROGRAM ? URL_PROGRAM.exercises : [
+// Built-in exercise catalog (source of truth for CONTENT). Also used as demo data
+// when no program is loaded.
+const DEFAULT_EXERCISES = [
   {
     id: 'sakkadi',
     name: 'Fiksaatioharjoitus',
@@ -1045,6 +1046,26 @@ const EXERCISES = URL_PROGRAM ? URL_PROGRAM.exercises : [
     instructions: `<strong>Tarvikkeet:</strong> n. 1 m lanka ja 3 erivärisiä helmiä.<br><br><strong>Valmistelu:</strong> Kiinnitä langan toinen pää kiinteään kohtaan (esim. ovenkahva). Aseta helmet eri etäisyyksille: yksi lähelle nenää (~10 cm), yksi keskelle, yksi kauas. Pidä langan toinen pää nenän kärjessä.<br><br><strong>Vaiheet:</strong><br>1. Katso kauimmaista helmeä — langan pitäisi näyttää jakautuvan kahtia (X-kuvio helmen kohdalla). Etummaiset helmet näkyvät kahtena.<br>2. Siirrä katse keskimmäiseen helmeen — X-kuvio siirtyy sen kohdalle.<br>3. Siirrä katse lähimpään helmeen — X-kuvio muodostuu sen kohdalla.<br>4. Toista hitaasti edestakaisin: kauas → keskelle → lähelle → takaisin.<br><br><strong>Variaatio:</strong> tee harjoitus myös eri kulmissa, esim. yläviistoon.<br><br><strong>Tavoite:</strong> parantaa silmien kykyä kääntyä hallitusti ja tarkentaa lähelle ja kauas.`
   }
 ];
+
+// A saved / QR-shared program defines WHICH exercises + scheduling (days, sets,
+// duration). The CONTENT (name, icon, instructions, materiaalit, units) is always
+// refreshed from DEFAULT_EXERCISES by id, so content fixes here also reach programs
+// that were shared before the fix — without re-issuing QR codes. Exercises not in
+// the catalog keep their embedded program content.
+const EXERCISES = (URL_PROGRAM?.exercises || DEFAULT_EXERCISES).map(ex => {
+  const cat = DEFAULT_EXERCISES.find(c => c.id === ex.id);
+  if (!cat) return ex;
+  return {
+    ...ex,
+    name: cat.name ?? ex.name,
+    icon: cat.icon ?? ex.icon,
+    cat: cat.cat ?? ex.cat,
+    unit: cat.unit ?? ex.unit,
+    unitLabel: cat.unitLabel ?? ex.unitLabel,
+    instructions: cat.instructions ?? ex.instructions,
+    materiaalit: cat.materiaalit ?? ex.materiaalit,
+  };
+});
 
 // Simulate saved diary data
 const DIARY_DATA = [
@@ -1368,7 +1389,7 @@ function openExerciseModal(id) {
   // Drop materials removed from the app (e.g. PDF korvattu kuvitetulla RICH_GUIDESilla).
   // Vanhat localStorageen tallennetut / QR-jaetut ohjelmat voivat yhä viitata näihin
   // tiedostoihin, jolloin iframe näyttäisi GitHubin 404-sivun.
-  const REMOVED_MATERIALS = ['brock-lanka-ohje.pdf', 'brock-lanka-seurantalomake.html'];
+  const REMOVED_MATERIALS = ['brock-lanka-ohje.pdf', 'brock-lanka-seurantalomake.html', 'sakkadi-numerotaulu.html'];
   const mats = (ex.materiaalit || []).filter(m => !REMOVED_MATERIALS.includes(m.tiedosto));
   const matsHtml = (mats.length ? mats.map(m => {
     const ext = fileExt(m.tiedosto);

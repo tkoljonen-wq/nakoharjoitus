@@ -796,11 +796,11 @@
 // ── EXERCISE LIBRARY DATA ────────────────────────────────────────────────
 // materiaalit: [{ nimi, tiedosto }] — tiedosto on suhteellinen polku materiaalit/-kansioon
 let LIBRARY = [
-  { id:'sakkadi', name:'Sakkadinen silmänliike', icon:'↔️', cat:'Silmänliike', unit:'ms', unitLabel:'reaktioaika (ms)',
-    instructions:'Aseta <strong>numerotaulu</strong> seinälle silmien korkeudelle noin 1 m etäisyydelle. Lue numerot 1–20 järjestyksessä mahdollisimman nopeasti liikuttaen vain silmiä, ei päätä. Pidä 30 s tauko sarjojen välillä. Mittaa aika tai laske virheet.',
-    materiaalit:[{ nimi:'Numerotaulu (A4, tulostettava)', tiedosto:'sakkadi-numerotaulu.html' }] },
-  { id:'silmakasi', name:'Silmä-käsikoordinaatio', icon:'🎯', cat:'Koordinaatio', unit:'pisteet', unitLabel:'osumia / 20',
-    instructions:'Pomppaa <strong>tennispallo</strong> seinään ja ota kiinni yhdellä kädellä vuorotellen. Etäisyys n. 2 m. Vaikeuta lisäämällä rytmi tai sulkemalla toinen silmä. Laske onnistuneet kiinniotot per sarja.' },
+  { id:'sakkadi', name:'Fiksaatioharjoitus', icon:'↔️', cat:'Sakkadit / katseen kohdennus', unit:'kirjaimet', unitLabel:'tunnistetut kirjaimet (1 min)',
+    instructions:'Tulosta <strong>fiksaatiotaulut 1 ja 2</strong> ja kiinnitä ne seinälle silmien korkeudelle n. <strong>1,5 m</strong> päähän toisistaan. Asetu n. 2 m päähän. Pidä pää paikallaan ja liikuta vain silmiä: lue vuorotellen vasemman ja oikean taulun kirjaimet rivi kerrallaan mahdollisimman nopeasti mutta tarkasti. Kesto 1 min — laske montako kirjainta ehdit tunnistaa.',
+    materiaalit:[{ nimi:'Fiksaatiotaulu 1 (tulosta A4)', tiedosto:'fiksaatiotaulu-1.pdf' }, { nimi:'Fiksaatiotaulu 2 (tulosta A4)', tiedosto:'fiksaatiotaulu-2.pdf' }] },
+  { id:'silmakasi', name:'Silmä-käsikoordinaatio', icon:'🎯', cat:'Silmä–käsi-koordinaatio', unit:'kiinniotot', unitLabel:'onnistuneet kiinniotot (30 s)',
+    instructions:'Seiso n. <strong>1,5–2 m</strong> päässä sileästä seinästä. Heitä <strong>tennispallo</strong> seinään vuorotellen oikealla ja vasemmalla kädellä ja ota se kiinni vastakkaisella kädellä. Pidä liike tasaisena ja kiinniotot hallittuina. Jatka 30 s ja laske onnistuneet kiinniotot.' },
   { id:'akkomodaatio', name:'Akkomodaatio (lähi-kauko)', icon:'🔭', cat:'Akkomodaatio', unit:'s', unitLabel:'tarkennusaika (s)',
     instructions:'Pidä <strong>kynää</strong> 10 cm silmistä ja katso vuorotellen kynän kärkeä ja kaukaista kohdetta (>5 m). Laske hitaasti 3 sekuntia per kohde.' },
   { id:'brock', name:'Brockin lanka', icon:'🪢', cat:'Binokulaarisuus', unit:'min', unitLabel:'harjoituksen kesto (min)',
