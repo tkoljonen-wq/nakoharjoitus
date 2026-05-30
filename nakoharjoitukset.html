@@ -1424,8 +1424,13 @@ function openExerciseModal(id) {
     </button>
   `;
 
-  document.getElementById('exerciseModal').classList.add('open');
+  const overlay = document.getElementById('exerciseModal');
+  overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
+  // The overlay is the scroll container and is reused between opens, so its
+  // scrollTop would otherwise persist from the previous exercise (opening
+  // scrolled down). Reset it so every exercise opens from the top.
+  overlay.scrollTop = 0;
 }
 
 function closeExerciseModal() {
