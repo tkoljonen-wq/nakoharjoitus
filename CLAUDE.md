@@ -351,9 +351,26 @@ Päiväkirja-välilehti luki aiemmin kovakoodattua `DIARY_DATA`-demoa. Nyt `buil
 
 **Pushattavat:** `nakoharjoitukset.html`, `sw.js` (käyttäjä pushaa itse — kansio ei ole git-repo).
 
+## Istunto 2026-05-30 (6) — Kehitys-välilehti näyttää oikeaa dataa — VALMIS
+
+Kehitys (Tilastot) -välilehti käytti kovakoodattua demo-dataa (`buildChart`-taulukko reaktioajoista + `statTotal = done + 12` + stat-korttien HTML-arvot 5/3/75%). Nyt kaikki neljä korttia, putki ja kaavio lasketaan oikeasti localStoragesta.
+
+| Alue | Mitä tehtiin |
+|---|---|
+| **Jaetut apufunktiot** | `loadAllCompletions()` (kaikki `completed_*`-avaimet → `{date:data}`), `doneCountForDay(data)` (tehtyjen määrä, `done!==false`). `buildDiary` refaktoroitu käyttämään näitä |
+| **`buildStats()`** | **Harjoitusta yhteensä** = kaikkien päivien tehdyt suoritukset; **Päivien putki** = peräkkäiset harjoituspäivät tähän asti (tämän päivän tekemättömyys ei katkaise); **Tällä viikolla** = kuluvan viikon tehdyt; **Suoritusaste** = viikon tehdyt / aikataulutetut (`computeTodayExercises(dayIdx).length`). Asettaa myös header-`streakCount`:n samasta laskennasta |
+| **`buildChart()`** | Viikkokaavio: tehtyjä harjoituksia per päivä (ma–su, kuluva viikko). Tuleva päivä = tyhjä palkki. Otsikko "Sakkadi — reaktioaika (ms)" → **"Harjoituksia / päivä — tämä viikko"** |
+| **`currentWeekDays()`** | Kuluvan viikon ma–su avaimet (UTC-pohjainen kuten tallennus), `future`-lippu tuleville päiville |
+| **Live-päivitys** | `markDoneFromModal` ja `showView('stats')` kutsuvat `buildStats()/buildChart()` → tilastot päivittyvät heti. Init-osion vanha streak-silmukka poistettu (buildStats hoitaa) |
+| **`sw.js`** | CACHE_NAME v21 → **v22** |
+
+**Testattu** previewillä (375px): 5 päivän viikkodata → total 7, putki 4 (ma–ti aukko katkaisee), tällä viikolla 7, suoritusaste 23% (7/30, demossa 5 harj./pv × 6 mennyttä pv), kaavio ma2·ke1·to2·pe1·la1 (ti+su tyhjät), `done:false`-osatulos ei lasketa. Tyhjä tila → 0/0/0/0%. Ei konsolivirheitä. ✓
+
+**Pushattavat:** `nakoharjoitukset.html`, `sw.js` (käyttäjä pushaa itse — kansio ei ole git-repo).
+
 ## Nykytila
-- **SW `CACHE_NAME` = `nakoharjoitus-v21`** (bumppaa aina kun `src` muuttuu ennen pushia).
-- **Päiväkirja** lukee oikeaa dataa localStoragesta (ei enää demo-`DIARY_DATA`). **Kehitys-välilehti** käyttää yhä demo-dataa (`buildChart`, `statTotal`) — luonteva seuraava jatkokehitys.
+- **SW `CACHE_NAME` = `nakoharjoitus-v22`** (bumppaa aina kun `src` muuttuu ennen pushia).
+- **Päiväkirja JA Kehitys** lukevat oikeaa dataa localStoragesta (ei enää demo-dataa). Molemmat välilehdet päivittyvät heti kun harjoitus merkitään tehdyksi.
 - Monisarjainen tuloskirjaus (`series: true`): **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`) ja **Tennispallon pudotus** (`reaktio`).
 - Yhden arvon kirjaus: **Brockin lanka** (`brock`, mitattava: lähimmän helmen etäisyys silmästä cm) ja **Kissakortti** (`kissakortti`, onnistuneet sulautumiset).
 - Aktiiviset harjoitukset: **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`), **Brockin lanka** (`brock`), **Kissakortti** (`kissakortti`), **Tennispallon pudotus** (`reaktio`).

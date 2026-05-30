@@ -979,12 +979,12 @@
     </div>
     <div class="stats-grid">
       <div class="stat-card"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Harjoitusta yhteensä</div></div>
-      <div class="stat-card"><div class="stat-value" id="statStreak">5</div><div class="stat-label">Päivien putki</div></div>
-      <div class="stat-card"><div class="stat-value" id="statWeek">3</div><div class="stat-label">Tällä viikolla</div></div>
-      <div class="stat-card"><div class="stat-value" id="statRate">75%</div><div class="stat-label">Suoritusaste</div></div>
+      <div class="stat-card"><div class="stat-value" id="statStreak">0</div><div class="stat-label">Päivien putki</div></div>
+      <div class="stat-card"><div class="stat-value" id="statWeek">0</div><div class="stat-label">Tällä viikolla</div></div>
+      <div class="stat-card"><div class="stat-value" id="statRate">0%</div><div class="stat-label">Suoritusaste</div></div>
     </div>
     <div style="padding: 20px; margin-top: 8px;">
-      <div class="section-title" style="padding:0; margin-bottom:12px">Sakkadi — reaktioaika (ms)</div>
+      <div class="section-title" style="padding:0; margin-bottom:12px">Harjoituksia / päivä — tämä viikko</div>
       <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px; height:120px; display:flex; align-items:flex-end; gap:8px;">
         <div id="chartBars" style="display:flex; align-items:flex-end; gap:8px; width:100%; height:100%;"></div>
       </div>
@@ -1727,6 +1727,7 @@ function markDoneFromModal() {
   try { localStorage.setItem(todayKey, JSON.stringify(completed)); } catch(e) {}
   closeExerciseModal();
   buildExercises();
+  buildStats(); // päivitä tilastokortit + putki heti
 }
 
 function updateProgress() {
@@ -1737,7 +1738,6 @@ function updateProgress() {
   const text = document.getElementById('progressText');
   if (fill) fill.style.width = pct + '%';
   if (text) text.textContent = done + ' / ' + total;
-  document.getElementById('statTotal').textContent = done + 12; // simulate history
 }
 
 // ── DIARY ─────────────────────────────────────────────────────────────────
@@ -1769,21 +1769,36 @@ function escapeHtml(s) {
     ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 }
 
+// Kerää kaikki localStoragen päiväkohtaiset suoritukset → { 'YYYY-MM-DD': dataObj }.
+// Yhteinen lähde päiväkirjalle ja tilastoille.
+function loadAllCompletions() {
+  const out = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    const m = key && key.match(/^completed_(\d{4}-\d{2}-\d{2})$/);
+    if (!m) continue;
+    try {
+      const data = JSON.parse(localStorage.getItem(key));
+      if (data && typeof data === 'object') out[m[1]] = data;
+    } catch(e) {}
+  }
+  return out;
+}
+
+// Montako harjoitusta merkitty tehdyksi annetun päivän datassa (done !== false).
+function doneCountForDay(data) {
+  if (!data) return 0;
+  return Object.keys(data).filter(id => data[id] && data[id].done !== false).length;
+}
+
 function buildDiary() {
   const container = document.getElementById('diaryList');
   container.innerHTML = '';
 
-  // Kerää kaikki localStoragen päiväkohtaiset suoritukset (avain completed_YYYY-MM-DD).
-  const days = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    const m = key && key.match(/^completed_(\d{4})-(\d{2})-(\d{2})$/);
-    if (!m) continue;
-    let data;
-    try { data = JSON.parse(localStorage.getItem(key)); } catch(e) { continue; }
-    if (!data || typeof data !== 'object') continue;
-
-    // Vain tehdyiksi merkityt harjoitukset (done !== false; vanhat liputtomat mukaan).
+  // Vain tehdyiksi merkityt harjoitukset, uusin päivä ensin.
+  const all = loadAllCompletions();
+  const days = Object.keys(all).map(dateStr => {
+    const data = all[dateStr];
     const entries = Object.keys(data)
       .filter(id => data[id] && data[id].done !== false)
       .map(id => {
@@ -1794,12 +1809,12 @@ function buildDiary() {
           note: data[id].note || ''
         };
       });
-    if (entries.length === 0) continue;
-
-    const d = new Date(+m[1], +m[2] - 1, +m[3]);
-    const dateLabel = fDays[d.getDay()] + ' ' + m[3] + '.' + m[2] + '.' + m[1];
-    days.push({ date: key, dateLabel, entries });
-  }
+    if (entries.length === 0) return null;
+    const p = dateStr.split('-');
+    const d = new Date(+p[0], +p[1] - 1, +p[2]);
+    const dateLabel = fDays[d.getDay()] + ' ' + p[2] + '.' + p[1] + '.' + p[0];
+    return { date: dateStr, dateLabel, entries };
+  }).filter(Boolean);
 
   // Uusin ensin.
   days.sort((a, b) => b.date.localeCompare(a.date));
@@ -1828,32 +1843,86 @@ function buildDiary() {
   });
 }
 
-// ── STATS CHART ───────────────────────────────────────────────────────────
+// ── STATS ─────────────────────────────────────────────────────────────────
+// Kuluvan viikon päivät (ma–su) avaimineen. future=true → tuleva päivä (ei dataa).
+// Avain muodostetaan samalla tavalla kuin tallennettaessa (toISOString = UTC).
+function currentWeekDays() {
+  const todayIdx = (now.getDay() + 6) % 7; // 0=ma .. 6=su
+  const out = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(now);
+    d.setDate(now.getDate() + (i - todayIdx));
+    out.push({ dayIdx: i, key: d.toISOString().split('T')[0], future: i > todayIdx });
+  }
+  return out;
+}
+
+// Viikkokaavio: montako harjoitusta tehty kunakin päivänä (ma–su, kuluva viikko).
 function buildChart() {
-  const data = [480, 450, null, 420, null, 410, null]; // Mon–Sun, nulls = rest
-  const days = ['MA','TI','KE','TO','PE','LA','SU'];
-  const max = 500;
+  const all = loadAllCompletions();
+  const week = currentWeekDays();
+  const labels = ['MA','TI','KE','TO','PE','LA','SU'];
+  const counts = week.map(d => d.future ? null : doneCountForDay(all[d.key]));
+  const max = Math.max(1, ...counts.filter(v => v !== null));
   const container = document.getElementById('chartBars');
   container.innerHTML = '';
-  data.forEach((v, i) => {
+  counts.forEach((v, i) => {
     const col = document.createElement('div');
     col.style.cssText = 'flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:4px; height:100%;';
-    if (v !== null) {
+    if (v !== null && v > 0) {
       const h = Math.round((v / max) * 100);
       col.innerHTML = `
         <div style="font-family:'Roboto Mono',monospace;font-size:8px;color:var(--accent)">${v}</div>
         <div style="width:100%;height:${h}%;background:linear-gradient(180deg,var(--accent2),var(--accent));border-radius:6px 6px 2px 2px;min-height:4px;"></div>
-        <div style="font-family:'Roboto Mono',monospace;font-size:8px;color:var(--text-faint)">${days[i]}</div>
+        <div style="font-family:'Roboto Mono',monospace;font-size:8px;color:var(--text-faint)">${labels[i]}</div>
       `;
     } else {
       col.innerHTML = `
         <div style="width:100%;height:4px;"></div>
         <div style="width:100%;height:4%;background:var(--border);border-radius:3px;"></div>
-        <div style="font-family:'Roboto Mono',monospace;font-size:8px;color:var(--text-faint)">${days[i]}</div>
+        <div style="font-family:'Roboto Mono',monospace;font-size:8px;color:var(--text-faint)">${labels[i]}</div>
       `;
     }
     container.appendChild(col);
   });
+}
+
+// Tilastokortit + putki localStoragesta. Kutsutaan initissä, Kehitys-välilehteä
+// avattaessa ja kun harjoitus merkitään tehdyksi.
+function buildStats() {
+  const all = loadAllCompletions();
+
+  // Harjoitusta yhteensä = kaikki tehdyt suoritukset kaikilta päiviltä.
+  let total = 0;
+  Object.values(all).forEach(data => { total += doneCountForDay(data); });
+
+  // Putki = peräkkäiset harjoituspäivät tähän päivään asti. Tämän päivän
+  // tekemättömyys EI katkaise putkea (päivä on vielä kesken).
+  let streak = 0;
+  for (let i = 0; i < 366; i++) {
+    const d = new Date(now); d.setDate(now.getDate() - i);
+    const c = doneCountForDay(all[d.toISOString().split('T')[0]]);
+    if (c > 0) streak++;
+    else if (i === 0) continue;
+    else break;
+  }
+
+  // Kuluva viikko: tehdyt suoritukset + suoritusaste (tehdyt / aikataulutetut).
+  const week = currentWeekDays();
+  let weekDone = 0, scheduled = 0;
+  week.forEach(d => {
+    if (d.future) return;
+    weekDone += doneCountForDay(all[d.key]);
+    scheduled += computeTodayExercises(d.dayIdx).length;
+  });
+  const rate = scheduled > 0 ? Math.min(100, Math.round((weekDone / scheduled) * 100)) : 0;
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('statTotal', total);
+  set('statStreak', streak);
+  set('statWeek', weekDone);
+  set('statRate', rate + '%');
+  set('streakCount', streak); // header-putki samasta laskennasta
 }
 
 // ── NAV ───────────────────────────────────────────────────────────────────
@@ -1862,9 +1931,10 @@ function showView(name, btn) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
   btn.classList.add('active');
-  // Päiväkirja rakennetaan uudelleen joka avauksella, jotta tämän istunnon
-  // aikana tehdyt merkinnät näkyvät heti (buildDiary lukee localStoragesta).
+  // Päiväkirja ja tilastot rakennetaan uudelleen joka avauksella, jotta tämän
+  // istunnon aikana tehdyt merkinnät näkyvät heti (lukevat localStoragesta).
   if (name === 'diary') buildDiary();
+  if (name === 'stats') { buildStats(); buildChart(); }
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────
@@ -1885,22 +1955,6 @@ try {
   if (saved) completed = JSON.parse(saved);
 } catch(e) {}
 
-// Compute streak from localStorage
-let streak = 0;
-for (let i = 1; i <= 60; i++) {
-  const d = new Date(now); d.setDate(d.getDate() - i);
-  const k = 'completed_' + d.toISOString().split('T')[0];
-  try {
-    const val = localStorage.getItem(k);
-    // Päivä lasketaan streakiin vain jos vähintään yksi harjoitus on merkitty
-    // tehdyksi (done !== false; vanhat done-liputtomat tallennukset lasketaan mukaan).
-    const day = val ? JSON.parse(val) : null;
-    if (day && Object.values(day).some(e => e && e.done !== false)) streak++;
-    else break;
-  } catch(e) { break; }
-}
-document.getElementById('streakCount').textContent = streak;
-
 // Compute today's exercises based on per-exercise days override or program default
 const todayDayIdx = (now.getDay() + 6) % 7; // JS Sun=0..Sat=6 → Mon=0..Sun=6
 applyTodaySchedule(todayDayIdx);
@@ -1908,6 +1962,7 @@ applyTodaySchedule(todayDayIdx);
 buildExercises();
 buildDiary();
 buildChart();
+buildStats(); // täyttää tilastokortit + header-putken (streakCount)
 
 // PWA service worker
 if ('serviceWorker' in navigator) {
