@@ -1025,16 +1025,6 @@ const DEFAULT_EXERCISES = [
     instructions: `Seiso n. <strong>1,5–2 m</strong> päässä sileästä seinästä. Heitä <strong>tennispallo</strong> seinään vuorotellen oikealla ja vasemmalla kädellä ja ota se kiinni vastakkaisella kädellä. Pidä liike tasaisena ja kiinniotot hallittuina. Jatka 30 s ja laske onnistuneet kiinniotot.`
   },
   {
-    id: 'akkomodaatio',
-    name: 'Akkomodaatio (lähi-kauko)',
-    icon: '🔭',
-    duration: '4 min',
-    sets: '3 sarjaa',
-    unit: 's',
-    unitLabel: 'tarkennusaika (s)',
-    instructions: `Pidä <strong>kynää</strong> 10 cm silmistä ja katso vuorotellen kynän kärkeä ja kaukaista kohdetta (>5 m). Laske hitaasti 3 sekuntia per kohde. Kun vaihdat, huomioi kuinka nopeasti kuva tarkentuu.`
-  },
-  {
     id: 'brock',
     name: "Brockin lanka",
     icon: '🪢',
@@ -1052,7 +1042,11 @@ const DEFAULT_EXERCISES = [
 // refreshed from DEFAULT_EXERCISES by id, so content fixes here also reach programs
 // that were shared before the fix — without re-issuing QR codes. Exercises not in
 // the catalog keep their embedded program content.
-const EXERCISES = (URL_PROGRAM?.exercises || DEFAULT_EXERCISES).map(ex => {
+// Exercises retired from the app. Dropped from already-shared / QR programs too.
+const REMOVED_EXERCISE_IDS = ['akkomodaatio', 'periferia', 'pursuit'];
+const EXERCISES = (URL_PROGRAM?.exercises || DEFAULT_EXERCISES)
+  .filter(ex => !REMOVED_EXERCISE_IDS.includes(ex.id))
+  .map(ex => {
   const cat = DEFAULT_EXERCISES.find(c => c.id === ex.id);
   if (!cat) return ex;
   return {
@@ -1074,7 +1068,6 @@ const DIARY_DATA = [
     dateLabel: 'PE 06.03.2026',
     entries: [
       { name: 'Sakkadinen silmänliike', result: '420 ms', note: 'Parempi kuin viimeksi' },
-      { name: 'Akkomodaatio (lähi-kauko)', result: '1.8 s', note: '' },
       { name: 'Brockin lanka', result: '22 cm', note: 'Vasen silmä dominoi' },
     ]
   },
