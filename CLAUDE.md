@@ -38,8 +38,8 @@ materiaalit/            ← Tulostettavat materiaalit (PDF/HTML)
 **Datan kulku:**
 
 1. Optikko rakentaa ohjelman `admin.html`-wizardissa
-2. JSON serialisoidaan ja **LZString-pakataan** URL-safe muotoon (`LZString.compressToEncodedURIComponent`)
-3. Upotetaan URL-hashiin (`#program=...`) — kompressoituna ~1000–1500 merkkiä (vs ~3175 ilman → QR-luettavuus)
+2. JSON serialisoidaan ja **LZString-pakataan** URL-safe muotoon (`LZString.compressToEncodedURIComponent`). **Vain minimaalinen payload upotetaan** — per harjoitus `{ id, sets, duration, days? }` + `schedule`. Kaikki sisältö virkistetään urheilijapuolella katalogista id:llä (ks. "Kultainen sääntö"), joten sitä ei lähetetä.
+3. Upotetaan URL-hashiin (`#program=...`) — kompressoituna **~200–300 merkkiä** (ennen payloadin trimmausta ~3000 → QR-koodi täyttyi/oli lukukelvoton; ks. istunto 2026-05-31 (6))
 4. Urheilija avaa linkin (esim. QR-skannauksella) `nakoharjoitukset.html#program=...`
 5. Urheilijasovellus purkaa ohjelman ja **tallentaa sen myös localStorageen** avaimeen `nakoharjoitusProgram` — näin PWA-uudelleenavaus aloitusnäytöltä toimii ilman hashia
 6. localStorage tallentaa myös päivittäiset suoritukset omissa avaimissaan (esim. `done-2026-05-28`)
@@ -216,7 +216,7 @@ Lisättiin suorituskuvat, uudistettiin/lisättiin harjoituksia, korjattiin talle
 ### ⭐ Sisältöarkkitehtuuri — harjoitusdatan KAKSI lähdettä (tärkein oppi)
 Sisältö elää **kahdessa paikassa**, ja molemmat on päivitettävä kun harjoitusta muokataan:
 
-1. **`admin.html` → `LIBRARY`** = lähde **uusille** generoitaville ohjelmille. Kun ohjelma generoidaan, harjoitusten sisältö (ml. `materiaalit`) leivotaan QR-koodiin/linkkiin (`out.materiaalit = ex.materiaalit`). Kentät: `{ id, name, icon, cat, unit, unitLabel, instructions, materiaalit? }` (ei duration/sets — ne asetetaan ohjelmakohtaisesti).
+1. **`admin.html` → `LIBRARY`** = lähde **uusille** generoitaville ohjelmille. `LIBRARY`-objekti sisältää koko sisällön (`{ id, name, icon, cat, unit, unitLabel, instructions, materiaalit? }`) editorin esikatselua varten, **mutta jakolinkkiin/QR:ään serialisoidaan vain `{ id, sets, duration, days? }`** (`generateAndPreview`, istunto 2026-05-31 (6)). Sisältö ei kulje linkissä koska se virkistetään katalogista id:llä urheilijapuolella.
 
 2. **`nakoharjoitukset.html` → `DEFAULT_EXERCISES`** = sisäänrakennettu katalogi (myös demo-fallback). Aktiivinen lista rakennetaan:
    ```js
@@ -499,8 +499,28 @@ Jatkoa: poistettiin loput emojit käyttäjän pyynnöstä.
 
 **Pushattavat:** `admin.html`, `sw.js` (käyttäjä pushaa itse — kansio ei ole git-repo).
 
+## Istunto 2026-05-31 (6) — Jakolinkin/QR:n payload minimoitu (QR-kokoongelma) — VALMIS
+
+Ongelma: pitkä ohjelma → "sisältö liian suuri QR-koodille" + lukukelvoton (maksimitiheys). Mitattu worst-case (5 harj.): pakattu URL **2 993 merkkiä** ≈ QR:n tavutilan yläraja.
+
+Juurisyy (sparrattu käyttäjän kanssa, vrt. palvelinmalli): QR oli täynnä **redundanttia dataa**. Urheilijasovellus ei käytä jaetusta ohjelmasta sisältöä lainkaan — `name/icon/cat/unit/unitLabel/instructions/materiaalit/series` virkistetään aina `DEFAULT_EXERCISES`-katalogista id:llä ("Kultainen sääntö"). `admin.html` leipoi silti kaikki nuo (ml. iso `instructions`-HTML) linkkiin.
+
+Korjaus (vaihtoehto A, ei palvelinta → ei GDPR-muutosta, painettu QR ei vanhene): `generateAndPreview()` serialisoi nyt vain `{ id, sets, duration, days? }` per harjoitus + `schedule`. Pudotettu myös `created`. **Tulos: 2 993 → ~217–297 merkkiä (~10×)**, QR harva ja helposti skannattava.
+
+| | JSON | Pakattu URL |
+|---|---|---|
+| Ennen | 3 868 | 2 993 |
+| Jälkeen | 360 | 297 |
+
+**Palvelinmalli (käyttäjän ehdotus) hylättiin toistaiseksi:** vaatisi serverless-kirjoituspään + tallennuksen, toisi GDPR-rekisterinpitäjävastuun, ja **painettu QR voisi kuolla** jos palvelintiedosto poistuu. A ratkaisi ongelman ilman näitä. (Palvelin kannattaisi vasta jos halutaan isoja itsenäisiä/custom-ohjelmia tai keskitetty hallinta → silloin persoonaton rakenne + satunnainen id + TTL.)
+
+**SW v30 → v31.** **Testattu** previewillä koko ketju: admin generoi (217 merkkiä) → jakolinkki avattu urheilijasovelluksessa → sakkadi+brock-sisältö (nimi, cat, unit, series, instructions, fiksaatiotaulu-PDFt, brockin rich-ohje 5 kuvaa) täysin rakennettu katalogista; brockin `days:[6]`+`sets`/`duration` säilyivät; sekapäivän opt-in toimi; QR renderöityi harvana (real click-flow, ei virheitä — konsolin QR-virheet olivat eval-toiston artefakteja). ✓
+
+**Pushattavat:** `admin.html`, `sw.js` (käyttäjä pushaa itse — kansio ei ole git-repo).
+
 ## Nykytila
-- **SW `CACHE_NAME` = `nakoharjoitus-v30`** (bumppaa aina kun `src` muuttuu ennen pushia).
+- **SW `CACHE_NAME` = `nakoharjoitus-v31`** (bumppaa aina kun `src` muuttuu ennen pushia).
+- **Jakolinkki/QR minimoitu:** vain `{ id, sets, duration, days? }` + `schedule` (`generateAndPreview`). Pakattu URL ~200–300 merkkiä (oli ~3000). Sisältö rakennetaan katalogista id:llä. Ei palvelinta → tietosuoja & painetun QR:n ikuisuus säilyvät.
 - **Harjoitusikonit (emoji) poistettu** nimien vierestä kaikkialta (admin-kirjasto/valitut/esikatselu + urheilijan kortit/modaali). `icon`-kenttä jää dataan käyttämättömänä.
 - **Kaikki koriste-/UI-emojit poistettu** (osio-otsikot, tilakortti, notif-banneri, bottom-nav, materiaalibadge/-otsikko/-napit, streak, empty-state, step 2 -napit, Aikataulu-nappi). Jäljellä vain Kopioi-toiminnon toast-viestin 📋 (ohimenevä).
 - **admin step 2 "Avaa urheilijan näkymä" -nappi** ei enää vihreä vaan syvä brändi-lila (`.btn-success` → `--accent2`).

@@ -956,23 +956,20 @@ function generateAndPreview() {
   const dur = document.getElementById('progDuration').value;
   const start = document.getElementById('startDate').value || new Date().toISOString().split('T')[0];
 
-  // Trim each exercise to the fields the athlete view needs; omit `days` unless overridden
+  // Sisällytä jakolinkkiin VAIN kentät joita urheilijasovellus oikeasti käyttää.
+  // Kaikki sisältö (name, icon, cat, unit, unitLabel, instructions, materiaalit, series)
+  // virkistetään urheilijapuolella DEFAULT_EXERCISES-katalogista id:n perusteella, joten
+  // niiden upottaminen tähän on pelkkää turhaa painolastia → pitää QR-koodin pienenä ja
+  // luettavana. Vain `days` upotetaan jos harjoituksella on oma aikataulu-override.
   const exercises = Object.values(selected).map(ex => {
-    const out = {
-      id: ex.id, name: ex.name, icon: ex.icon, cat: ex.cat,
-      unit: ex.unit, unitLabel: ex.unitLabel,
-      instructions: ex.instructions,
-      sets: ex.sets, duration: ex.duration
-    };
-    if (ex.materiaalit?.length) out.materiaalit = ex.materiaalit;
+    const out = { id: ex.id, sets: ex.sets, duration: ex.duration };
     if (Array.isArray(ex.days) && ex.days.length > 0) out.days = ex.days;
     return out;
   });
 
   programData = {
     exercises,
-    schedule: { days: trainingDays, durationWeeks: parseInt(dur), startDate: start },
-    created: new Date().toISOString()
+    schedule: { days: trainingDays, durationWeeks: parseInt(dur), startDate: start }
   };
 
   // Update summary
