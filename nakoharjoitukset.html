@@ -1351,39 +1351,62 @@ function buildExercises() {
     return;
   }
 
-  // Lista: treenipäivänä aikataulutetut, muuten (opt-in) koko ohjelma.
-  const list = (mode === 'training') ? TODAY_EXERCISES : EXERCISES;
-
-  if (mode !== 'training' && showAllToday) {
+  // Lepo / ennen jaksoa / jälkeen + opt-in painettu: koko ohjelma vapaaehtoisena.
+  if (mode !== 'training') {
     const note = document.createElement('div');
     note.className = 'voluntary-note';
     note.innerHTML = `<span>${restMessage(mode).voluntary}</span><button onclick="hideAllExercises()">Piilota</button>`;
     container.appendChild(note);
+    EXERCISES.forEach(ex => renderExerciseCard(ex, container));
+    updateProgress();
+    return;
   }
 
-  list.forEach((ex) => {
-    const card = document.createElement('div');
-    card.className = 'ex-card' + (isDone(ex.id) ? ' done' : '');
-    card.id = 'card-' + ex.id;
-    card.onclick = () => openExerciseModal(ex.id);
+  // Treenipäivä: näytä tälle päivälle aikataulutetut harjoitukset.
+  TODAY_EXERCISES.forEach(ex => renderExerciseCard(ex, container));
 
-    card.innerHTML = `
-      <div class="ex-header">
-        <div class="ex-icon">${ex.icon}</div>
-        <div class="ex-info">
-          <div class="ex-name">${ex.name}</div>
-          <div class="ex-meta">
-            <span>⏱ ${ex.duration}</span>
-            <span>${ex.sets}</span>
-          </div>
-        </div>
-        <div class="ex-status">${isDone(ex.id) ? '✓' : '›'}</div>
-      </div>
-    `;
-    container.appendChild(card);
-  });
+  // Harjoitukset jotka kuuluvat ohjelmaan mutta lepäävät juuri tänään (osalla
+  // on oma päiväaikataulu). Tarjotaan vapaaehtoisina saman opt-in-logiikan kautta
+  // kuin täysi lepopäivä — urheilija saa ne halutessaan näkyviin napin takaa.
+  const restingToday = EXERCISES.filter(ex => !TODAY_EXERCISES.some(t => t.id === ex.id));
+  if (restingToday.length > 0) {
+    const note = document.createElement('div');
+    note.className = 'voluntary-note';
+    if (showAllToday) {
+      note.innerHTML = `<span>Vapaaehtoiset harjoitukset — eivät ole tänään aikataulussa.</span><button onclick="hideAllExercises()">Piilota</button>`;
+      container.appendChild(note);
+      restingToday.forEach(ex => renderExerciseCard(ex, container));
+    } else {
+      note.innerHTML = `<span>Muut harjoitukset lepäävät tänään.</span><button onclick="revealAllExercises()">Tee silti</button>`;
+      container.appendChild(note);
+    }
+  }
 
   updateProgress();
+}
+
+// Yhden harjoituskortin renderöinti listaan (sekä aikataulutetut että
+// vapaaehtoiset käyttävät tätä).
+function renderExerciseCard(ex, container) {
+  const card = document.createElement('div');
+  card.className = 'ex-card' + (isDone(ex.id) ? ' done' : '');
+  card.id = 'card-' + ex.id;
+  card.onclick = () => openExerciseModal(ex.id);
+
+  card.innerHTML = `
+    <div class="ex-header">
+      <div class="ex-icon">${ex.icon}</div>
+      <div class="ex-info">
+        <div class="ex-name">${ex.name}</div>
+        <div class="ex-meta">
+          <span>⏱ ${ex.duration}</span>
+          <span>${ex.sets}</span>
+        </div>
+      </div>
+      <div class="ex-status">${isDone(ex.id) ? '✓' : '›'}</div>
+    </div>
+  `;
+  container.appendChild(card);
 }
 
 // ── RICH GUIDES ───────────────────────────────────────────────────────────

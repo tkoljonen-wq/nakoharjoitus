@@ -431,11 +431,26 @@ HTML: `week-grid` on nyt tyhjä `#weekGrid`-kontti. Kytketty initiin ja `markDon
 
 **Pushattavat:** `nakoharjoitukset.html`, `sw.js` (käyttäjä pushaa itse — kansio ei ole git-repo).
 
+## Istunto 2026-05-31 — Opt-in vapaaehtoisille harjoituksille myös treenipäivänä — VALMIS
+
+Bugi: kun harjoituksilla on **harjoituskohtaiset päiväaikataulut** (`ex.days`) ja tänään on **sekapäivä** (osa treenaa, osa lepää), `mode='training'` näytti vain aikataulutetut harjoitukset ja piilotti loput **ilman mitään tapaa saada niitä näkyviin**. Täydellä lepopäivällä opt-in-nappi ("Tee harjoitus silti") jo toimi, mutta sekapäivänä lepäävät harjoitukset katosivat kokonaan. Käyttäjä halusi saman vapaaehtoisuus-opt-inin myös sekapäiville.
+
+Korjaus `buildExercises()`:ssä (`nakoharjoitukset.html`):
+- Treenipäivänä renderöidään ensin `TODAY_EXERCISES` (aikataulutetut). Sen jälkeen lasketaan `restingToday = EXERCISES.filter(ex => !TODAY_EXERCISES.some(t => t.id === ex.id))` — ohjelmaan kuuluvat mutta tänään lepäävät.
+- Jos `restingToday.length > 0`: `!showAllToday` → `.voluntary-note` "Muut harjoitukset lepäävät tänään." + **"Tee silti"** -nappi (`revealAllExercises()`). `showAllToday` → note "Vapaaehtoiset harjoitukset — eivät ole tänään aikataulussa." + **"Piilota"** (`hideAllExercises()`) + lepäävien korttien renderöinti.
+- Kortin renderöinti eriytetty omaan `renderExerciseCard(ex, container)` -apufunktioon (sekä aikataulutetut, lepäävät että ei-treenipäivän koko ohjelma käyttävät sitä). Ei uutta CSS:ää — `.voluntary-note` riittää.
+- `updateProgress()` laskee yhä vain `TODAY_EXERCISES` → vapaaehtoiset suoritukset eivät kasvata päivän edistymispalkkia (mutta tallentuvat normaalisti localStorageen → näkyvät päiväkirjassa/tilastoissa/putkessa, kuten lepopäivän vapaaehtoiset). Modaali avautuu paljastetuille (`openExerciseModal`/`markDoneFromModal` käyttävät `EXERCISES.find`).
+- **SW v25 → v26.**
+
+**Testattu** previewillä (375px, oikeilla tallennetuilla ohjelmilla): sekapäivä → 1 aikataulutettu + "Tee silti"; paljasta → lepäävä kortti + "Piilota"; modaali avautuu lepäävälle; kaikki-aikataulutettu → ei opt-inia; täysi lepopäivä ennallaan; edistymispalkki 0/1 (vapaaehtoinen ei laske). Ei konsolivirheitä. ✓
+
+**Pushattavat:** `nakoharjoitukset.html`, `sw.js` (käyttäjä pushaa itse — kansio ei ole git-repo).
+
 ## Nykytila
-- **SW `CACHE_NAME` = `nakoharjoitus-v25`** (bumppaa aina kun `src` muuttuu ennen pushia).
+- **SW `CACHE_NAME` = `nakoharjoitus-v26`** (bumppaa aina kun `src` muuttuu ennen pushia).
 - **Kaikki näkymät lukevat oikeaa dataa localStoragesta** — ei enää demo-/kovakoodattua dataa missään (Tänään, "Tämä viikko" -ruudukko, Päiväkirja, Kehitys). Päivittyvät heti kun harjoitus merkitään tehdyksi.
 - **Kehitys-välilehti:** 4 tilastokorttia + viikon volyymipylväät + harjoituskohtaiset viivadiagrammit (`brock`, `silmakasi`, `reaktio`, `sakkadi` — päivän keskiarvo; kissakortti ei kuvaajaa).
-- **"Tänään"-tilakone:** `training`/`rest`/`before`/`ended` (`DAY_STATE.mode`). Ei-treenipäivänä opt-in-nappi paljastaa koko ohjelman harjoitukset vapaaehtoisina. Jakso lasketaan `schedule.startDate`+`durationWeeks`:stä (puuttuessa → aina aktiivinen).
+- **"Tänään"-tilakone:** `training`/`rest`/`before`/`ended` (`DAY_STATE.mode`). Ei-treenipäivänä opt-in-nappi paljastaa koko ohjelman harjoitukset vapaaehtoisina. **Treenipäivänä** jos osa harjoituksista lepää (harjoituskohtainen `ex.days`), nekin saa opt-in-napilla ("Tee silti") näkyviin vapaaehtoisina. Jakso lasketaan `schedule.startDate`+`durationWeeks`:stä (puuttuessa → aina aktiivinen).
 - Monisarjainen tuloskirjaus (`series: true`): **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`) ja **Tennispallon pudotus** (`reaktio`).
 - Yhden arvon kirjaus: **Brockin lanka** (`brock`, mitattava: lähimmän helmen etäisyys silmästä cm) ja **Kissakortti** (`kissakortti`, onnistuneet sulautumiset).
 - Aktiiviset harjoitukset: **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`), **Brockin lanka** (`brock`), **Kissakortti** (`kissakortti`), **Tennispallon pudotus** (`reaktio`).
