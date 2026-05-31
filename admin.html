@@ -277,6 +277,15 @@
 
   .mini-input:focus { border-color: var(--accent2); }
 
+  .input-unit { display: flex; align-items: center; gap: 6px; }
+  .unit-label {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
   .remove-btn {
     background: none; border: none;
     color: var(--text-faint); cursor: pointer; font-size: 16px;
@@ -634,6 +643,7 @@
       flex-wrap: wrap;
       justify-content: flex-start;
     }
+    .sel-ex-controls .input-unit { flex: 1 1 120px; }
     .sel-ex-controls .mini-input { width: auto !important; flex: 1 1 80px; min-width: 0; }
     .sel-ex-controls .day-toggle-btn { flex: 1 1 100%; justify-content: center; }
   }
@@ -826,7 +836,7 @@ function toggleExercise(ex) {
   if (selected[ex.id]) {
     delete selected[ex.id];
   } else {
-    selected[ex.id] = { ...ex, sets: '3', duration: '5 min' };
+    selected[ex.id] = { ...ex, sets: '3', duration: '5' };
   }
   buildLibrary();
   buildSelected();
@@ -857,10 +867,10 @@ function buildSelected() {
         </div>
         <div class="sel-ex-controls">
           ${ex.series
-            ? `<input class="mini-input" type="text" value="${ex.sets}" placeholder="sarjat" title="Sarjat (kpl)"
-                onchange="selected['${id}'].sets = this.value">`
-            : `<input class="mini-input" type="text" value="${ex.duration}" placeholder="kesto" title="Kesto"
-                onchange="selected['${id}'].duration = this.value" style="width:90px">`}
+            ? `<span class="input-unit"><input class="mini-input" type="text" inputmode="numeric" value="${ex.sets}" placeholder="3" title="Sarjat (kpl)"
+                onchange="selected['${id}'].sets = this.value"><span class="unit-label">kpl</span></span>`
+            : `<span class="input-unit"><input class="mini-input" type="text" inputmode="numeric" value="${ex.duration}" placeholder="5" title="Kesto (min)"
+                onchange="selected['${id}'].duration = this.value"><span class="unit-label">min</span></span>`}
           <button class="day-toggle-btn${hasOverride ? ' has-override' : ''}" onclick="toggleDaysPanel('${id}')" title="Mukauta harjoituspäiviä">${dayLabel}</button>
         </div>
         <button class="remove-btn" onclick="removeEx('${id}')" title="Poista">✕</button>

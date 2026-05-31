@@ -1088,8 +1088,8 @@ const DEFAULT_EXERCISES = [
     name: 'Fiksaatioharjoitus',
     icon: '↔️',
     cat: 'Sakkadit / katseen kohdennus',
-    duration: '5 min',
-    sets: '3 sarjaa',
+    duration: '5',
+    sets: '3',
     series: true,
     unit: 'kirjaimet',
     unitLabel: 'tunnistetut kirjaimet (1 min)',
@@ -1104,8 +1104,8 @@ const DEFAULT_EXERCISES = [
     name: 'Silmä-käsikoordinaatio',
     icon: '🎯',
     cat: 'Silmä–käsi-koordinaatio',
-    duration: '5 min',
-    sets: '3 sarjaa',
+    duration: '5',
+    sets: '3',
     series: true,
     unit: 'kiinniotot',
     unitLabel: 'onnistuneet kiinniotot (30 s)',
@@ -1116,8 +1116,8 @@ const DEFAULT_EXERCISES = [
     name: "Brockin lanka",
     icon: '🪢',
     cat: 'Binokulaarisuus',
-    duration: '5 min',
-    sets: '1 sarja',
+    duration: '5',
+    sets: '1',
     unit: 'cm',
     unitLabel: 'lähimmän helmen etäisyys silmästä (cm)',
     instructions: `<strong>Tarvikkeet:</strong> n. 1 m lanka ja 3 erivärisiä helmiä.<br><br><strong>Valmistelu:</strong> Kiinnitä langan toinen pää kiinteään kohtaan (esim. ovenkahva). Aseta helmet eri etäisyyksille: yksi lähelle nenää (~10 cm), yksi keskelle, yksi kauas. Pidä langan toinen pää nenän kärjessä.<br><br><strong>Vaiheet:</strong><br>1. Katso kauimmaista helmeä — langan pitäisi näyttää jakautuvan kahtia (X-kuvio helmen kohdalla). Etummaiset helmet näkyvät kahtena.<br>2. Siirrä katse keskimmäiseen helmeen — X-kuvio siirtyy sen kohdalle.<br>3. Siirrä katse lähimpään helmeen — X-kuvio muodostuu sen kohdalla.<br>4. Toista hitaasti edestakaisin: kauas → keskelle → lähelle → takaisin.<br><br><strong>Variaatio:</strong> tee harjoitus myös eri kulmissa, esim. yläviistoon.<br><br><strong>Tavoite:</strong> parantaa silmien kykyä kääntyä hallitusti ja tarkentaa lähelle ja kauas.`
@@ -1127,8 +1127,8 @@ const DEFAULT_EXERCISES = [
     name: 'Kissakortti',
     icon: '🐱',
     cat: 'Konvergenssi / stereonäkö',
-    duration: '5 min',
-    sets: '5–10 toistoa',
+    duration: '5',
+    sets: '1',
     unit: 'toistot',
     unitLabel: 'onnistuneet sulautumiset (kolmas kissa)',
     materiaalit: [
@@ -1141,8 +1141,8 @@ const DEFAULT_EXERCISES = [
     name: 'Tennispallon pudotus',
     icon: '⚡',
     cat: 'Reaktio / perifeerinen näkö',
-    duration: '5 min',
-    sets: '10 pudotusta',
+    duration: '5',
+    sets: '3',
     series: true,
     unit: 'pisteet',
     unitLabel: 'pisteet (max 20, 10 pudotusta)',
@@ -1174,6 +1174,15 @@ const EXERCISES = (URL_PROGRAM?.exercises || DEFAULT_EXERCISES)
     series: cat.series ?? ex.series,
   };
 });
+
+// Harjoituksen mittari: sarja-harjoitukset → "N kpl", muut → "N min".
+// Arvosta pidetään vain numeerinen osa — vanhat jaetut ohjelmat saattoivat
+// upottaa yksikön mukaan (esim. "5 min"), joten suffiksi siivotaan pois.
+function exerciseMetric(ex) {
+  const raw = String((ex.series ? ex.sets : ex.duration) ?? '');
+  const num = (raw.match(/[\d.,]+(?:\s*[–-]\s*[\d.,]+)?/) || [raw])[0].replace(/\s/g, '');
+  return ex.series ? `${num} kpl` : `${num} min`;
+}
 
 // ── STATE ─────────────────────────────────────────────────────────────────
 let completed = {};
@@ -1363,8 +1372,7 @@ function renderExerciseCard(ex, container) {
       <div class="ex-info">
         <div class="ex-name">${ex.name}</div>
         <div class="ex-meta">
-          <span>⏱ ${ex.duration}</span>
-          <span>${ex.sets}</span>
+          <span>${ex.series ? '' : '⏱ '}${exerciseMetric(ex)}</span>
         </div>
       </div>
       <div class="ex-status">${isDone(ex.id) ? '✓' : '›'}</div>
@@ -1694,7 +1702,7 @@ function openExerciseModal(id) {
   const prev = completed[id] || { num: '', note: '' };
 
   document.getElementById('modalName').textContent = ex.name;
-  document.getElementById('modalCat').textContent = `${ex.cat} · ${ex.sets} · ${ex.duration}`;
+  document.getElementById('modalCat').textContent = `${ex.cat} · ${exerciseMetric(ex)}`;
 
   const body = document.getElementById('modalBody');
   const guideHtml = (RICH_GUIDES[ex.id] || ex.instructions || '');
