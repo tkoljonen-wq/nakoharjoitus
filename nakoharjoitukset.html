@@ -1181,7 +1181,7 @@ const EXERCISES = (URL_PROGRAM?.exercises || DEFAULT_EXERCISES)
 function exerciseMetric(ex) {
   const raw = String((ex.series ? ex.sets : ex.duration) ?? '');
   const num = (raw.match(/[\d.,]+(?:\s*[–-]\s*[\d.,]+)?/) || [raw])[0].replace(/\s/g, '');
-  return ex.series ? `${num} kpl` : `${num} min`;
+  return ex.series ? `${num} sarjaa` : `${num} min`;
 }
 
 // ── STATE ─────────────────────────────────────────────────────────────────

@@ -868,7 +868,7 @@ function buildSelected() {
         <div class="sel-ex-controls">
           ${ex.series
             ? `<span class="input-unit"><input class="mini-input" type="text" inputmode="numeric" value="${ex.sets}" placeholder="3" title="Sarjat (kpl)"
-                onchange="selected['${id}'].sets = this.value"><span class="unit-label">kpl</span></span>`
+                onchange="selected['${id}'].sets = this.value"><span class="unit-label">sarjaa</span></span>`
             : `<span class="input-unit"><input class="mini-input" type="text" inputmode="numeric" value="${ex.duration}" placeholder="5" title="Kesto (min)"
                 onchange="selected['${id}'].duration = this.value"><span class="unit-label">min</span></span>`}
           <button class="day-toggle-btn${hasOverride ? ' has-override' : ''}" onclick="toggleDaysPanel('${id}')" title="Mukauta harjoituspäiviä">${dayLabel}</button>
