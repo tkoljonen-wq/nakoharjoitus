@@ -227,7 +227,7 @@ $bmp.Save($dst,$codec,$ep)
 
 ## Nykytila
 
-- **SW `CACHE_NAME` = `nakoharjoitus-v32`** (bumppaa aina kun `src` muuttuu ennen pushia).
+- **SW `CACHE_NAME` = `nakoharjoitus-v33`** (bumppaa aina kun `src` muuttuu ennen pushia).
 - Jakolinkki/QR minimoitu (~200–300 merkkiä); sisältö rakennetaan katalogista id:llä. Ei palvelinta → tietosuoja & painetun QR:n ikuisuus säilyvät. (Palvelinmalli harkittu ja hylätty: toisi GDPR-rekisterinpitäjävastuun + painettu QR voisi kuolla. Kannattaisi vasta isoille itsenäisille/custom-ohjelmille tai keskitettyyn hallintaan → persoonaton rakenne + satunnainen id + TTL.)
 - Kaikki näkymät lukevat oikeaa dataa localStoragesta (Tänään, "Tämä viikko" -ruudukko, Päiväkirja, Kehitys).
 - Aktiiviset harjoitukset: `sakkadi`, `silmakasi`, `brock`, `kissakortti`, `reaktio` (ks. taulukko yllä).

@@ -856,10 +856,11 @@ function buildSelected() {
           <div style="font-family:'Roboto Mono',monospace;font-size:9px;color:var(--text-dim)">${ex.cat}</div>
         </div>
         <div class="sel-ex-controls">
-          <input class="mini-input" type="text" value="${ex.sets}" placeholder="sarjat" title="Sarjat"
-            onchange="selected['${id}'].sets = this.value">
-          <input class="mini-input" type="text" value="${ex.duration}" placeholder="kesto" title="Kesto"
-            onchange="selected['${id}'].duration = this.value" style="width:90px">
+          ${ex.series
+            ? `<input class="mini-input" type="text" value="${ex.sets}" placeholder="sarjat" title="Sarjat (kpl)"
+                onchange="selected['${id}'].sets = this.value">`
+            : `<input class="mini-input" type="text" value="${ex.duration}" placeholder="kesto" title="Kesto"
+                onchange="selected['${id}'].duration = this.value" style="width:90px">`}
           <button class="day-toggle-btn${hasOverride ? ' has-override' : ''}" onclick="toggleDaysPanel('${id}')" title="Mukauta harjoituspäiviä">${dayLabel}</button>
         </div>
         <button class="remove-btn" onclick="removeEx('${id}')" title="Poista">✕</button>
