@@ -142,14 +142,6 @@
     display: flex; align-items: center; gap: 8px;
   }
 
-  .card-title-icon {
-    width: 28px; height: 28px;
-    background: var(--surface2);
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px;
-  }
-
   /* FORM */
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
@@ -206,7 +198,6 @@
   .ex-lib-card:hover { border-color: var(--accent2); background: #fff; }
   .ex-lib-card.selected { border-color: var(--accent); background: rgba(154,94,163,0.06); }
 
-  .ex-lib-icon { font-size: 22px; margin-bottom: 8px; }
   .ex-lib-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
   .ex-lib-cat {
     font-family: 'Roboto Mono', monospace;
@@ -258,7 +249,7 @@
   .sel-ex-row {
     padding: 14px 16px;
     display: grid;
-    grid-template-columns: auto 1fr auto auto;
+    grid-template-columns: 1fr auto auto;
     gap: 12px;
     align-items: center;
   }
@@ -269,7 +260,6 @@
     align-items: center;
   }
 
-  .sel-ex-icon { font-size: 18px; }
   .sel-ex-name { font-size: 13px; font-weight: 700; }
 
   .mini-input {
@@ -488,7 +478,6 @@
     display: flex; align-items: center; gap: 8px;
   }
 
-  .phone-ex-icon { font-size: 12px; }
   .phone-ex-name { font-size: 9px; color: var(--text); font-weight: 700; }
   .phone-ex-meta { font-family: 'Roboto Mono', monospace; font-size: 7px; color: var(--text-dim); }
 
@@ -683,7 +672,6 @@
 
     <div class="card">
       <div class="card-title">
-        <div class="card-title-icon">📚</div>
         Harjoituskirjasto — valitse harjoitukset
       </div>
       <div class="ex-library" id="exLibrary"></div>
@@ -691,7 +679,6 @@
 
     <div class="card">
       <div class="card-title">
-        <div class="card-title-icon">⚙️</div>
         Valitut harjoitukset — mukauta
       </div>
       <div class="selected-list" id="selectedList">
@@ -704,7 +691,6 @@
 
     <div class="card">
       <div class="card-title">
-        <div class="card-title-icon">📅</div>
         Oletusaikataulu
       </div>
       <p style="font-size:12px;color:var(--text-dim);margin-bottom:14px;line-height:1.6">
@@ -740,7 +726,6 @@
 
     <div class="card">
       <div class="card-title">
-        <div class="card-title-icon">👁️</div>
         Esikatselu &amp; jakaminen
       </div>
       <div class="preview-wrap">
@@ -764,7 +749,6 @@
 
     <div class="card">
       <div class="card-title">
-        <div class="card-title-icon">🔗</div>
         QR-koodi &amp; linkki
       </div>
       <div class="qr-area">
@@ -835,13 +819,10 @@ function buildLibrary() {
     card.className = 'ex-lib-card' + (selected[ex.id] ? ' selected' : '');
     card.id = 'lib-' + ex.id;
     card.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-        <div class="ex-lib-icon">${ex.icon}</div>
-        <div class="ex-lib-check">${selected[ex.id] ? '✓' : ''}</div>
-      </div>
+      <div class="ex-lib-check">${selected[ex.id] ? '✓' : ''}</div>
       <div class="ex-lib-name">${ex.name}</div>
       <div class="ex-lib-cat">${ex.cat} · ${ex.unit || 'laadullinen'}</div>
-      ${ex.materiaalit?.length ? `<div class="ex-lib-material-badge">📄 ${ex.materiaalit.length} tulostettava</div>` : ''}
+      ${ex.materiaalit?.length ? `<div class="ex-lib-material-badge">${ex.materiaalit.length} tulostettava</div>` : ''}
     `;
     card.onclick = () => toggleExercise(ex);
     el.appendChild(card);
@@ -877,7 +858,6 @@ function buildSelected() {
     wrapper.className = 'sel-ex-wrapper';
     wrapper.innerHTML = `
       <div class="sel-ex-row">
-        <div class="sel-ex-icon">${ex.icon}</div>
         <div>
           <div class="sel-ex-name">${ex.name}</div>
           <div style="font-family:'Roboto Mono',monospace;font-size:9px;color:var(--text-dim)">${ex.cat}</div>
@@ -1007,7 +987,7 @@ function generateAndPreview() {
   Object.values(selected).slice(0,3).forEach(ex => {
     const div = document.createElement('div');
     div.className = 'phone-ex';
-    div.innerHTML = `<div class="phone-ex-icon">${ex.icon}</div><div><div class="phone-ex-name">${ex.name}</div><div class="phone-ex-meta">${ex.sets} · ${ex.duration}</div></div>`;
+    div.innerHTML = `<div><div class="phone-ex-name">${ex.name}</div><div class="phone-ex-meta">${ex.sets} · ${ex.duration}</div></div>`;
     phoneList.appendChild(div);
   });
 

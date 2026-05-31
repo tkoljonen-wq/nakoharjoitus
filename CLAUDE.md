@@ -446,8 +446,38 @@ Korjaus `buildExercises()`:ssä (`nakoharjoitukset.html`):
 
 **Pushattavat:** `nakoharjoitukset.html`, `sw.js` (käyttäjä pushaa itse — kansio ei ole git-repo).
 
+## Istunto 2026-05-31 (2) — Harjoitusikonit pois nimien vierestä — VALMIS
+
+Käyttäjän pyynnöstä poistettiin harjoituskohtaiset emoji-ikonit (`ex.icon`: 🎯 🪢 🐱 ⚡ ↔️) harjoitusten nimien vierestä **kaikkialta** (admin + urheilijasovellus). Datan `icon`-kenttä jätettiin `LIBRARY`/`DEFAULT_EXERCISES`:iin (vaaraton, ei enää renderöidä).
+
+Poistetut renderöintipaikat + niihin liittyvä kuollut CSS:
+- **admin.html:** kirjastokortti (`.ex-lib-icon` + sen flex-wrapper; `.ex-lib-check` jää float:right), valitut-rivi (`.sel-ex-icon`; grid `auto 1fr auto auto` → `1fr auto auto`), puhelinesikatselu (`.phone-ex-icon`).
+- **nakoharjoitukset.html:** Tänään-kortti (`.ex-icon` + `.ex-card.done .ex-icon`), harjoitusmodaalin otsikko (`#modalIcon` / `.modal-header-icon` + `openExerciseModal`:n `modalIcon`-asetus).
+
+**Säilytetyt** ikonit (eivät ole harjoitusikoneja): osio-otsikot (📚 ⚙️ 📅 👁️ 🔗), tilakortit (🌙 📅 🎉), notif-banneri, bottom-navin ikonit, materiaalibadge 📄.
+
+**SW v26 → v27.** **Testattu** previewillä: kaikki 5 renderöintipaikkaa ikonittomia, nimet+kategoriat ennallaan, valinta-check + kontrollit toimivat, ei konsolivirheitä. ✓
+
+**Pushattavat:** `admin.html`, `nakoharjoitukset.html`, `sw.js` (käyttäjä pushaa itse — kansio ei ole git-repo).
+
+## Istunto 2026-05-31 (3) — Loputkin koriste-ikonit pois — VALMIS
+
+Jatkoa edelliseen: käyttäjän pyynnöstä poistettiin myös aiemmin säilytetyt koriste-ikonit.
+
+Poistetut + kuollut CSS:
+- **admin.html:** osio-otsikot (`.card-title-icon` 📚 ⚙️ 📅 👁️ 🔗 — kaikki 5 + CSS-sääntö), materiaalibadgesta 📄-emoji (teksti "N tulostettava" jää).
+- **nakoharjoitukset.html:** tilakortin ikoni (`.rest-day-icon` 🌙/📅/🎉 + CSS), "Muista…"-notif-banneri (`.notif-icon` 👁️ + CSS), bottom-navin ikonit (`.nav-icon` 👁️ 📓 📈 + 2 CSS-sääntöä; jäljellä vain `.nav-label`-tekstit), modaalin materiaalilinkin 📄 (`.modal-material-title`).
+
+**Tietoisesti SÄILYTETYT** (eivät olleet pyynnössä): Aikataulu-napin 📅 (`.day-toggle-btn`, funktionaalinen + leipätekstin "📅-napilla"-viittaus), materiaalin toimintonapit 🔗 Avaa / 📥 Lataa PDF (`.modal-material-btn`), streak-tagin 🔥, empty-state ☝️ (`.empty-icon`). Bottom-navin nav-btn toimii pelkillä teksteillä (flex-column, gap säilyy).
+
+**SW v27 → v28.** **Testattu** previewillä: admin 5 osio-otsikkoa ikonittomia + badge "2/1 tulostettava"; urheilija nav 0 ikonia (3 tekstilabelia), notif 0, rest-day-card 0, modaalin materiaaliotsikot ilman 📄 (action-napit 🔗/📥 jäivät). Ei konsolivirheitä. ✓
+
+**Pushattavat:** `admin.html`, `nakoharjoitukset.html`, `sw.js` (käyttäjä pushaa itse — kansio ei ole git-repo).
+
 ## Nykytila
-- **SW `CACHE_NAME` = `nakoharjoitus-v26`** (bumppaa aina kun `src` muuttuu ennen pushia).
+- **SW `CACHE_NAME` = `nakoharjoitus-v28`** (bumppaa aina kun `src` muuttuu ennen pushia).
+- **Harjoitusikonit (emoji) poistettu** nimien vierestä kaikkialta (admin-kirjasto/valitut/esikatselu + urheilijan kortit/modaali). `icon`-kenttä jää dataan käyttämättömänä.
+- **Koriste-ikonit poistettu** myös osio-otsikoista, tilakortista, notif-bannerista, bottom-navista ja materiaalibadge/-otsikoista. Säilytetty vain: Aikataulu-napin 📅, materiaalin 🔗/📥-toimintonapit, streak 🔥, empty-state ☝️.
 - **Kaikki näkymät lukevat oikeaa dataa localStoragesta** — ei enää demo-/kovakoodattua dataa missään (Tänään, "Tämä viikko" -ruudukko, Päiväkirja, Kehitys). Päivittyvät heti kun harjoitus merkitään tehdyksi.
 - **Kehitys-välilehti:** 4 tilastokorttia + viikon volyymipylväät + harjoituskohtaiset viivadiagrammit (`brock`, `silmakasi`, `reaktio`, `sakkadi` — päivän keskiarvo; kissakortti ei kuvaajaa).
 - **"Tänään"-tilakone:** `training`/`rest`/`before`/`ended` (`DAY_STATE.mode`). Ei-treenipäivänä opt-in-nappi paljastaa koko ohjelman harjoitukset vapaaehtoisina. **Treenipäivänä** jos osa harjoituksista lepää (harjoituskohtainen `ex.days`), nekin saa opt-in-napilla ("Tee silti") näkyviin vapaaehtoisina. Jakso lasketaan `schedule.startDate`+`durationWeeks`:stä (puuttuessa → aina aktiivinen).

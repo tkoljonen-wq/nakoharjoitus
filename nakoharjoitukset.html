@@ -217,7 +217,6 @@
     box-shadow: 0 2px 8px rgba(50,50,50,0.04);
   }
 
-  .rest-day-icon { font-size: 44px; margin-bottom: 14px; }
   .rest-day-title { font-family: 'Roboto Condensed', sans-serif; font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
   .rest-day-text { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
 
@@ -273,18 +272,6 @@
     gap: 14px;
     padding: 16px;
   }
-
-  .ex-icon {
-    width: 44px; height: 44px;
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
-    flex-shrink: 0;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-  }
-
-  .ex-card.done .ex-icon { background: rgba(45,122,79,0.12); border-color: rgba(45,122,79,0.3); }
 
   .ex-info { flex: 1; }
 
@@ -502,16 +489,6 @@
   }
 
   .modal-close:hover { border-color: var(--accent); color: var(--accent); }
-
-  .modal-header-icon {
-    width: 36px; height: 36px;
-    border-radius: 10px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-    flex-shrink: 0;
-  }
 
   .modal-header-text { flex: 1; min-width: 0; }
   .modal-header-name { font-family: 'Roboto Condensed', sans-serif; font-size: 16px; font-weight: 700; line-height: 1.2; color: var(--text); }
@@ -787,7 +764,6 @@
     transition: opacity 0.2s;
   }
 
-  .nav-icon { font-size: 20px; filter: grayscale(0.6); opacity: 0.6; transition: all 0.2s; }
   .nav-label {
     font-family: 'Roboto Condensed', sans-serif;
     font-size: 10px;
@@ -797,7 +773,6 @@
     text-transform: uppercase;
   }
 
-  .nav-btn.active .nav-icon { filter: none; opacity: 1; }
   .nav-btn.active .nav-label { color: var(--accent); }
 
   /* VIEWS */
@@ -943,8 +918,6 @@
     animation: slideIn 0.4s ease;
   }
 
-  .notif-icon { font-size: 20px; flex-shrink: 0; }
-
   @keyframes slideIn {
     from { opacity: 0; transform: translateY(-8px); }
     to { opacity: 1; transform: translateY(0); }
@@ -982,7 +955,6 @@
     </div>
 
     <div class="notif-banner" id="notifBanner">
-      <span class="notif-icon">👁️</span>
       <span>Muista: tee harjoitukset ennen iltaa, mieluiten <strong>luonnonvalossa</strong> tai hyvässä valaistuksessa.</span>
     </div>
 
@@ -1054,7 +1026,6 @@
   <div class="modal-content">
     <div class="modal-header">
       <button class="modal-close" onclick="closeExerciseModal()" aria-label="Sulje">✕</button>
-      <div class="modal-header-icon" id="modalIcon">🎯</div>
       <div class="modal-header-text">
         <div class="modal-header-name" id="modalName">—</div>
         <div class="modal-header-cat" id="modalCat">—</div>
@@ -1067,15 +1038,12 @@
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
   <button class="nav-btn active" onclick="showView('home',this)">
-    <span class="nav-icon">👁️</span>
     <span class="nav-label">Tänään</span>
   </button>
   <button class="nav-btn" onclick="showView('diary',this)">
-    <span class="nav-icon">📓</span>
     <span class="nav-label">Päiväkirja</span>
   </button>
   <button class="nav-btn" onclick="showView('stats',this)">
-    <span class="nav-icon">📈</span>
     <span class="nav-label">Kehitys</span>
   </button>
 </div>
@@ -1342,7 +1310,6 @@ function buildExercises() {
     const m = restMessage(mode);
     container.innerHTML = `
       <div class="rest-day-card">
-        <div class="rest-day-icon">${m.icon}</div>
         <div class="rest-day-title">${m.title}</div>
         <div class="rest-day-text">${m.text}</div>
         <button class="reveal-btn" onclick="revealAllExercises()">${m.btn}</button>
@@ -1395,7 +1362,6 @@ function renderExerciseCard(ex, container) {
 
   card.innerHTML = `
     <div class="ex-header">
-      <div class="ex-icon">${ex.icon}</div>
       <div class="ex-info">
         <div class="ex-name">${ex.name}</div>
         <div class="ex-meta">
@@ -1729,7 +1695,6 @@ function openExerciseModal(id) {
   modalExId = id;
   const prev = completed[id] || { num: '', note: '' };
 
-  document.getElementById('modalIcon').textContent = ex.icon;
   document.getElementById('modalName').textContent = ex.name;
   document.getElementById('modalCat').textContent = `${ex.cat} · ${ex.sets} · ${ex.duration}`;
 
@@ -1762,7 +1727,7 @@ function openExerciseModal(id) {
     const isPdf = ext === 'pdf';
     return `
       <div class="modal-material">
-        <div class="modal-material-title">📄 ${m.nimi}</div>
+        <div class="modal-material-title">${m.nimi}</div>
         <iframe class="modal-pdf-frame" src="${url}" title="${m.nimi}" loading="lazy"></iframe>
         <div class="modal-material-actions">
           <a class="modal-material-btn" href="${url}" target="_blank" rel="noopener">🔗 Avaa</a>
