@@ -578,9 +578,11 @@
   .btn-secondary:hover { border-color: var(--accent2); }
 
   .btn-success {
-    background: var(--highlight);
+    background: var(--accent2);
     color: #fff;
   }
+
+  .btn-success:hover { background: var(--accent); }
 
   .btn-row { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; }
 
@@ -594,7 +596,6 @@
     letter-spacing: 0.05em;
   }
 
-  .empty-icon { font-size: 28px; margin-bottom: 8px; }
 
   /* TAG */
   .tag {
@@ -683,7 +684,6 @@
       </div>
       <div class="selected-list" id="selectedList">
         <div class="empty-state">
-          <div class="empty-icon">☝️</div>
           Valitse harjoituksia yllä olevasta kirjastosta
         </div>
       </div>
@@ -694,7 +694,7 @@
         Oletusaikataulu
       </div>
       <p style="font-size:12px;color:var(--text-dim);margin-bottom:14px;line-height:1.6">
-        Nämä päivät koskevat harjoituksia joille ei ole asetettu omaa aikataulua. Yksittäisen harjoituksen päiviä voi mukauttaa kunkin harjoituksen 📅-napilla yllä.
+        Nämä päivät koskevat harjoituksia joille ei ole asetettu omaa aikataulua. Yksittäisen harjoituksen päiviä voi mukauttaa kunkin harjoituksen Aikataulu-napilla yllä.
       </p>
       <div class="schedule-grid" id="dayGrid"></div>
       <div class="duration-row">
@@ -757,9 +757,9 @@
         <div class="link-box" id="shareLink">— generoidaan ohjelmasta —</div>
       </div>
       <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
-        <button class="btn btn-primary" onclick="copyLink()">📋 Kopioi linkki</button>
-        <button class="btn btn-secondary" onclick="printQR()">🖨️ Tulosta QR</button>
-        <button class="btn btn-success" onclick="openProgram()">📱 Avaa urheilijan näkymä</button>
+        <button class="btn btn-primary" onclick="copyLink()">Kopioi linkki</button>
+        <button class="btn btn-secondary" onclick="printQR()">Tulosta QR</button>
+        <button class="btn btn-success" onclick="openProgram()">Avaa urheilijan näkymä</button>
       </div>
     </div>
 
@@ -843,7 +843,7 @@ function buildSelected() {
   const el = document.getElementById('selectedList');
   const keys = Object.keys(selected);
   if (keys.length === 0) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">☝️</div>Valitse harjoituksia yllä olevasta kirjastosta</div>';
+    el.innerHTML = '<div class="empty-state">Valitse harjoituksia yllä olevasta kirjastosta</div>';
     return;
   }
   el.innerHTML = '';
@@ -867,7 +867,7 @@ function buildSelected() {
             onchange="selected['${id}'].sets = this.value">
           <input class="mini-input" type="text" value="${ex.duration}" placeholder="kesto" title="Kesto"
             onchange="selected['${id}'].duration = this.value" style="width:90px">
-          <button class="day-toggle-btn${hasOverride ? ' has-override' : ''}" onclick="toggleDaysPanel('${id}')" title="Mukauta harjoituspäiviä">📅 ${dayLabel}</button>
+          <button class="day-toggle-btn${hasOverride ? ' has-override' : ''}" onclick="toggleDaysPanel('${id}')" title="Mukauta harjoituspäiviä">${dayLabel}</button>
         </div>
         <button class="remove-btn" onclick="removeEx('${id}')" title="Poista">✕</button>
       </div>

@@ -110,8 +110,6 @@
     border-radius: 100px;
   }
 
-  .streak-fire { font-size: 14px; }
-
   h1 {
     font-family: 'Roboto Condensed', sans-serif;
     font-size: 34px;
@@ -948,7 +946,7 @@
         <img src="silmaasema-logo.jpg" alt="Silmäasema" class="brand-logo">
       </div>
       <div class="header-top" style="justify-content:flex-end">
-        <div class="streak-badge"><span class="streak-fire">🔥</span> <span id="streakCount">0</span> pv putki</div>
+        <div class="streak-badge"><span id="streakCount">0</span> pv putki</div>
       </div>
       <h1 id="todayHeadline">Tänään on<br><span>harjoituspäivä</span></h1>
       <div class="date-line" id="dateLine"><span class="live-dot"></span></div>
@@ -1730,8 +1728,8 @@ function openExerciseModal(id) {
         <div class="modal-material-title">${m.nimi}</div>
         <iframe class="modal-pdf-frame" src="${url}" title="${m.nimi}" loading="lazy"></iframe>
         <div class="modal-material-actions">
-          <a class="modal-material-btn" href="${url}" target="_blank" rel="noopener">🔗 Avaa</a>
-          ${isPdf ? `<a class="modal-material-btn" href="${url}" download>📥 Lataa PDF</a>` : ''}
+          <a class="modal-material-btn" href="${url}" target="_blank" rel="noopener">Avaa</a>
+          ${isPdf ? `<a class="modal-material-btn" href="${url}" download>Lataa PDF</a>` : ''}
         </div>
       </div>`;
   }).join('') : '');

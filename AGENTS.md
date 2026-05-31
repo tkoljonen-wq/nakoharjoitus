@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
 
 ## Projekti
 
@@ -431,82 +431,11 @@ HTML: `week-grid` on nyt tyhjä `#weekGrid`-kontti. Kytketty initiin ja `markDon
 
 **Pushattavat:** `nakoharjoitukset.html`, `sw.js` (käyttäjä pushaa itse — kansio ei ole git-repo).
 
-## Istunto 2026-05-31 — Opt-in vapaaehtoisille harjoituksille myös treenipäivänä — VALMIS
-
-Bugi: kun harjoituksilla on **harjoituskohtaiset päiväaikataulut** (`ex.days`) ja tänään on **sekapäivä** (osa treenaa, osa lepää), `mode='training'` näytti vain aikataulutetut harjoitukset ja piilotti loput **ilman mitään tapaa saada niitä näkyviin**. Täydellä lepopäivällä opt-in-nappi ("Tee harjoitus silti") jo toimi, mutta sekapäivänä lepäävät harjoitukset katosivat kokonaan. Käyttäjä halusi saman vapaaehtoisuus-opt-inin myös sekapäiville.
-
-Korjaus `buildExercises()`:ssä (`nakoharjoitukset.html`):
-- Treenipäivänä renderöidään ensin `TODAY_EXERCISES` (aikataulutetut). Sen jälkeen lasketaan `restingToday = EXERCISES.filter(ex => !TODAY_EXERCISES.some(t => t.id === ex.id))` — ohjelmaan kuuluvat mutta tänään lepäävät.
-- Jos `restingToday.length > 0`: `!showAllToday` → `.voluntary-note` "Muut harjoitukset lepäävät tänään." + **"Tee silti"** -nappi (`revealAllExercises()`). `showAllToday` → note "Vapaaehtoiset harjoitukset — eivät ole tänään aikataulussa." + **"Piilota"** (`hideAllExercises()`) + lepäävien korttien renderöinti.
-- Kortin renderöinti eriytetty omaan `renderExerciseCard(ex, container)` -apufunktioon (sekä aikataulutetut, lepäävät että ei-treenipäivän koko ohjelma käyttävät sitä). Ei uutta CSS:ää — `.voluntary-note` riittää.
-- `updateProgress()` laskee yhä vain `TODAY_EXERCISES` → vapaaehtoiset suoritukset eivät kasvata päivän edistymispalkkia (mutta tallentuvat normaalisti localStorageen → näkyvät päiväkirjassa/tilastoissa/putkessa, kuten lepopäivän vapaaehtoiset). Modaali avautuu paljastetuille (`openExerciseModal`/`markDoneFromModal` käyttävät `EXERCISES.find`).
-- **SW v25 → v26.**
-
-**Testattu** previewillä (375px, oikeilla tallennetuilla ohjelmilla): sekapäivä → 1 aikataulutettu + "Tee silti"; paljasta → lepäävä kortti + "Piilota"; modaali avautuu lepäävälle; kaikki-aikataulutettu → ei opt-inia; täysi lepopäivä ennallaan; edistymispalkki 0/1 (vapaaehtoinen ei laske). Ei konsolivirheitä. ✓
-
-**Pushattavat:** `nakoharjoitukset.html`, `sw.js` (käyttäjä pushaa itse — kansio ei ole git-repo).
-
-## Istunto 2026-05-31 (2) — Harjoitusikonit pois nimien vierestä — VALMIS
-
-Käyttäjän pyynnöstä poistettiin harjoituskohtaiset emoji-ikonit (`ex.icon`: 🎯 🪢 🐱 ⚡ ↔️) harjoitusten nimien vierestä **kaikkialta** (admin + urheilijasovellus). Datan `icon`-kenttä jätettiin `LIBRARY`/`DEFAULT_EXERCISES`:iin (vaaraton, ei enää renderöidä).
-
-Poistetut renderöintipaikat + niihin liittyvä kuollut CSS:
-- **admin.html:** kirjastokortti (`.ex-lib-icon` + sen flex-wrapper; `.ex-lib-check` jää float:right), valitut-rivi (`.sel-ex-icon`; grid `auto 1fr auto auto` → `1fr auto auto`), puhelinesikatselu (`.phone-ex-icon`).
-- **nakoharjoitukset.html:** Tänään-kortti (`.ex-icon` + `.ex-card.done .ex-icon`), harjoitusmodaalin otsikko (`#modalIcon` / `.modal-header-icon` + `openExerciseModal`:n `modalIcon`-asetus).
-
-**Säilytetyt** ikonit (eivät ole harjoitusikoneja): osio-otsikot (📚 ⚙️ 📅 👁️ 🔗), tilakortit (🌙 📅 🎉), notif-banneri, bottom-navin ikonit, materiaalibadge 📄.
-
-**SW v26 → v27.** **Testattu** previewillä: kaikki 5 renderöintipaikkaa ikonittomia, nimet+kategoriat ennallaan, valinta-check + kontrollit toimivat, ei konsolivirheitä. ✓
-
-**Pushattavat:** `admin.html`, `nakoharjoitukset.html`, `sw.js` (käyttäjä pushaa itse — kansio ei ole git-repo).
-
-## Istunto 2026-05-31 (3) — Loputkin koriste-ikonit pois — VALMIS
-
-Jatkoa edelliseen: käyttäjän pyynnöstä poistettiin myös aiemmin säilytetyt koriste-ikonit.
-
-Poistetut + kuollut CSS:
-- **admin.html:** osio-otsikot (`.card-title-icon` 📚 ⚙️ 📅 👁️ 🔗 — kaikki 5 + CSS-sääntö), materiaalibadgesta 📄-emoji (teksti "N tulostettava" jää).
-- **nakoharjoitukset.html:** tilakortin ikoni (`.rest-day-icon` 🌙/📅/🎉 + CSS), "Muista…"-notif-banneri (`.notif-icon` 👁️ + CSS), bottom-navin ikonit (`.nav-icon` 👁️ 📓 📈 + 2 CSS-sääntöä; jäljellä vain `.nav-label`-tekstit), modaalin materiaalilinkin 📄 (`.modal-material-title`).
-
-**Tietoisesti SÄILYTETYT** (eivät olleet pyynnössä): Aikataulu-napin 📅 (`.day-toggle-btn`, funktionaalinen + leipätekstin "📅-napilla"-viittaus), materiaalin toimintonapit 🔗 Avaa / 📥 Lataa PDF (`.modal-material-btn`), streak-tagin 🔥, empty-state ☝️ (`.empty-icon`). Bottom-navin nav-btn toimii pelkillä teksteillä (flex-column, gap säilyy).
-
-**SW v27 → v28.** **Testattu** previewillä: admin 5 osio-otsikkoa ikonittomia + badge "2/1 tulostettava"; urheilija nav 0 ikonia (3 tekstilabelia), notif 0, rest-day-card 0, modaalin materiaaliotsikot ilman 📄 (action-napit 🔗/📥 jäivät). Ei konsolivirheitä. ✓
-
-**Pushattavat:** `admin.html`, `nakoharjoitukset.html`, `sw.js` (käyttäjä pushaa itse — kansio ei ole git-repo).
-
-## Istunto 2026-05-31 (4) — Viimeiset koriste-ikonit pois — VALMIS
-
-Jatkoa: poistettiin loput emojit käyttäjän pyynnöstä.
-- **nakoharjoitukset.html:** materiaalin toimintonapeista 🔗/📥 (`.modal-material-btn` → "Avaa" / "Lataa PDF"), streak-tagista 🔥 (`.streak-fire`-span + CSS poistettu; jää "N pv putki").
-- **admin.html:** kirjaston tyhjän tilan ☝️ (`.empty-icon` molemmista renderöintipaikoista + CSS-sääntö poistettu).
-
-**Jäljellä ainoa emoji koko sovelluksessa:** Aikataulu-napin 📅 (`.day-toggle-btn`, funktionaalinen; leipäteksti viittaa "📅-napilla"). Kaikki muut koriste-/UI-emojit poistettu.
-
-**SW v28 → v29.** **Testattu** previewillä: materiaalinapit "Avaa"/"Lataa PDF", streak "0 pv putki", admin empty-state ilman ☝️. Ei konsolivirheitä. ✓
-
-**Pushattavat:** `admin.html`, `nakoharjoitukset.html`, `sw.js` (käyttäjä pushaa itse — kansio ei ole git-repo).
-
-## Istunto 2026-05-31 (5) — Step 2 -nappien ikonit pois + Aikataulu-nappi + vihreä → lila — VALMIS
-
-`admin.html`:
-- Step 2 -toimintonapeista poistettu emojit: 📋 Kopioi linkki, 🖨️ Tulosta QR, 📱 Avaa urheilijan näkymä → pelkät tekstit.
-- Aikataulu-napista (`.day-toggle-btn`) poistettu 📅 → näyttää nyt pelkän `${dayLabel}`:n ("Aikataulu" tai päivänimet). Leipätekstin viittaus "📅-napilla" → "Aikataulu-napilla".
-- **Vihreä → lila:** `.btn-success` (Avaa urheilijan näkymä) `var(--highlight)` (vihreä) → `var(--accent2)` (#7d4685, syvä brändi-lila) + uusi hover `var(--accent)`. Pidetään syvempänä kuin btn-primary (#9A5EA3 "Kopioi linkki"), jotta CTA erottuu.
-
-**Jäljellä:** Kopioi-toiminnon toast-viestin 📋 ("Linkki kopioitu! 📋") jätettiin (ohimenevä, ei pyydetty). Koko sovelluksessa ei enää muita UI-emojeja.
-
-**SW v29 → v30.** **Testattu** previewillä: 3 nappia tekstillä, `.btn-success` taustaväri `rgb(125,70,133)` = `--accent2`, day-toggle "Aikataulu" ilman 📅. Ei konsolivirheitä. ✓
-
-**Pushattavat:** `admin.html`, `sw.js` (käyttäjä pushaa itse — kansio ei ole git-repo).
-
 ## Nykytila
-- **SW `CACHE_NAME` = `nakoharjoitus-v30`** (bumppaa aina kun `src` muuttuu ennen pushia).
-- **Harjoitusikonit (emoji) poistettu** nimien vierestä kaikkialta (admin-kirjasto/valitut/esikatselu + urheilijan kortit/modaali). `icon`-kenttä jää dataan käyttämättömänä.
-- **Kaikki koriste-/UI-emojit poistettu** (osio-otsikot, tilakortti, notif-banneri, bottom-nav, materiaalibadge/-otsikko/-napit, streak, empty-state, step 2 -napit, Aikataulu-nappi). Jäljellä vain Kopioi-toiminnon toast-viestin 📋 (ohimenevä).
-- **admin step 2 "Avaa urheilijan näkymä" -nappi** ei enää vihreä vaan syvä brändi-lila (`.btn-success` → `--accent2`).
+- **SW `CACHE_NAME` = `nakoharjoitus-v25`** (bumppaa aina kun `src` muuttuu ennen pushia).
 - **Kaikki näkymät lukevat oikeaa dataa localStoragesta** — ei enää demo-/kovakoodattua dataa missään (Tänään, "Tämä viikko" -ruudukko, Päiväkirja, Kehitys). Päivittyvät heti kun harjoitus merkitään tehdyksi.
 - **Kehitys-välilehti:** 4 tilastokorttia + viikon volyymipylväät + harjoituskohtaiset viivadiagrammit (`brock`, `silmakasi`, `reaktio`, `sakkadi` — päivän keskiarvo; kissakortti ei kuvaajaa).
-- **"Tänään"-tilakone:** `training`/`rest`/`before`/`ended` (`DAY_STATE.mode`). Ei-treenipäivänä opt-in-nappi paljastaa koko ohjelman harjoitukset vapaaehtoisina. **Treenipäivänä** jos osa harjoituksista lepää (harjoituskohtainen `ex.days`), nekin saa opt-in-napilla ("Tee silti") näkyviin vapaaehtoisina. Jakso lasketaan `schedule.startDate`+`durationWeeks`:stä (puuttuessa → aina aktiivinen).
+- **"Tänään"-tilakone:** `training`/`rest`/`before`/`ended` (`DAY_STATE.mode`). Ei-treenipäivänä opt-in-nappi paljastaa koko ohjelman harjoitukset vapaaehtoisina. Jakso lasketaan `schedule.startDate`+`durationWeeks`:stä (puuttuessa → aina aktiivinen).
 - Monisarjainen tuloskirjaus (`series: true`): **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`) ja **Tennispallon pudotus** (`reaktio`).
 - Yhden arvon kirjaus: **Brockin lanka** (`brock`, mitattava: lähimmän helmen etäisyys silmästä cm) ja **Kissakortti** (`kissakortti`, onnistuneet sulautumiset).
 - Aktiiviset harjoitukset: **Fiksaatioharjoitus** (`sakkadi`), **Silmä-käsikoordinaatio** (`silmakasi`), **Brockin lanka** (`brock`), **Kissakortti** (`kissakortti`), **Tennispallon pudotus** (`reaktio`).
