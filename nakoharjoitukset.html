@@ -1175,13 +1175,21 @@ const EXERCISES = (URL_PROGRAM?.exercises || DEFAULT_EXERCISES)
   };
 });
 
-// Harjoituksen mittari: sarja-harjoitukset → "N kpl", muut → "N min".
+// Harjoituksen mittari: sarja-harjoitukset → "N sarjaa", muut → "N min".
 // Arvosta pidetään vain numeerinen osa — vanhat jaetut ohjelmat saattoivat
 // upottaa yksikön mukaan (esim. "5 min"), joten suffiksi siivotaan pois.
 function exerciseMetric(ex) {
   const raw = String((ex.series ? ex.sets : ex.duration) ?? '');
   const num = (raw.match(/[\d.,]+(?:\s*[–-]\s*[\d.,]+)?/) || [raw])[0].replace(/\s/g, '');
   return ex.series ? `${num} sarjaa` : `${num} min`;
+}
+
+// Korvaa rich-ohjeen {{maara}}-paikkamerkit ohjelman todellisella volyymilla
+// (esim. "3 sarjaa" / "5 min"), jotta ohjeen annostelu täsmää aina kortin
+// yläreunan kanssa. Per-sarja-parametrit (lepoajat, pisteytys, viikkorytmi)
+// pysyvät kiintoteksteinä, koska ohjelma ei mallinna niitä.
+function fillGuide(html, ex) {
+  return String(html).replace(/\{\{maara\}\}/g, exerciseMetric(ex));
 }
 
 // ── STATE ─────────────────────────────────────────────────────────────────
@@ -1394,7 +1402,7 @@ const RICH_GUIDES = {
 
     <div class="guide-meta">
       <div><span>Tarvikkeet</span>Kaksi tulostettua fiksaatiotaulua, teippiä ja sekuntikello</div>
-      <div><span>Kesto</span>1 min / sarja, 2–3 sarjaa</div>
+      <div><span>Kesto</span>1 min / sarja, {{maara}}</div>
       <div><span>Tavoite</span>Parantaa silmien nopeaa ja tarkkaa siirtymistä kohteesta toiseen (sakkadit) — laske tunnistetut kirjaimet 1 minuutissa</div>
     </div>
 
@@ -1426,7 +1434,7 @@ const RICH_GUIDES = {
 
     <h4>3. Harjoittelun rytmi</h4>
     <ul>
-      <li>Tee <strong>2–3 sarjaa</strong>, lepää 30–60 s sarjojen välissä.</li>
+      <li>Tee <strong>{{maara}}</strong>, lepää 30–60 s sarjojen välissä.</li>
       <li>Kirjaa jokaisen sarjan tunnistettujen kirjainten määrä ja seuraa kehitystä.</li>
       <li>Harjoittele <strong>3–5 kertaa viikossa</strong>.</li>
     </ul>
@@ -1451,7 +1459,7 @@ const RICH_GUIDES = {
 
     <div class="guide-meta">
       <div><span>Tarvikkeet</span>Tennispallo, sileä seinä ja sekuntikello</div>
-      <div><span>Kesto</span>30 s / sarja, harjoitusohjelman mukaisesti</div>
+      <div><span>Kesto</span>30 s / sarja, {{maara}}</div>
       <div><span>Tavoite</span>Mitata ja kehittää silmä–käsi-koordinaatiota — laske onnistuneet kiinniotot 30 sekunnissa</div>
     </div>
 
@@ -1483,7 +1491,7 @@ const RICH_GUIDES = {
 
     <h4>3. Harjoittelun rytmi</h4>
     <ul>
-      <li>Tee <strong>3 sarjaa</strong> à 30 s, pidä noin 30 s tauko sarjojen välillä.</li>
+      <li>Tee <strong>{{maara}}</strong> à 30 s, pidä noin 30 s tauko sarjojen välillä.</li>
       <li>Kirjaa jokaisen sarjan onnistuneet kiinniotot — näin seuraat kehitystä.</li>
       <li>Aloita helpolla etäisyydellä ja lisää vaikeutta vasta kun kiinniotot ovat hallittuja.</li>
     </ul>
@@ -1502,7 +1510,7 @@ const RICH_GUIDES = {
 
     <div class="guide-meta">
       <div><span>Tarvikkeet</span>n. 1 m lanka ja 3 eriväristä helmeä</div>
-      <div><span>Kesto</span>Harjoitusohjelman mukaisesti</div>
+      <div><span>Kesto</span>{{maara}} kerrallaan</div>
       <div><span>Tavoite</span>Tehtävä hallitusti lähimmän helmen ollessa n. 5 cm etäisyydellä</div>
     </div>
 
@@ -1553,7 +1561,7 @@ const RICH_GUIDES = {
       <li>Vaihda katsetta hitaasti: kauimmainen → keskimmäinen → lähin → keskimmäinen → kauimmainen.</li>
       <li>Pidä jokaisessa kohdassa rauhallinen pysähdys. Tavoite ei ole nopeus vaan kuvan hallinta.</li>
       <li>Jos X-kuvio katoaa, pysähdy. Räpäytä silmiä, hengitä rauhallisesti ja yritä saada kuva takaisin hallintaan.</li>
-      <li>Harjoittele 5 minuuttia kerrallaan joka toinen päivä 12 viikon ajan, ellei muuta ole ohjeistettu. Sen jälkeen ylläpito 1–2 kertaa viikossa.</li>
+      <li>Harjoittele <strong>{{maara}}</strong> kerrallaan joka toinen päivä 12 viikon ajan, ellei muuta ole ohjeistettu. Sen jälkeen ylläpito 1–2 kertaa viikossa.</li>
     </ul>
 
     <h4>4. Jos kuva ei näytä oikealta</h4>
@@ -1580,7 +1588,7 @@ const RICH_GUIDES = {
 
     <div class="guide-meta">
       <div><span>Tarvikkeet</span>Tulostettu kissakortti (kaksi kissaa rinnakkain) ja kynä osoittimeksi</div>
-      <div><span>Kesto</span>5–10 toistoa, 1–2 kertaa päivässä</div>
+      <div><span>Kesto</span>{{maara}} kerrallaan, 1–2 kertaa päivässä</div>
       <div><span>Tavoite</span>Harjoittaa silmien yhteistoimintaa ja konvergenssia — saavuttaa nopea ja vakaa "kolmas kissa" ilman rasitusta</div>
     </div>
 
@@ -1644,7 +1652,7 @@ const RICH_GUIDES = {
 
     <div class="guide-meta">
       <div><span>Tarvikkeet</span>Kaksi tennispalloa ja pari (valmentaja tai harjoituskaveri)</div>
-      <div><span>Kesto</span>10 pudotusta / sarja</div>
+      <div><span>Kesto</span>10 pudotusta / sarja, {{maara}}</div>
       <div><span>Tavoite</span>Kehittää reaktionopeutta ja perifeeristä havainnointia — pisteytä kiinniotot (max 20 pistettä)</div>
     </div>
 
@@ -1664,7 +1672,7 @@ const RICH_GUIDES = {
       <li>Pari pudottaa <strong>yhden pallon</strong> kerrallaan ilman ennakkomerkkiä, vuorotellen oikeasta ja vasemmasta kädestä.</li>
       <li>Urheilija reagoi perifeerisen näön havaintoon ja <strong>yrittää ottaa pallon kiinni</strong> ennen kuin se osuu maahan.</li>
       <li>Pari vaihtelee pudotushetkeä ja -kättä, jotta urheilija ei voi ennakoida.</li>
-      <li>Toista yhteensä <strong>10 pudotusta</strong>.</li>
+      <li>Yksi sarja on <strong>10 pudotusta</strong> — tee ohjelmasi mukaiset <strong>{{maara}}</strong>.</li>
     </ul>
 
     <h4>3. Pisteytys</h4>
@@ -1705,7 +1713,7 @@ function openExerciseModal(id) {
   document.getElementById('modalCat').textContent = `${ex.cat} · ${exerciseMetric(ex)}`;
 
   const body = document.getElementById('modalBody');
-  const guideHtml = (RICH_GUIDES[ex.id] || ex.instructions || '');
+  const guideHtml = fillGuide(RICH_GUIDES[ex.id] || ex.instructions || '', ex);
 
   // Tuloskirjaus: monisarjainen harjoitus (ex.series) kerää vaihtelevan määrän
   // sarjoja dynaamisesti — yksi syöttökenttä kerrallaan + "Tallenna"-nappi lisää
