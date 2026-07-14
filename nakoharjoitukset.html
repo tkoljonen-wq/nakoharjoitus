@@ -1051,20 +1051,35 @@
 // ── LOAD PROGRAM FROM URL (and persist to localStorage so PWA reopens work) ──
 const PROGRAM_STORAGE_KEY = 'nakoharjoitusProgram';
 
+// Paikallinen päivämääräavain YYYY-MM-DD. EI UTC:tä (toISOString) — harjoitus
+// kirjautuu sille kalenteripäivälle jona se tehtiin, myös keskiyön ja aamuyön
+// välillä (Suomi on UTC+2/+3). Samaa avainta käyttävät tallennus, viikkoruudukko,
+// putki ja tilastot.
+function localDateKey(d) {
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+
+// ISO 8601 -viikkonumero (suomalainen kalenteriviikko): viikko määräytyy
+// torstain mukaan, viikko 1 sisältää tammikuun 4. päivän.
+function isoWeek(d) {
+  const t = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  t.setDate(t.getDate() - ((t.getDay() + 6) % 7) + 3); // tämän viikon torstai
+  const week1 = new Date(t.getFullYear(), 0, 4);
+  week1.setDate(week1.getDate() - ((week1.getDay() + 6) % 7) + 3); // viikon 1 torstai
+  return 1 + Math.round((t - week1) / (7 * 86400000));
+}
+
 function loadProgramFromURL() {
   // 1) Try URL hash (kun urheilija avaa jaetun linkin / QR-koodin)
   try {
     const hash = window.location.hash;
     if (hash && hash.includes('program=')) {
       const encoded = hash.split('program=')[1];
-      let parsed = null;
-      // Try LZString first (new format)
-      if (typeof LZString !== 'undefined') {
-        const decompressed = LZString.decompressFromEncodedURIComponent(encoded);
-        if (decompressed) parsed = JSON.parse(decompressed);
-      }
-      // Fallback: legacy btoa + encodeURIComponent
-      if (!parsed) parsed = JSON.parse(decodeURIComponent(atob(encoded)));
+      const decompressed = LZString.decompressFromEncodedURIComponent(encoded);
+      const parsed = JSON.parse(decompressed);
+      if (!parsed || !Array.isArray(parsed.exercises)) throw new Error('Virheellinen ohjelma');
       // Persist so PWA-opens ilman hashia toimivat
       try { localStorage.setItem(PROGRAM_STORAGE_KEY, JSON.stringify(parsed)); } catch(e) {}
       return parsed;
@@ -1180,7 +1195,7 @@ const EXERCISES = (URL_PROGRAM?.exercises || DEFAULT_EXERCISES)
 // upottaa yksikön mukaan (esim. "5 min"), joten suffiksi siivotaan pois.
 function exerciseMetric(ex) {
   const raw = String((ex.series ? ex.sets : ex.duration) ?? '');
-  const num = (raw.match(/[\d.,]+(?:\s*[–-]\s*[\d.,]+)?/) || [raw])[0].replace(/\s/g, '');
+  const num = (raw.match(/[\d.,]+(?:\s*[–-]\s*[\d.,]+)?/) || [raw])[0].replace(/\s/g, '') || '–';
   return ex.series ? `${num} sarjaa` : `${num} min`;
 }
 
@@ -1735,14 +1750,18 @@ function openExerciseModal(id) {
   // tiedostoihin, jolloin iframe näyttäisi GitHubin 404-sivun.
   const REMOVED_MATERIALS = ['brock-lanka-ohje.pdf', 'brock-lanka-seurantalomake.html', 'sakkadi-numerotaulu.html'];
   const mats = (ex.materiaalit || []).filter(m => !REMOVED_MATERIALS.includes(m.tiedosto));
+  // Mobiiliselaimet (Android/iOS Chrome & Safari) eivät renderöi PDF:ää iframeen
+  // — näytetään esikatselu vain hiirilaitteilla, mobiilissa vain Avaa/Lataa-napit.
+  const canInlinePdf = !window.matchMedia('(pointer: coarse)').matches;
   const matsHtml = (mats.length ? mats.map(m => {
     const ext = fileExt(m.tiedosto);
     const url = `./materiaalit/${m.tiedosto}`;
     const isPdf = ext === 'pdf';
+    const showPreview = !isPdf || canInlinePdf;
     return `
       <div class="modal-material">
         <div class="modal-material-title">${m.nimi}</div>
-        <iframe class="modal-pdf-frame" src="${url}" title="${m.nimi}" loading="lazy"></iframe>
+        ${showPreview ? `<iframe class="modal-pdf-frame" src="${url}" title="${m.nimi}" loading="lazy"></iframe>` : ''}
         <div class="modal-material-actions">
           <a class="modal-material-btn" href="${url}" target="_blank" rel="noopener">Avaa</a>
           ${isPdf ? `<a class="modal-material-btn" href="${url}" download>Lataa PDF</a>` : ''}
@@ -1766,7 +1785,7 @@ function openExerciseModal(id) {
       ${isMulti ? `<div class="series-unit">${ex.unitLabel || ''}</div>` : ''}
       ${logInputsHtml}
       <div class="log-label" style="margin-top:10px">Muistiinpano (vapaaehtoinen)</div>
-      <textarea class="log-textarea" id="modalNote" placeholder="Esim. vasen silmä väsyi, parempi kuin eilen...">${prev.note || ''}</textarea>
+      <textarea class="log-textarea" id="modalNote" placeholder="Esim. vasen silmä väsyi, parempi kuin eilen...">${escapeHtml(prev.note || '')}</textarea>
     </div>
     <button class="done-btn ${isDone(id) ? 'completed' : ''}" onclick="markDoneFromModal()">
       ${isDone(id) ? '✓ Merkitty tehdyksi' : 'Merkitse tehdyksi'}
@@ -1793,7 +1812,7 @@ function renderSeriesSection() {
   const saved = modalSeries.map((v, i) => `
     <div class="series-row">
       <div class="series-label">Sarja ${i + 1}</div>
-      <div class="series-value">${v}</div>
+      <div class="series-value">${escapeHtml(v)}</div>
       <button class="series-del" onclick="removeSeriesEntry(${i})" aria-label="Poista sarja ${i + 1}">✕</button>
     </div>`).join('');
   c.innerHTML = `
@@ -1991,14 +2010,14 @@ function buildDiary() {
 
 // ── STATS ─────────────────────────────────────────────────────────────────
 // Kuluvan viikon päivät (ma–su) avaimineen. future=true → tuleva päivä (ei dataa).
-// Avain muodostetaan samalla tavalla kuin tallennettaessa (toISOString = UTC).
+// Avain muodostetaan samalla tavalla kuin tallennettaessa (localDateKey, paikallinen aika).
 function currentWeekDays() {
   const todayIdx = (now.getDay() + 6) % 7; // 0=ma .. 6=su
   const out = [];
   for (let i = 0; i < 7; i++) {
     const d = new Date(now);
     d.setDate(now.getDate() + (i - todayIdx));
-    out.push({ dayIdx: i, key: d.toISOString().split('T')[0], future: i > todayIdx });
+    out.push({ dayIdx: i, key: localDateKey(d), future: i > todayIdx });
   }
   return out;
 }
@@ -2047,7 +2066,7 @@ function buildStats() {
   let streak = 0;
   for (let i = 0; i < 366; i++) {
     const d = new Date(now); d.setDate(now.getDate() - i);
-    const c = doneCountForDay(all[d.toISOString().split('T')[0]]);
+    const c = doneCountForDay(all[localDateKey(d)]);
     if (c > 0) streak++;
     else if (i === 0) continue;
     else break;
@@ -2197,15 +2216,15 @@ function showView(name, btn) {
 
 const now = new Date();
 const fDays = ['SU','MA','TI','KE','TO','PE','LA'];
-const weekNum = Math.ceil((Math.floor((now - new Date(now.getFullYear(),0,1))/86400000) + 1) / 7);
+const weekNum = isoWeek(now);
 document.getElementById('dateLine').innerHTML =
   '<span class="live-dot"></span>' + fDays[now.getDay()] + ' ' +
   String(now.getDate()).padStart(2,'0') + '.' +
   String(now.getMonth()+1).padStart(2,'0') + '.' + now.getFullYear() +
   ' — Viikko ' + weekNum;
 
-// Load today's completions (keyed by date so resets each day)
-const todayKey = 'completed_' + now.toISOString().split('T')[0];
+// Load today's completions (keyed by local date so resets each day)
+const todayKey = 'completed_' + localDateKey(now);
 try {
   const saved = localStorage.getItem(todayKey);
   if (saved) completed = JSON.parse(saved);

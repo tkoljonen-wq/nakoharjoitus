@@ -48,7 +48,7 @@ materiaalit/            ← Tulostettavat materiaalit (PDF/HTML) + rich-ohjeiden
 
 **Vaihe 1: Harjoitukset** — kaikki muokattava yhdessä paikassa
 - Harjoituskirjasto (valitse harjoituksia `LIBRARY`-listasta)
-- Valitut harjoitukset — mukauta (per-harjoitus sets/kesto + Aikataulu-päiväpaneeli per-harjoitus aikataulu-overridelle)
+- Valitut harjoitukset — mukauta. **Per-harjoitus näkyy vain YKSI mittari `series`-lipun mukaan:** sarja-harjoitukset (`series:true`) → sarjamäärä (oletus `3`, yksikkö "sarjaa"); muut → kesto minuutteina (oletus `5`, yksikkö "min"). **Syöttökentässä pelkkä numero**, yksikkö renderöidään kentän ulkopuolelle (`.input-unit`/`.unit-label`). Lisäksi Aikataulu-päiväpaneeli per-harjoitus aikataulu-overridelle.
 - Oletusaikataulu (viikonpäivät + kesto + aloituspäivä) — käytetään harjoituksille joilla ei ole omaa override-päivälistaa
 
 **Vaihe 2: Jaa linkki** — esikatselu + QR-koodi + Kopioi/Tulosta/Avaa-napit (kaikki lila `btn-primary`; "← Takaisin" vaalea `btn-secondary`)
@@ -77,11 +77,13 @@ Harjoituksilla joilla on `materiaalit` näkyy "N tulostettava" -merkintä kirjas
 
 ## Kuvitetut harjoitusohjeet — `RICH_GUIDES` (nakoharjoitukset.html)
 
-Pitkät kuvitetut ohjeet elävät `nakoharjoitukset.html`:n `RICH_GUIDES`-objektissa, **avaimena harjoituksen `id`**. Modaali käyttää `guideHtml = RICH_GUIDES[ex.id] || ex.instructions` — jos id:lle löytyy rich-ohje, se korvaa lyhyen `instructions`-tekstin. Pidetään erillään jaetusta ohjelmasta (iso HTML ei kulkisi QR:ssä); koska se avaintuu id:llä, ohje näkyy oikein myös oikeilla (ei-demo) ohjelmilla.
+Pitkät kuvitetut ohjeet elävät `nakoharjoitukset.html`:n `RICH_GUIDES`-objektissa, **avaimena harjoituksen `id`**. Modaali käyttää `guideHtml = fillGuide(RICH_GUIDES[ex.id] || ex.instructions, ex)` — jos id:lle löytyy rich-ohje, se korvaa lyhyen `instructions`-tekstin. Pidetään erillään jaetusta ohjelmasta (iso HTML ei kulkisi QR:ssä); koska se avaintuu id:llä, ohje näkyy oikein myös oikeilla (ei-demo) ohjelmilla.
+
+**⭐ Dynaaminen volyymi-injektio:** rich-ohjeissa **ohjelman määräämä volyymi** (sarjamäärä / minuutit) kirjoitetaan paikkamerkillä `{{maara}}`, jonka `fillGuide(html, ex)` korvaa ajossa `exerciseMetric(ex)`-arvolla (esim. "3 sarjaa" / "5 min"). Näin ohjeen annostelu täsmää aina kortin/modaalin yläreunan mittariin ja päivittyy myös jo jaetuissa ohjelmissa. **Per-sarja-parametrit** joita ohjelma EI mallinna (per-sarja-aika `1 min/sarja`, lepoajat, pisteytys `10 pudotusta/sarja`, toistot, viikkorytmi) **jätetään kiinteäksi tekstiksi** — älä korvaa niitä `{{maara}}`:llä.
 
 **Uuden rich-ohjeen lisääminen:**
 1. Kopioi kuvat `materiaalit/`-kansioon (pienet kirjaimet, ei ääkkösiä).
-2. Lisää `RICH_GUIDES['<id>'] = \`...html...\`` — valmiit luokat: `.guide-warn` (varoituslaatikko), `.guide-meta` (3-sarakkeinen tarvike/kesto/tavoite), `.guide-callout` (muistisääntö), `.guide-table` (vianetsintä), `<h4>` (osio-otsikko), `<figure><img><figcaption>` (kuvat).
+2. Lisää `RICH_GUIDES['<id>'] = \`...html...\`` — valmiit luokat: `.guide-warn` (varoituslaatikko), `.guide-meta` (3-sarakkeinen tarvike/kesto/tavoite), `.guide-callout` (muistisääntö), `.guide-table` (vianetsintä), `<h4>` (osio-otsikko), `<figure><img><figcaption>` (kuvat). Ohjelman volyymiluvut paikkamerkillä `{{maara}}` (ks. yllä).
 3. Lisää kuvat `sw.js`:n `PRECACHE_ASSETS`-listalle ja bumppaa `CACHE_NAME`.
 
 ## Urheilijan näkymä (nakoharjoitukset.html)
@@ -91,6 +93,7 @@ Kolme välilehteä (bottom nav): **Tänään / Päiväkirja / Kehitys**. Kaikki 
 - **Demotila** aktivoituu jos URL-hashissa ei ole `#program=...` JA localStoragessa ei ole tallennettua ohjelmaa (kovakoodatut esimerkit).
 - `loadProgramFromURL()`: (1) URL-hash → tallennus localStorageen; (2) jos hash puuttuu, yritä localStorage.
 - **Tänään**: edistymiskortti + "Tämä viikko" -ruudukko + harjoituskortit. Fullscreen "Avaa harjoitus" -modaali: ohje (rich tai lyhyt) + tulostettavat materiaalit + tuloskirjaus.
+- **Mittarimerkintä** (kortti + modaalin otsikko): `exerciseMetric(ex)` → sarja-harjoitukset `series:true` näyttävät "N sarjaa", muut "N min" (vain kellosymboli `⏱` minuuteilla). Funktio **siivoaa arvosta yksikkösuffiksin** (vanhat jaetut ohjelmat upottivat esim. `"5 min"`) → vain numeerinen osa + yksikkö → ei "5 min min". Vain `series`-lipun mukainen mittari näytetään; toinen kenttä (oletusarvo) jätetään huomiotta.
 - **Päiväkirja** (`buildDiary()`): skannaa `completed_*`-avaimet, näyttää tehdyt uusin ensin.
 - **Kehitys**: 4 tilastokorttia + viikon volyymipylväät (`buildChart`) + harjoituskohtaiset SVG-viivadiagrammit (`buildLineCharts`, `LINE_CHART_EXERCISES` = `brock`/`silmakasi`/`reaktio`/`sakkadi`; päivän arvo = lukemien keskiarvo; kissakortti ei kuvaajaa).
 
@@ -145,6 +148,8 @@ Sisältö elää **kahdessa paikassa**, ja molemmat on päivitettävä kun harjo
 
 **Kultainen sääntö:** jaettu ohjelma määrää vain **mitkä** harjoitukset + aikataulun (`days`, `sets`, `duration`). **Kaikki sisältö virkistetään aina `DEFAULT_EXERCISES`:stä id:n perusteella** → sisältömuutokset näkyvät myös jo jaetuissa ohjelmissa ilman uutta QR-koodia.
 
+> **`sets`/`duration` ovat numeerisia merkkijonoja** (esim. `'3'`, `'5'` — ei yksikköä). Optikko muokkaa vain `series`-lipun mukaista mittaria (sarja-harjoitus → `sets`, muu → `duration`); toinen kenttä serialisoituu oletusarvolla mutta urheilijapuoli jättää sen huomiotta (`exerciseMetric`). Yksikkö ("sarjaa"/"min") lisätään näyttöhetkellä, ei dataan.
+
 **Apulistat `nakoharjoitukset.html`:ssä:**
 - **`REMOVED_EXERCISE_IDS`** — poistetut harjoitus-id:t (suodattuvat pois myös vanhoista ohjelmista).
 - **`REMOVED_MATERIALS`** (`openExerciseModal`:ssa) — poistettujen materiaalitiedostojen nimet: `brock-lanka-ohje.pdf`, `brock-lanka-seurantalomake.html`, `sakkadi-numerotaulu.html`.
@@ -196,7 +201,7 @@ $bmp.Save($dst,$codec,$ep)
 
 ## Datasopimukset — tuloskirjaus & localStorage
 
-**Päivän avain:** `completed_YYYY-MM-DD` (UTC-pohjainen, `now.toISOString().split('T')[0]`). Arvo = objekti `{ <harjoitus-id>: entry }`.
+**Päivän avain:** `completed_YYYY-MM-DD` (**paikallinen aika**, apufunktio `localDateKey(d)` — EI `toISOString()`/UTC:tä, jottei aamuyöllä 00–03 tehty harjoitus kirjaudu edelliselle päivälle). Sama funktio molemmissa HTML-tiedostoissa; viikkonumero ISO 8601 (`isoWeek`). Arvo = objekti `{ <harjoitus-id>: entry }`.
 
 **Entry-muodot:**
 - Monisarjainen (`series: true`): `{ nums: ['42','45','48'], note, done, time }`
@@ -227,11 +232,13 @@ $bmp.Save($dst,$codec,$ep)
 
 ## Nykytila
 
-- **SW `CACHE_NAME` = `nakoharjoitus-v33`** (bumppaa aina kun `src` muuttuu ennen pushia).
+- **SW `CACHE_NAME` = `nakoharjoitus-v34`** (bumppaa aina kun `src` muuttuu ennen pushia).
+- **Kovettamiset (2026-07-14):** admin validoi ettei tyhjää ohjelmaa voi jakaa (≥1 harjoitus; oletuspäiviä tarvitaan jos jollain harjoituksella ei ole omaa aikataulua); jakolinkin kanta `new URL('nakoharjoitukset.html', location.href)` (toimii myös clean URL:lla `/admin`); modaalin muistiinpano + sarja-arvot HTML-escapataan; legacy btoa-purku poistettu (`#program=` on aina LZString); sw.js offline-HTML-fallback vain `req.mode === 'navigate'` -pyynnöille; PDF-iframe-esikatselu piilotetaan kosketuslaitteilla (`pointer: coarse` — mobiili-Chrome ei renderöi PDF:ää iframeen, napit jäävät).
 - Jakolinkki/QR minimoitu (~200–300 merkkiä); sisältö rakennetaan katalogista id:llä. Ei palvelinta → tietosuoja & painetun QR:n ikuisuus säilyvät. (Palvelinmalli harkittu ja hylätty: toisi GDPR-rekisterinpitäjävastuun + painettu QR voisi kuolla. Kannattaisi vasta isoille itsenäisille/custom-ohjelmille tai keskitettyyn hallintaan → persoonaton rakenne + satunnainen id + TTL.)
 - Kaikki näkymät lukevat oikeaa dataa localStoragesta (Tänään, "Tämä viikko" -ruudukko, Päiväkirja, Kehitys).
 - Aktiiviset harjoitukset: `sakkadi`, `silmakasi`, `brock`, `kissakortti`, `reaktio` (ks. taulukko yllä).
 - UI emojiton (paitsi toast 📋); admin step 2 -napit kaikki lila.
+- **Volyymimittari yhtenäistetty (`series`-pohjainen):** adminissa per-harjoitus vain yksi numeerinen kenttä (sarja-harjoitus → sarjat, muu → min) + yksikkö kentän ulkopuolella. Urheilijapuoli näyttää `exerciseMetric` ("N sarjaa"/"N min"), ja rich-ohjeet injektoivat ohjelman volyymin `{{maara}}`-paikkamerkillä (`fillGuide`). `sets`/`duration` numeerisia; yksikkö vain näytöllä.
 
 ## Seuraavalla istunnolla — TODO
 

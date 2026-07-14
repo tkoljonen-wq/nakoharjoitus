@@ -3,7 +3,7 @@
 // Bumppaa CACHE_NAME aina kun julkaiset uudet HTML/CSS/JS/materiaali-tiedostot,
 // jotta vanha cache puretaan automaattisesti.
 
-const CACHE_NAME = 'nakoharjoitus-v33';
+const CACHE_NAME = 'nakoharjoitus-v34';
 
 const PRECACHE_ASSETS = [
   './',
@@ -82,6 +82,12 @@ self.addEventListener('fetch', event => {
         }
         return res;
       })
-      .catch(() => caches.match(req).then(cached => cached || caches.match('./nakoharjoitukset.html')))
+      .catch(() => caches.match(req).then(cached => {
+        if (cached) return cached;
+        // HTML-fallback vain sivunavigointeihin — kuva-/PDF-pyyntö ei saa
+        // saada HTML-vastausta (rikkinäinen kuva on parempi kuin väärä sisältö).
+        if (req.mode === 'navigate') return caches.match('./nakoharjoitukset.html');
+        return Response.error();
+      }))
   );
 });

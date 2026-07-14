@@ -956,9 +956,17 @@ function toggleDay(i, btn) {
 }
 
 // ── GENERATE PROGRAM ─────────────────────────────────────────────────────
+// Paikallinen päivämäärä YYYY-MM-DD (ei UTC:tä — toISOString antaisi aamuyöllä
+// edellisen päivän).
+function localDateKey(d) {
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+
 function generateAndPreview() {
   const dur = document.getElementById('progDuration').value;
-  const start = document.getElementById('startDate').value || new Date().toISOString().split('T')[0];
+  const start = document.getElementById('startDate').value || localDateKey(new Date());
 
   // Sisällytä jakolinkkiin VAIN kentät joita urheilijasovellus oikeasti käyttää.
   // Kaikki sisältö (name, icon, cat, unit, unitLabel, instructions, materiaalit, series)
@@ -970,6 +978,17 @@ function generateAndPreview() {
     if (Array.isArray(ex.days) && ex.days.length > 0) out.days = ex.days;
     return out;
   });
+
+  // Validointi: tyhjä ohjelma tuottaisi urheilijalle ikuisen lepopäivän ja
+  // ylikirjoittaisi mahdollisen aiemman ohjelman urheilijan laitteella.
+  if (exercises.length === 0) {
+    showToast('Valitse vähintään yksi harjoitus');
+    return;
+  }
+  if (trainingDays.length === 0 && exercises.some(ex => !ex.days)) {
+    showToast('Valitse oletusaikatauluun vähintään yksi harjoituspäivä');
+    return;
+  }
 
   programData = {
     exercises,
@@ -994,7 +1013,9 @@ function generateAndPreview() {
 
   // Generate share URL with LZString-compressed data (URL-safe, much shorter than btoa)
   const encoded = LZString.compressToEncodedURIComponent(JSON.stringify(programData));
-  const baseUrl = window.location.origin + window.location.pathname.replace('admin.html','') + 'nakoharjoitukset.html';
+  // new URL ratkaisee suhteessa nykyiseen sivuun — toimii myös kun admin on
+  // avattu ilman .html-päätettä (esim. GitHub Pagesin "clean URL" /admin).
+  const baseUrl = new URL('nakoharjoitukset.html', window.location.href).href;
   const shareUrl = baseUrl + '#program=' + encoded;
   document.getElementById('shareLink').textContent = shareUrl;
 
@@ -1060,7 +1081,7 @@ buildLibrary();
 buildSelected();
 buildDayGrid();
 // Set today as default start date
-document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
+document.getElementById('startDate').value = localDateKey(new Date());
 
 // PWA service worker
 if ('serviceWorker' in navigator) {
