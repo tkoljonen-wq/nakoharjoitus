@@ -3,7 +3,10 @@
 // Bumppaa CACHE_NAME aina kun julkaiset uudet HTML/CSS/JS/materiaali-tiedostot,
 // jotta vanha cache puretaan automaattisesti.
 
-const CACHE_NAME = 'nakoharjoitus-v34';
+// Origin tkoljonen-wq.github.io on jaettu muiden sovellusten kanssa:
+// poistetaan vain tämän sovelluksen omat vanhat välimuistit
+const CACHE_PREFIX = 'nakoharjoitus-';
+const CACHE_NAME = CACHE_PREFIX + 'v35';
 
 const PRECACHE_ASSETS = [
   './',
@@ -55,7 +58,7 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(names =>
       Promise.all(
-        names.filter(n => n !== CACHE_NAME).map(n => caches.delete(n))
+        names.filter(n => n.startsWith(CACHE_PREFIX) && n !== CACHE_NAME).map(n => caches.delete(n))
       )
     ).then(() => self.clients.claim())
   );
